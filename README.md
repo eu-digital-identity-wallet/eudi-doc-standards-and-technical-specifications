@@ -4,7 +4,7 @@
 Before using this repo and start creating Issues please read the instructions
 * [How to work with Issues for capturing the Gaps](https://github.com/eu-digital-identity-wallet/ec-internal-standards/discussions/36)
 
-## Structure 
+## Repository Structure 
 1. [Issues](https://github.com/eu-digital-identity-wallet/ec-internal-standards/issues): List of all gaps
 2. [Project views](https://github.com/eu-digital-identity-wallet/ec-internal-standards/projects): Roadmap and scheduling information
 
