@@ -19,11 +19,11 @@ Before using this repo and start creating Issues please read the instructions
 As per [Regulation (EU) No 1025/2012 on European standardisation](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32012R1025)
 
 * Recognized SDOs​
-  * ISO/IEC ​
+  * **ISO/IEC** ​ 
     International Organization for  Standardisation / ​International Electrotechnical Commission
-  * ETSI
+  * **ETSI**  
     European Telecommunications Standards Institute  ​
-  * CEN/CENELEC ​
+  * **CEN/CENELEC** ​ 
     European Committee for Standardization/ European Committee for Electrotechnical Standardization ​
 * Non-Recognized SDOs ​
   * W3C World Wide Web Consortium ​
