@@ -14,3 +14,19 @@ Before using this repo and start creating Issues please read the instructions
 * [Standards_execution_prioritization_v.0.1](https://eceuropaeu.sharepoint.com/:w:/r/teams/GRP-EUDIWNiScyEC/Shared%20Documents/Standardisation/Standards_execution_prioritization_v.0.1.docx?d=w83e8b59effda4e30b448802ee4580d95&csf=1&web=1&e=5b9gWj)
 * [Gap Analysis Reports (fiche)](https://eceuropaeu.sharepoint.com/teams/GRP-EUDIWNiScyEC/Shared%20Documents/Forms/AllItems.aspx?id=%2Fteams%2FGRP%2DEUDIWNiScyEC%2FShared%20Documents%2FGeneral%2F10%5Fstandardisation%2F02%5Fdeliverables%2F03%5Fgap%5Freport%5F%28fiche%29&viewid=8b0debd9%2D8221%2D4571%2Db353%2D00a09529bf0e)
 * [20240924 TS Proposed stages for kanban](https://eceuropaeu.sharepoint.com/:p:/r/teams/GRP-EUDIWNiScyEC/Shared%20Documents/General/10_standardisation/09_tracking%20progress%20on%20kanban/20240924%20TS%20Proposed%20stages%20for%20kanban.pptx?d=w609dfdf4a23b4c52bcb19f6f010d3769&csf=1&web=1&e=QDMnxg)
+
+### Recognized SDOs
+As per [Regulation (EU) No 1025/2012 on European standardisation](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32012R1025)
+
+* Recognized SDOs​
+  * ISO/IEC ​
+    International Organization for  Standardisation / ​International Electrotechnical Commission
+  * ETSI
+    European Telecommunications Standards Institute  ​
+  * CEN/CENELEC ​
+    European Committee for Standardization/ European Committee for Electrotechnical Standardization ​
+* Non-Recognized SDOs ​
+  * W3C World Wide Web Consortium ​
+  * IETF Internet Engineering Task Force ​
+  * OIDF OpenID Foundation ​
+  * CSC Cloud Signature Consortium​
