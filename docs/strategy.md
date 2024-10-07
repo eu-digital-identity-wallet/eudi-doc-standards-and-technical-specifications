@@ -65,6 +65,52 @@ Establish and maintain robust standards to ensure consistency, security, interop
   - **Financial Support**: Secure funding through grants, including Action Grants from DG GROW and potential financial support options such as open calls from StandICT.eu. This helps ensure that the necessary resources are available for the development and maintenance of these standards.
   - **Coordination**: Coordinate with these SDOs to ensure that the developed standards meet the EUDIW requirements and are ready for integration into the Implementing Acts.
 
+## Influencing Standards Development through Action Grants
+
+To effectively influence the development of new standards or further the enhancement of existing ones for the **EU Digital Identity Wallet (EUDIW)**, a structured approach must be taken. This process works specifically with **ETSI** and **CEN/CENELEC** through the mechanism of **Action Grants**, which are available via **DG Grow** to support such activities.
+
+### Steps for Engaging ETSI and CEN/CENELEC
+
+1. **Engage with European Standardization Organizations (ESO)**:  
+   The first step is to establish an agreement with the relevant ESOs (ETSI and CEN/CENELEC) on the scope of work that needs to be developed. This could include the creation of new standards or the enhancement of existing ones to meet the needs outlined in the EUDIW’s architectural framework and its alignment with the eIDAS regulation.
+
+2. **Utilize DG Grow’s Action Grants**:  
+   Action Grants, specifically offered by DG Grow, provide the necessary financial support to fund standardization efforts. This process is tailored for **ETSI** and **CEN/CENELEC** and follows a clearly defined timeline within a fiscal year:
+
+   - **Application Periods**: Grants can be requested during three points within a calendar year:
+     - **Start of the year (January)**: The recommended time to begin the application process.
+     - **Mid-year (June)**: Another window, but contingent on available funds.
+     - **End of year (October)**: Typically used only if there is unspent budget remaining.
+
+   Action Grants ensure that ETSI and CEN/CENELEC have the resources required to develop or refine standards. There is no need to go through more cumbersome procedures such as Comitology.
+
+   > **Note**: This funding mechanism applies exclusively to ETSI and CEN/CENELEC. Other standards bodies or alternative standardization approaches are not covered by these grants.
+
+3. **Coordinate with DG Grow**:  
+   It is essential to work in close collaboration with DG Grow to prepare the required documentation for the Action Grant proposals. This involves:
+
+   - **Preparation of Project Proposals**: A detailed description of the work and the expected deliverables must be prepared. It is vital to ensure that the deliverables are clearly aligned with the needs of the EUDIW and the objectives of the grant.
+   - **Call for Proposals**: In January, DG Grow typically announces the first round of calls for proposals. The proposal should be prepared in time for this deadline.
+   - **Approval and Evaluation**: DG Grow will publish the call, and the European Standardization Organizations (ETSI and CEN/CENELEC) will respond by submitting their proposals, outlining how they plan to address the requested tasks. DG Grow will evaluate the submissions and determine the beneficiaries for the grants.
+
+4. **Engage with D3 for Technical Assistance**:  
+   The **D3 Unit** can assist in the preparation of calls for proposals that DG Grow will publish. This collaboration is important to ensure the technical specifications required by EUDIW are addressed comprehensively in the proposal. 
+
+5. **Finalization and Execution**:  
+   Once the proposals have been submitted by ETSI and CEN/CENELEC and evaluated by DG Grow, it is essential to ensure proper follow-up. Regular communication with both DG Grow and the standardization bodies will ensure that the project remains on track and that deliverables are met within the agreed timelines.
+
+### Example of Calls for Proposals
+
+An example of the kind of Action Grant call that should be prepared can be found here:  
+[Support Standardisation Activities Performed by CEN, CENELEC, and ETSI](https://eismea.ec.europa.eu/funding-opportunities/calls-proposals/support-standardisation-activities-performed-cen-cenelec-and-etsi-2_en)
+
+Additionally, guidelines on the grant process provided by DG Grow can be referenced here:  
+[EC Funding of Standardisation Work](https://eceuropaeu.sharepoint.com/sites/KNB-Standardisation/SitePages/EC-funding-of-standardisation-work.aspx?xsdata=MDV8MDJ8fDkzY2I5ZmVmMzUzNTQ2Mzg4ZGI3MDhkY2Q4OTQxZTFmfGIyNGM4YjA2NTIyYzQ2ZmU5MDgwNzA5MjZmOGRkZGIxfDB8MHw2Mzg2MjMzNzc4NTE5MTE2MDd8VW5rbm93bnxWR1ZoYlhOVFpXTjFjbWwwZVZObGNuWnBZMlY4ZXlKV0lqb2lNQzR3TGpBd01EQWlMQ0pRSWpvaVYybHVNeklpTENKQlRpSTZJazkwYUdWeUlpd2lWMVFpT2pFeGZRPT18MXxMMk5vWVhSekx6RTVPbTFsWlhScGJtZGZXVmRKZVUxRVVYcGFSMVYwVFdwSk1FNXBNREJOVkUwMFRGZEplVTFVUlhSTk1sWnBUbFJqZDAxVVNUTk9lbEUxUUhSb2NtVmhaQzUyTWk5dFpYTnpZV2RsY3k4eE56STJOelF3T1RnME9UTXp8NjVmMTU2OTBlNGQwNDNjYThkYjcwOGRjZDg5NDFlMWZ8YjVlMDdhMjA4Njk1NDI4Mzk3NmI4OWVhNmZhY2Y4OWE%3D&sdata=ekx1VUVueHlnOXREZWtkdDh5MWt6QWw4WU5aajVMb1E0SldaMUE3UDlkQT0%3D&ovuser=b24c8b06-522c-46fe-9080-70926f8dddb1%2CStavros.KOUNIS%40ext.ec.europa.eu&OR=Teams-HL&CT=1726740984403&clickparams=eyJBcHBOYW1lIjoiVGVhbXMtRGVza3RvcCIsIkFwcFZlcnNpb24iOiI0OS8yNDA4MTcwMDQxOSIsIkhhc0ZlZGVyYXRlZFVzZXIiOmZhbHNlfQ%3D%3D)
+
+### Additional Considerations
+
+While **Action Grants** are the primary vehicle for developing standards in collaboration with ETSI and CEN/CENELEC, there is also the possibility of leveraging **research projects** developed within the **EUDIW** framework. However, this approach requires participating in or initiating a research project, which can be a more complex and resource-intensive option. Therefore, it is advised to focus on the Action Grants process unless specific research opportunities are already being pursued.
+
 ## Updates Based on Implementing Acts
 - **Plan for Continuous Updates**: Plan for continuous updates of the fiche document to reflect changes in Implementing Acts.
 - **Regular Review and Updates**: Establish a process for regular review and updates of the fiche document to ensure it remains current and comprehensive.
