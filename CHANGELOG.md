@@ -1,33 +1,34 @@
-# Gap Analysis Maintenance Process and Changelog
+# Gap Analysis Maintenance Process and Change Log
 
 ## Instructions
+
 ### 1. Ongoing Monitoring
-- Monitor all the standards that are referenced in the ARF and Implementing Acts. - `NiScy`
-- Identify and register in the relevant Working Groups and forums that are developing the standards. `TBD WHO`
-- Subscribe to the Working Groups and forums newsletters and mailing lists, and set up alerts. - `NiScy`
-- Create a central document where all findings, updates, and important developments are logged - `CHANGELOG.md`
+- **Monitor Standards**: Regularly monitor all standards referenced in the ARF and Implementing Acts. - `NiScy`
+- **Identify Relevant Groups**: Identify and register with the relevant Working Groups and forums where these standards are being developed. `TBD WHO`
+- **Subscribe to Updates**: Subscribe to newsletters, mailing lists, and set up alerts for these Working Groups and forums. - `NiScy`
+- **Log Findings**: Create a central document (`CHANGELOG.md`) to log all findings, updates, and significant developments.
 
 ### 2. Periodic Reviews
-- Every two months (or immediately after critical changes in the standardization landscape) review and analyze the current state of standards against the gaps already identified in the repository.
-- Conduct review meetings with stakeholders (CNECT, NiScy ARF team, etc.) to discuss new findings and update gaps.
-- Assess relevance, i.e., analyze if the new developments impact the current gap analysis.
+- **Bi-Monthly Review**: Every two months—or immediately after critical changes in the standardization landscape—review and analyze the current state of standards against the gaps identified in the repository.
+- **Review Meetings**: Conduct review meetings with stakeholders (e.g., CNECT, NiScy ARF team) to discuss new findings and update identified gaps.
+- **Assess Relevance**: Analyze the impact of new developments on the current gap analysis and update as needed.
 
 ### 3. Document Changes
-- Keep clear and organized records to track what was updated and when - `CHANGELOG.md`
-- Log the date of the update and list specific changes made to the gap analysis (e.g., new drafts/standards introduced, old ones deprecated, specific areas now in compliance, etc). This should be logged in real-time during the review process.
-- Update the issues in the repository with the latest gap assessments and justifications for any changes.
+- **Maintain Clear Records**: Track and document all updates, including the date, changes made, and any specific impacts on the gap analysis. Use `CHANGELOG.md` to log changes in real-time during the review process.
+- **Log Specific Changes**: List each update’s details, such as newly introduced or deprecated standards and areas now in compliance.
+- **Update Repository**: Reflect all gap assessments and justifications for changes in the repository issues.
 
 ## Working Group / Standardization Organization Monitoring
-This table lists the persons who follow each Working Group:
+The table below lists the individuals responsible for monitoring each Working Group:
 
-| Full name   | Organization  | Working Group / Standardization Organization  |
+| Full Name   | Organization  | Working Group / Standardization Organization  |
 |-------------|---------------|----------------------------------------------|
 | John Smith  | NiScy         | ISO/IEC                                      |
 | Jane Doe    | CNECT         | ETSI                                         |
 | Alice Brown | NiScy         | CEN/CENELEC                                  |
 
-## Changes record 
+## Change Log
 
-| Date of Update      |  Updated by  | Changes introduced | Impact on gap analysis |
-| ----------- | ----------- | ----------- | ----------- |
-|  YYYY-MM-DD     | Name       | Added new standard XYZ, deprecated ABC |  Closed gap in section X |
+| Date of Update | Updated By  | Changes Introduced                                      | Impact on Gap Analysis        |
+|----------------|-------------|---------------------------------------------------------|--------------------------------|
+| YYYY-MM-DD     | Name        | Added new standard XYZ, deprecated ABC                   | Closed gap in section X        |
