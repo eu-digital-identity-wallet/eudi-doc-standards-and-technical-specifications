@@ -1,6 +1,6 @@
-# CHANGELOG
-## Gap Analysis Maintenance Process
+# Gap Analysis Maintenance Process and Changelog
 
+## Instructions
 ### 1. Ongoing Monitoring
 - Monitor all the standards that are referenced in the ARF and Implementing Acts. - `NiScy`
 - Identify and register in the relevant Working Groups and forums that are developing the standards. `TBD WHO`
@@ -16,3 +16,18 @@
 - Keep clear and organized records to track what was updated and when - `CHANGELOG.md`
 - Log the date of the update and list specific changes made to the gap analysis (e.g., new drafts/standards introduced, old ones deprecated, specific areas now in compliance, etc). This should be logged in real-time during the review process.
 - Update the issues in the repository with the latest gap assessments and justifications for any changes.
+
+## Working Group / Standardization Organization Monitoring
+This table lists the persons who follow each Working Group:
+
+| Full name   | Organization  | Working Group / Standardization Organization  |
+|-------------|---------------|----------------------------------------------|
+| John Smith  | NiScy         | ISO/IEC                                      |
+| Jane Doe    | CNECT         | ETSI                                         |
+| Alice Brown | NiScy         | CEN/CENELEC                                  |
+
+## Changes record 
+
+| Date of Update      |  Updated by  | Changes introduced | Impact on gap analysis |
+| ----------- | ----------- | ----------- | ----------- |
+|  YYYY-MM-DD     | Name       | Added new standard XYZ, deprecated ABC |  Closed gap in section X |
