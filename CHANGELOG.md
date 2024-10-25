@@ -12,6 +12,7 @@
 - **Bi-Monthly Review**: Every two months—or immediately after critical changes in the standardization landscape—review and analyze the current state of standards against the gaps identified in the repository.
 - **Review Meetings**: Conduct review meetings with stakeholders (e.g., CNECT, NiScy ARF team) to discuss new findings and update identified gaps.
 - **Assess Relevance**: Analyze the impact of new developments on the current gap analysis and update as needed.
+- **Progress Update Session**: Schedule a one-hour session to update each other on status and progress. This session also supports continuity.
 
 ### 3. Document Changes
 - **Maintain Clear Records**: Track and document all updates, including the date, changes made, and any specific impacts on the gap analysis. Use `CHANGELOG.md` to log changes in real-time during the review process.
@@ -32,3 +33,4 @@ The table below lists the individuals responsible for monitoring each Working Gr
 | Date of Update | Updated By  | Changes Introduced                                      | Impact on Gap Analysis        |
 |----------------|-------------|---------------------------------------------------------|--------------------------------|
 | YYYY-MM-DD     | Name        | Added new standard XYZ, deprecated ABC                   | Closed gap in section X        |
+
