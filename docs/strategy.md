@@ -111,6 +111,9 @@ Additionally, guidelines on the grant process provided by DG Grow can be referen
 
 While **Action Grants** are the primary vehicle for developing standards in collaboration with ETSI and CEN/CENELEC, there is also the possibility of leveraging **research projects** developed within the **EUDIW** framework. However, this approach requires participating in or initiating a research project, which can be a more complex and resource-intensive option. Therefore, it is advised to focus on the Action Grants process unless specific research opportunities are already being pursued.
 
+### Action Grants Timeline 
+The [Action Grants Timelne](https://github.com/eu-digital-identity-wallet/ec-internal-standards/blob/main/docs/action-grants-timeline.md) provides and indicative timeline with all the key events for 2025.
+
 ## Updates Based on Implementing Acts
 - **Plan for Continuous Updates**: Plan for continuous updates of the fiche document to reflect changes in Implementing Acts.
 - **Regular Review and Updates**: Establish a process for regular review and updates of the fiche document to ensure it remains current and comprehensive.
