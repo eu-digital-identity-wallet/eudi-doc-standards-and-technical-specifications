@@ -24,9 +24,15 @@ The table below lists the individuals responsible for monitoring each Working Gr
 
 | Full Name   | Organization  | Working Group / Standardization Organization  |
 |-------------|---------------|----------------------------------------------|
-| John Smith  | NiScy         | ISO/IEC                                      |
-| Jane Doe    | CNECT         | ETSI                                         |
-| Alice Brown | NiScy         | CEN/CENELEC                                  |
+| David Bakker  | NiScy         | ISO/IEC 18013-5, 18013-7                                   |
+| Ofer Ishai    | NiScy         | remaining ISOs                                         |
+| Anders | NiScy         | CEN/CENELEC (partial)                                 |
+| José Miranda | NiScy | ETSI (partial), CSC, IETF OAuth (token) identifier list, IETF token status list |
+| Kristina | CNECT | OIDF and IETF SD-JWT/SD-JWT VC |
+| Tomasz | NiScy| remaining IETF RFCs, ETSI (partial), EuroSmart, E-ark |
+| Paul Hin | NiScy | W3C, BSI |
+| Harri (new member? | NiScy | ETSI (partial, CEN/CENELEC (partial), ITU-T, GSMA, GlobalPlatfomr |
+
 
 ## Change Log
 
@@ -34,3 +40,6 @@ The table below lists the individuals responsible for monitoring each Working Gr
 |----------------|-------------|---------------------------------------------------------|--------------------------------|
 | YYYY-MM-DD     | Name        | Added new standard XYZ, deprecated ABC                   | Closed gap in section X        |
 
+
+
+ETSI (partial) so list will be decided later. Please add the Family name of Harri or add (new member) since they don't know him. And finally there are in batch 3 other SDOs so maybe you can add them to Anders or split also to Tomasz and Harri (like ITU-T, GSMA, etc..)
