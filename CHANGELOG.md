@@ -31,7 +31,7 @@ The table below lists the individuals responsible for monitoring each Working Gr
 | Kristina | CNECT | OIDF and IETF SD-JWT/SD-JWT VC |
 | Tomasz | NiScy| remaining IETF RFCs, ETSI (partial), EuroSmart, E-ark |
 | Paul Hin | NiScy | W3C, BSI |
-| Harri (new member? | NiScy | ETSI (partial, CEN/CENELEC (partial), ITU-T, GSMA, GlobalPlatfomr |
+| Harri (new member) | NiScy | ETSI (partial, CEN/CENELEC (partial), ITU-T, GSMA, GlobalPlatfomr |
 
 
 ## Change Log
