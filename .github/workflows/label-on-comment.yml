@@ -1,0 +1,27 @@
+name: Label issues on comment
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  label-on-comment:
+    if: github.event.issue.pull_request == null
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add "needs review" label to commented issues
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issue = context.payload.issue;
+            const currentLabels = issue.labels.map(label => label.name);
+
+            if (!currentLabels.includes('needs review')) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: ['needs review']
+              });
+            }
