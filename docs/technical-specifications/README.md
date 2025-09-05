@@ -58,7 +58,9 @@ its corresponding GitHub discussion area and roadmap issue.
 | **TS08** | [Specification of Common Interface for Lodging Complaints to DPAs](./ts8-common-interface-for-reporting-of-wrp-to-dpa.md) | [Discussion area](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/discussions/379) | [Roadmap issue](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/19) |
 | **TS09** | [Specification of Wallet-to-Wallet Interactions](./ts9-wallet-to-wallet-interactions.md) | [Discussion area](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/discussions/381) | [Roadmap issue](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/22) |
 | **TS10** | [Data Portability and Download (Export)](./ts10-data-portability-and-download-(export).md) | [Discussion area](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/discussions/407) | [Roadmap issue](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/24) |
-| **TS11** | Specification of Interfaces and Formats for the Catalogue of Attestation Rulebooks and Attributes | Discussion area | [Roadmap issue](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/21) |
+| **TS11** | Specification of Interfaces and Formats for the Catalogue of Attestation Rulebooks and Attributes | [Discussion area](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/discussions/428) | [Roadmap issue](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/21) |
+| **TS12** | Specification of electronic payments Strong Customer Authentication (SCA) implementation with the wallet  | Discussion area | Roadmap issue |
+| **TS13** | Implementation of ZKP based on arithmetic circuits in the EUDI Wallet| Roadmap issue |
 
 ## Tracking All Relevant Standards and Technical Specifications
 
