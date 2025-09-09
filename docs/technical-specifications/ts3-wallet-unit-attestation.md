@@ -15,6 +15,7 @@ The present document specifies how WUA is used in connection with PID Providers 
 | `0.2`   | 14.04.2025 | Improvements after first round of feedback and improved scoping.                 |
 | `0.3`   | 28.04.2025 | Addition of Wallet App Attestation, improvements after second round of feedback. |
 | `0.4`   | 16.05.2025 | Improvements after commenting. |
+| `1.0`   | 20.08.2025 | Changes to WUA Use Cases section (removed references to presentation WUA).       |
 	
 ## 1 Introduction and Overview
 The WUA (Wallet Unit Attestation) topic has been discussed in the European Digital Identity Cooperation Group. As a result a number of High Level Requirements (HLRs) have been proposed. The present document is set to enable actors in the EUDIW ecosystem to follow the HLRs while ensuring the interoperability of the ecosystem. The HLRs are available in the [ARF ANNEX 2 Topic 9](https://eu-digital-identity-wallet.github.io/eudi-doc-architecture-and-reference-framework/latest/annexes/annex-2/annex-2-high-level-requirements/#a239-topic-9---wallet-unit-attestation). 
@@ -23,28 +24,21 @@ This specification is designed to enable the high level requirements defined in 
 
 [Section 2](#2-solution-description) of this document will serve as the contents of the technical specification and the appendix informally discusses the different solutions that have been proposed during development of this technical specification. 
 
-### 1.1 WUA Use Cases (from ARF HLRs)
-The HLRs of the ARF mandates that the WUA functionality must support a certain set of information to be transferred from the Wallet Provider (via the Wallet Unit) to the Issuing entities (i.e., PID Provider or Attestation Provider) and another set of information to the Relying Parties. That is, the content of the WUA differs based upon which party receives the information. Additionally, the WUA functionality will be used as part of separate protocols for respective issuance and presentations. We therefore distinguish between these parts of the functionality by using the following terminology: 
+### 1.1 WUA Use Case (from ARF HLRs)
+The HLRs of the ARF mandates that the WUA functionality must support a certain set of information to be transferred from the Wallet Provider (via the Wallet Unit) to the Issuing entities (i.e., PID Provider or Attestation Provider), hence we define WUAs as: 
 
-* *Issuance WUAs*: Wallet Unit Attestations which information will be transferred from a Wallet Provider to the Issuer via the Wallet during issuance. Issuance WUAs must allow Issuers to determine the security level of the wallet, authenticate the wallet and check that it has not been revoked for the lifetime of the attestation they are issuing. 
-* *Presentation WUAs*: Wallet Unit Attestations which information will be transferred from a Wallet Provider to a Relying Party via the Wallet during presentation. Presentation WUAs must enable a Relying Party to authenticate the wallet and check that it has not been revoked at the time of presentation.
-
-**This technical specification will only address the Issuance WUA.**
+* *WUAs*: Wallet Unit Attestations which information will be transferred from a Wallet Provider to the Issuer via the Wallet during issuance. WUAs must allow Issuers to determine the security level of the wallet, authenticate the wallet and check that it has not been revoked for the lifetime of the attestation they are issuing. 
 
 ### 1.2 Scope
 This STS will specify the following:
 
-* The *transfer* of Issuance WUAs between the wallet and the issuing party (i.e., either PID or Attestation Provider). 
-* The *format* of Issuance WUAs including its encoding and integrity protection mechanism. 
-* The *content* of Issuance WUAs. 
-* The *life cycle* of Issuance WUAs. 
-* The *revocation mechanism* for Issuance WUAs.
+* The *transfer* of WUAs between the wallet and the issuing party (i.e., either PID or Attestation Provider). 
+* The *format* of WUAs including its encoding and integrity protection mechanism. 
+* The *content* of WUAs. 
+* The *life cycle* of WUAs. 
+* The *revocation mechanism* for WUAs.
 
 > Note that _how_ Wallet Providers issue WUAs to the wallet are out of scope for this technical specification, as this will only be done by the wallet providers themselves and does therefore not require any standard to achieve interoperability. 
-
-Below is a simple depiction of which parts of interactions involving WUAs between different actors in the EUDIW ecosystem are in scope of the WUA specifications:
-
-<br/><img src="img/ts3-wua-scope.png"/><br/>
 
 ## 1.3 Requirements Notation
 The key words "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC2119](https://datatracker.ietf.org/doc/html/rfc2119) [RFC8174](https://datatracker.ietf.org/doc/html/rfc8174) when, and only when, they are written in all capital letters. 
@@ -64,7 +58,7 @@ A high level overview of the current solution is given in the table below:
 | Life Cycle          | The WAA shall be have a very short time-to-live. The WUA shall be issued by Wallet Providers that may issue WUAs with different validity periods to the same. They must however maintain the revocation status for the entire validity period of the WUA if longer than 24 hours. See [Section 2.4 Life Cycle](#24-life-cycle).                                                                                                                                                                |
 | Revocation          | WAA shall not, due to their short time-to-live, have any revocation mechanism associated. Revocation of WUAs shall be done using chunked Status List. See [Section 2.5 Revocation](#25-revocation).|
 
-Below we present details of the technical specification for Issuance WUAs. 
+Below we present details of the technical specification for WUAs. 
 
 ## 2.1 Format
 A Wallet App Attestation SHALL be a JSON Web Token (JWT) as specified in [RFC7519](https://datatracker.ietf.org/doc/html/rfc7519).
@@ -206,7 +200,7 @@ In case a Wallet Unit is to be revoked, a Wallet Provider SHALL revoke all WUAs 
 During re-issuance of a PID or Attestation (i.e., if for example the technical validity of a PID or Attestation expires before the administrative validity period expires), then the Wallet Unit (or Attestation Provider) SHALL send a new WUA (i.e., a WUA that has not been used in relation to issuance before) in the *Credential Request* to the PID or Attestation Provider. 
 
 ### 2.4.2 PID Provider and Attestation Provider responsibilities
-The technical validity period of a PID or Attestation SHALL end before the technical validity period of the issuance WUA shown to the PID in the issuance process.
+The technical validity period of a PID or Attestation SHALL end before the technical validity period of the WUA shown to the PID in the issuance process.
 
 Other Attestation Providers MAY choose a technical validity period of the attestations they issue independently of the technical validity for the WUA used during issuance. 
 
