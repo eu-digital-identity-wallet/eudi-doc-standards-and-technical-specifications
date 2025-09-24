@@ -1,12 +1,12 @@
  <img align="right" height="50" src="https://raw.githubusercontent.com/eu-digital-identity-wallet/eudi-srv-web-issuing-eudiw-py/34015dc3c6f52529a99e673df1d4fa69d50f7ff5/app/static/ic-logo.svg"/><br/>
 
-# Specification of interfaces and formats for the catalogue of attributes and the catalogue of schemes
+# Specification of interfaces and formats for the catalogue of attributes and the catalogue of schemas
 
 ## Abstract
 
-The present document specifies the interfaces and formats of European Commission’s catalogue of attributes and catalogue of schemes required by the [European Digital Identity Regulation (EU 910/2014)](https://eur-lex.europa.eu/eli/reg/2014/910/oj/eng). Specification includes data models and applicable application programming interfaces (APIs) for management of machine-readable attestation of attributes schemes.
+The present document specifies the interfaces and formats of European Commission’s catalogue of attributes and catalogue of schemas required by the [European Digital Identity Regulation (EU 910/2014)](https://eur-lex.europa.eu/eli/reg/2014/910/oj/eng). Specification includes guidance on Attestation Rulebooks, attestation type data models and applicable application programming interface (API) for management of machine-readable attestation schemas.
 
-Management of attribute schemas for the core attributes listed in Appendix VI of the [European Digital Identity Regulation (EU 910/2014)](https://eur-lex.europa.eu/eli/reg/2014/910/oj/eng) is proposed to be handled through the European Commission's common OOTS services and infrastructure. This specification defines the data model to be used, and refers to the ETSI technical specification 119 478 regarding implementation of the verification interface towards authentic sources in member states.
+Management of attribute schemas for the core attributes listed in Appendix VI of the [European Digital Identity Regulation (EU 910/2014)](https://eur-lex.europa.eu/eli/reg/2014/910/oj/eng) is proposed to be handled through the European Commission's OOTS services and infrastructure. This specification defines the data model to be used, and refers to the OOTS Common Services eDelivery and ETSI technical specification 119 478 regarding implementation of the verification (and retrieval) interface towards authentic sources in member states.
 
 ### [GitHub discussion](**~https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/discussions/428~**)
 
@@ -15,12 +15,13 @@ Management of attribute schemas for the core attributes listed in Appendix VI of
 | Version | Date       | Description                                                          |
 |---------|------------|----------------------------------------------------------------------|
 | `0.1`   | 05.09.2025 | Initial version for discussion in sync with topic O discussion paper |
+| `0.2`   | 24.09.2025 | Updated version after first focus group meeting and feedback |
 
 ## 1. Introduction and Overview
 
-The present document specifies the interfaces and formats and the application programming interface (API) related to **Catalogues of Attributes and Catalogues of Schemes** according to [European Digital Identity Regulation (EU 910/2014)](~https://eur-lex.europa.eu/eli/reg/2014/910/oj/eng~) - herein [Regulation] and the Commission Implementing Regulation (CIR) [EU 2025/1569](~http://data.europa.eu/eli/reg_impl/2025/848/oj~) of 29 July 2025 laying down rules for the application of Regulation (EU) No 910/2014 of the European Parliament and of the Council as regards qualified electronic attestations of attributes and electronic attestations of attributes provided by or on behalf of a public sector body responsible for an authentic source - herein [CIR for EAAs].
+The present document specifies the interfaces and formats and the application programming interface (API) related to **Catalogues of Attributes and Catalogues of Schemas** according to [European Digital Identity Regulation (EU 910/2014)](~https://eur-lex.europa.eu/eli/reg/2014/910/oj/eng~) - herein [Regulation] and the Commission Implementing Regulation (CIR) [EU 2025/1569](~http://data.europa.eu/eli/reg_impl/2025/1569/oj~) of 29 July 2025 laying down rules for the application of Regulation (EU) No 910/2014 of the European Parliament and of the Council as regards qualified electronic attestations of attributes and electronic attestations of attributes provided by or on behalf of a public sector body responsible for an authentic source - herein [CIR for EAAs].
 
-Catalogue of attributes and attributes are addressed in Article  45e of the Regulation and the [CIR for EAAs] lay down further details, which are in scope of present technical document:
+Catalogue of attributes and attributes are addressed in Article  45e of the [Regulation] and the [CIR for EAAs] lays down further details, which are in scope of present technical document:
 
 (1) Member States shall ensure, within 24 months of the date of entry into force of the implementing acts referred to in Articles 5a(23) and 5c(6), that, **at least for the attributes listed in Annex VI, wherever those attributes rely on authentic sources within the public sector, measures are taken to allow qualified trust service providers of electronic attestations of attributes to verify those attributes by electronic means** at the request of the user, in accordance with Union or national law.
 
@@ -60,72 +61,72 @@ The [CIR for EAAs] specifies the catalogue of schemes for attestations of attrib
 8. any requirements concerning the providers or the sources of information on which those providers rely when issuing electronic attestations of attributes
 9. a statement whether electronic attestations of attributes within the scope of the scheme are to be issued as qualified electronic attestations of attributes, as electronic attestations of attributes issued by or on behalf of a public sector body responsible for an authentic source, or as both.
 
-The catalogues shall provide their information in both human- and machine-readable format (first presumably via a web service, latter through a high-availability API). API and infrastructure serving data behind it shall meet the requirements for high availability and real-time scheme verification by Wallet Units and Verifiers.
+**The catalogues shall provide their information in both human- and machine-readable format** (first presumably via a web service, latter through a high-availability API). API and infrastructure serving data behind it shall meet the requirements for high availability and real-time scheme verification by Wallet Units and Verifiers.
+
+> Note: This specification, as a technical specification uses term **"schema"** instead of word "scheme" used in the regulatory texts, it being the more correct one to be used for data structures.
 
 ## 2. Data Model for the catalogue of attributes
 
-The data model and common format for catalogue of attributes is designed for hosting from the [Single Digital Gateway](https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32018R1724&from=EN) and [OOTS Semantic Repository](https://sr.dev.oots.tech.ec.europa.eu/) services of the European Commission, taking into account the requirements from the [Regulation] regarding the mandatory attribute elements to be registered.
+The data model and common format for the catalogue of attributes is designed to be hosted by the [Single Digital Gateway](https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32018R1724&from=EN) and [OOTS Semantic Repository](https://sr.dev.oots.tech.ec.europa.eu/) services of the European Commission, taking into account the requirements from the [Regulation] regarding the mandatory attribute elements to be registered.
 
-![CatAttrib-DataModel](img/ts11-cat-attr-datamodel.svg)
+As outlined in the figure below, the main class of the data model is ****Attribute****, which
 
-As outlined in the figure, the main class of the data model is ****Attribute****, which
-
-* contains the attributes listed in Section 2.1
-* defines its own **auxiliary classes**:
-  * **AuthenticSourceEVS**
-  * **MultiLangString**
-
-> NOTE: Figure remains TBA for this or future version
+* contains the properties listed in [Section 2.1](#21-attribute)
+* defines one **auxiliary class**:
+  * **AuthenticSourceEVS** [(Section 2.1.1)](#211-authenticsourceevs)
+  
+![CatAttrib-DataModel](img/ts11-cat-of-attributes-uml-diagram.png)
 
 ### 2.1 Attribute
 
-The `Attribute` main class contains two sub-classes `MultiLangString` and `AuthenticSourceEVS` and the attributes specified in the following table:
+The `Attribute` main class contains a sub-class `AuthenticSourceEVS` and the properties specified in the following table - with mappings to matching Single Digital Gateway/OOTS and ETSI 119 478 data properties provided for convenience:
 
-| Attribute          | Multiplicity | Type  | Description |
-|--------------------|--------------|-------|-------------|
-| `name`       | [1..1]       | *string*                                                   | English-language (default) attribute name used to identify the attribute within the catalogue of attributes. |
-| `identifier` | [1..1]       | *string*                                                   | unique identifier (UUID) assigned for the attribute within the catalogue of attributes. |
-| `semDescription`     | [1..1]       | *string*                                                  | URI pointing to semantic description of the attribute in the [OOTS Semantic Repository](https://sr.dev.oots.tech.ec.europa.eu/). **Note:** For registration of attributes onto the repository, re-use of existing descriptions in sources such as [Representation Powers and Mandates (RPaM) Ontology](https://joinup.ec.europa.eu/collection/isa-action-201612-semantic-interoperability-representation-powers-and-mandates-0/solution/representation-powers-and-mandates-ontology#:~:text=The%20ultimate%20objective%20of%20the,structured%20and%20machine%2Dreadable%20format) - [SEMPER \| DE4A](https://www.de4a.eu/semper) - [SEMIC Core Vocabularies](https://interoperable-europe.ec.europa.eu/collection/semic-support-centre/core-vocabularies#What%20are%20the%20Core%20Vocabularies) - [IANA Registry for JSON Web Token Claims](https://www.iana.org/assignments/jwt/jwt.xhtml) (for JSON-based attributes only) - [ISO/IEC 23220-2](https://www.iso.org/standard/86782.html) (for CBOR-based attributes only) SHALL be applied in catalogue of attributes to avoid overlapping interpretations of core attributes. |
-| `version`        | [1..1]       | *string*                                                   | Version number of the managed data model, SHALL follow [semantic versioning (SemVer)](https://semver.org/) practices.    |
-| `nameSpace`        | [1..1]       | *string*                                                   | inverse-domain-name ordered namespace of the attribute as per NS_dual requirement in ISO/IEC 23220-4 Annex A. Each namespace has one or more data elements.       |
-| `localisedName`    | [1..*]       | Array of *[MultiLangString](#245-multilangstring) objects* | contains an array of arrays with valid localised **names of the attribute** in EU Member States. The names should be used for displaying the attribute name in a user-localised user interface of a Wallet Unit, Attestation Provider or Wallet-Relying Party. |
-| `authenticSources` | [1..*]       | Array of [*AuthenticSourceEVS*](#xxx-authenticsourceevs) objects | array of `AuthenticSourceEVS` objects. Each Member State providing the attribute through an authentic source/sources shall register their national evidence verification points. The object contains both the MS identifier and the endpoint as an URI - see [**AuthenticSourceEVS**](#xxx-authenticsourceevs). |
+| Property name      | Multiplicity | Type  | Description | OOTS property mapping  | ETSI 119 478 property mapping  |
+|--------------------|--------------|-------|-------------|---------------|-----------------------|
+| `name`             | [1..*]       | *rdfs:Literal*            | array of language-tag -localised friendly names of the attribute. At least English-language (default) attribute name SHALL be provided. | sdg:DataServiceEvidenceType/sdg:Title  | |
+| `identifier` | [1..1]  | *rdfs:Literal*  | unique identifier assigned for the attribute within the catalogue of attributes, in form of a URI according to [RFC3986](https://datatracker.ietf.org/doc/html/rfc3986). This identifier shall contain the namespace, the local identifier and the version of the attribute as required in [CIR for EAAs] Article 7 5(d).  | sdg:DataServiceEvidenceType/sdg:EvidenceTypeClassification | |
+| `description`             | [0..*]       | *rdfs:Literal*            | human-friendly description of the attribute, which SHOULD be provided at least in English, and additional localisations MAY be provided with corresponding language tags appended to the description string. | sdg:DataServiceEvidenceType/sdg:Description | |
+| `semDescription`     | [1..1]       | *string*                                                  | URI pointing to semantic description of the attribute in the [OOTS Semantic Repository](https://sr.dev.oots.tech.ec.europa.eu/). **Note:** For registration of attributes onto the repository, re-use of existing external descriptions in sources such as [Representation Powers and Mandates (RPaM) Ontology](https://joinup.ec.europa.eu/collection/isa-action-201612-semantic-interoperability-representation-powers-and-mandates-0/solution/representation-powers-and-mandates-ontology#:~:text=The%20ultimate%20objective%20of%20the,structured%20and%20machine%2Dreadable%20format) - [SEMPER \| DE4A](https://www.de4a.eu/semper) - [SEMIC Core Vocabularies](https://interoperable-europe.ec.europa.eu/collection/semic-support-centre/core-vocabularies#What%20are%20the%20Core%20Vocabularies) - [IANA Registry for JSON Web Token Claims](https://www.iana.org/assignments/jwt/jwt.xhtml) (for JSON-based attributes only) - [ISO/IEC 23220-2](https://www.iso.org/standard/86782.html) (for CBOR-based attributes only) SHALL be applied in catalogue of attributes to avoid overlapping definitions or interpretations of core attributes. | sdg:DataServiceEvidenceType/sdg:DistributedAs/sdg:ConformsTo |  |
+| `version`        | [1..1]       | *string*                                                   | Version number of the managed attribute data model, SHALL follow [semantic versioning (SemVer)](https://semver.org/) practices.   | sr:Asset/sr:version |  |
+| `nameSpace`        | [1..1]       | *string*                                                   | URI assigned for the attribute's namespace it conforms to, according to [RFC3986](https://datatracker.ietf.org/doc/html/rfc3986).  See also `identifier` above.     | sr:Assetsr:conformsTo |  |
+| `contactInfo`    | [1..*]       | *vcard:Kind* | provides the contact information of the entity which requested to include the attribute in the catalogue of attributes. Information SHALL contain at least the email address of the entity's responsible contact point. | *To be clarified* |  |
+| `legalBasis`     | [0..*]    | *[Provider information specification]:Law*     | property allows provisioning of information with respect to the EU or national level law that acts as the legal basis of the attribute. Value SHOULD be an URI pointing to the EU or national regulation text when such is available online. See [Provider information specification](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts2-notification-publication-provider-information.md).   | sr:Asset/sr:isDerivedFrom/sr:ReferenceFramework/sr:identifier |  |
+| `authenticSources` | [1..*]       | Array of [*AuthenticSourceEVS*](#211-authenticsourceevs) objects | array of `AuthenticSourceEVS` objects. Each Member State providing the attribute through an authentic source/sources shall register their national evidence/attribute verification points. The object contains both the Member State national identifier and the endpoint as an URI - see [**AuthenticSourceEVS**](#211-authenticsourceevs). | sdg:DataServiceEvidenceType/sdg:AccessService |  |
 
-#### 2.1.1 MultiLangString
+#### 2.1.1 AuthenticSourceEVS
 
-The `MultiLangString` sub-class is used within the definition of the [￼`Attribute`￼](#21-attribute) class to provide the country code and language-specific attribute name tuple in`localisedName` array. The codes and strings shall be provided according to the rules set in Annex E of \[ETSI TS 119 612\].
+The `AuthenticSourceEVS` sub-class is used within the definition of the [￼`Attribute`￼](#21-attribute) class to provide the **Member State identifier**, **data source identifier** and **verification endpoint** triple in the `authenticSources` array. The codes and strings shall be provided according to the rules set in Annex E of [ETSI TS 119 612] and national codification schemes. Access control and authorisation for the verification endpoint with REST API types `ver_restAPI` and `ret_restAPI` is specified in Section 5.4 of ETSI TS 119 478, Single Digital Gateway (SDG) access policies and configurations for type `ver_eDelivery` and `ret_eDelivery` are described in chapter 4, section 4.7 of the [OOTS Technical Design Documents](https://www.google.com/url?q=https://ec.europa.eu/digital-building-blocks/sites/spaces/TDD/pages/605325079/OOTS%2BTechnical%2BDesign%2BDocuments%2BReleases&source=gmail-imap&ust=1759247967000000&usg=AOvVaw1sf_-SGE17E_RSymm5-9KY) (TDDs).
 
-| Attribute | Multiplicity | Type       | Description |
-|-----------|--------------|------------|-------------|
-| `lang`    | [1..1]       | *string* | Specifies the country code of the localised text. |
-| `content` | [1..1]       | *string* | The localised text as a string.                   |
-
-#### 2.1.2 AuthenticSourceEVS
-
-The `AuthenticSourceEVS` sub-class is used within the definition of the [￼`Attribute`￼](#21-attribute) class to provide the **Member State identifier**, **data source identifier** and **verification endpoint URI** triple in the `authenticSources` array. The codes and strings shall be provided according to the rules set in Annex E of [ETSI TS 119 612] and national codification schemes. Access control and authorisation for the verification endpoint is specified in Section 5.4 of ETSI TS 119 478.
-
-| Attribute     | Multiplicity | Type       | Description  |
-|---------------|--------------|------------|--------------|
-| `country`     | [1..1]       | *string* | specifies the member state through a country code.             |
-| `nationalSubID`| [0..1]       | *string* | optional, narrows down a respective authentic source in the member state defined in `country` . SHALL be codified through a national coding scheme. Only necessary in member states with multiple authentic sources for the single attribute.                                 |
-| `integrationType`        | [1..1]       | *string* |integration type identifier of the endpoint. Valid values are TBD.             |
-| `uri`         | [1..1]       | *string* | URI for retrieving data from the verification endpoint    |
-
-> Note: The `authenticSourceEVS` object approach is suited for the verification interface defined for QTSP use in ETSI TS 119 478. It is TBA what is the object structure if a member state is alternatively (or additionally) providing the verification solution via integration through the OOTS Common Services on discovery, request/response & eDelivery for providing the evidencetype/attribute verification service.
+| Attribute     | Multiplicity | Type       | Description  | OOTS property mapping | ETSI 119 478 property mapping |
+|---------------|--------------|------------|--------------|---------------|-----------------------|
+| `country`     | [1..1]       | *string* | specifies the member state through a country code.             | sdg:DataServiceEvidenceType/sdg:AccessService/sdg:Publisher/sdg:Jurisdiction/sdg:AdminUnitLevel1 | |
+| `nationalSubID`| [0..1]       | *string* | optional, narrows down a respective authentic source in the member state defined in `country` . SHALL be codified through a national coding scheme. Only necessary in member states with multiple authentic sources for the single attribute.   | sdg:DataServiceEvidenceType/sdg:AccessService/sdg:Publisher/sdg:Identifier  | |
+| `integrationType`        | [1..1]       | *string* |integration type identifier of the endpoint. Valid enumeration values are `ver_eDelivery`, `ret_eDelivery`, `ver_restAPI` and `ret_restAPI`. | sdg:DataServiceEvidenceType/sdg:AccessService/sdg:ConformsTo | |
+| `endpoint`         | [1..1]       | *string* | URI for either verifying or retrieving data from the verification endpoint. The URI format used depends on the `integrationType` enum type, and will be either a party identifier for integration type values `ver_eDelivery` and `ret_eDelivery` or a direct server API endpoint for integration type values `ver_restAPI` and `ret_restAPI`.    | sdg:DataServiceEvidenceType/sdg:AccessService/sdg:Identifier |  |
 
 ## 3. Interfaces for the catalogue of attributes
 
-The OOTS services offer public-access search functions for discovery of registered attributes (the Semantic Repository, offering access to EvidenceTypes (equal to attributes in EUDI Wallet ecosystem) per []()) and data sources serving given EvidenceType verification service. It provides the QTSPs and other actors the option to integrate onto the [eDelivery services]() for executing actual attribute validation service against an integrated member state verification endpoint. ETSI TS 119 478 introduces another interface approach through use of [OpenAPI](~https://spec.openapis.org/oas/latest.html~) compatible API and [OAuth 2.0 dynamic client registration profile (RFC 7591)](https://www.rfc-editor.org/info/rfc7591) based mechanism for authentic source verification requests by the QTSPs.
+Two technical interface alternatives are specified for QTSPs to use with the Catalogue of Attributes Authentic Source verification service. The other one is based on the Single Digital Gateway infrastructure of the EU, the other one provides an alternative with a direct Application Programming Interface design pattern.
+
+### 3.1 Once-Only Technical Services - Common Services
+
+The [OOTS Common Services](https://ec.europa.eu/digital-building-blocks/sites/spaces/TDD/pages/909707674/Chapter+3+Common+Services+v1.2.2+July+2025) offer public-access search functions for discovery of registered attributes (hosted and managed in the [Semantic Repository](https://sr.dev.oots.tech.ec.europa.eu/)), offering access to EvidenceTypes (equal to attributes in the EUDI Wallet ecosystem) and Data Services serving given EvidenceType related verification service for the Member States and their public sector entities. The Common Services provide the QTSPs and other actors the option to integrate onto the [eDelivery Building Block](https://ec.europa.eu/digital-building-blocks/sites/spaces/TDD/pages/909707682/1.+Once-Only+Technical+System+High+Level+Architecture+v1.2.2+July+2025#id-1.OnceOnlyTechnicalSystemHighLevelArchitecturev1.2.2(July2025)-7.4.eDelivery) for executing actual attribute verification service against a discovered member state verification endpoint.
+
+### 3.2 OpenAPI compatible REST APIs
+
+[ETSI TS 119 478](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/26) introduces another interface option through use of [DCAT3](https://www.w3.org/TR/vocab-dcat-3/), the [SEMIC DCAT-AP 3.0](https://semiceu.github.io/DCAT-AP/releases/3.0.0/), two new [OpenAPI](~https://spec.openapis.org/oas/latest.html~) compatible APIs and [OAuth 2.0 dynamic client registration profile (RFC 7591)](https://www.rfc-editor.org/info/rfc7591) authorisation based mechanism for the authentic source verification and retrieval requests by the QTSPs.
+
+### 3.3 Governance and maintenance of catalogue of attributes
+
+> TBA (according to the OOTS governance rules, with guidance over how private sector may get access to the infrastructure required).
 
 ## 4. Catalogue of schemes
 
-### 4.1 Process for registration and updating of Attestation Rulebooks and attestation schemes
+### 4.1 Requirements
 
-#### 4.1.1 Requirements
+In the EUDIW ecosystem providers of QEAAs and PUB-EAAs SHOULD register their attestations into the European Commission’s Catalogue of Attestations. For non-qualified EAA providers the registration of a rulebook and the accompanied attestation scheme is optional, but it is RECOMMENDED that EAA providers register their attestations to the Catalogue of Attestations.
 
-In the EUDIW ecosystem providers of QEAAs and PUB-EAAs SHOULD register their attestations into the European Commission’s Catalogue of Attestations. EAA providers the registration of a rulebook and accompanied attestation scheme is optional but they MAY freely register their attestations to the Catalogue of Attestations.
-
-Information that combination of Attestation Rulebook and scheme registered in catalogue of schemes SHALL contain, according to [CIR for EAAs] includes the following:
+Information that the combination of Attestation Rulebook and scheme registered in catalogue of schemes SHALL contain for the QEAAs and Pub_EAAs (and for EAAs, when applicable), according to [CIR for EAAs] includes the following:
 
 * name;
 * status;
@@ -139,121 +140,202 @@ Information that combination of Attestation Rulebook and scheme registered in ca
 * applicable trust model, requirements for attestation providers or data sources, and
 * type of attestation (Qualified, Pub_EAA or EAA) (Ed note: PID is not strictly speaking an attestation, left out intentionally)
 
-### 4.1.2 Governance for Attestation Rulebooks and attestation schemes
+### 4.2. Human-readable format - Attestation Rulebook
 
-The European Commission's registration and governance (maintenance) process for catalogued Attestation Rulebooks and related requirements, and a rulebook template for documenting of individual attestation of attribute rulebooks and schema is published at the [Attestation Rulebooks Catalogue repository](https://github.com/eu-digital-identity-wallet/eudi-doc-attestation-rulebooks-catalog).
+The governance model and rules of an individual attestation of attributes SHALL be documented into its corresponding, publicly accessible Attestation Rulebook.
 
-A new, approved catalogued Attestation Rulebook and its attestation schema SHALL be published with version number 1.0. Lifecycle management of published Attestation Catalogues SHALL utilise [semantic versioning (SemVer)](https://semver.org/) in version numbering.
+The location of the European Commission -managed, open catalog for Attestation Rulebooks is the [Attestation Rulebooks Catalog repository](https://github.com/eu-digital-identity-wallet/eudi-doc-attestation-rulebooks-catalog). All QEAA and Pub_EAA Attestation Rulebooks SHALL be published in this catalog along with their attestation schemes, and registration of Attestation Rulebooks into this catalog is recommended for EAA providers.
 
-The management and versioning of published Attestation Rulebooks and attestation schemes SHALL be executed through a versioning system for Attestation Rulebooks in human-readable format, and through the [Application Programming Interface](~#5-application-programming-interface~) for machine-readable attestation schemes.
+URL to the published Rulebooks in the Attestation Rulebooks Catalog is [https://github.com/eu-digital-identity-wallet/eudi-doc-attestation-rulebooks-catalog/tree/main/rulebooks](https://github.com/eu-digital-identity-wallet/eudi-doc-attestation-rulebooks-catalog/tree/main/rulebooks).
 
-Operations SHALL be authorized by the entity that has registered the Schema.
+#### 4.2.1 Rulebook template
 
-> Note: A more complete governance description is work in progress, using the draft CD of ISO 23220-7 as the baseline for building a managed registering authority for attestation catalogues. the ISO specification aims at covering the globally recognised mdoc document types, and can well be used as a reference in this specification when approved as International Standard in the ISO.
+The Attestation Rulebooks Catalog repository offers a generic [rulebook template](https://github.com/eu-digital-identity-wallet/eudi-doc-attestation-rulebooks-catalog/tree/main/template) for creation of Rulebooks.
 
-### 4.2 Data models and formats for attestation schemes
+### 4.3 Machine-readable data models and formats - attestation schemes
 
-#### 4.2.1 Human-readable format - Attestation Rulebook
+#### 4.3.1 SchemaMeta main class
 
-The governance model and rules of an individual catalogued attestation of attributes SHALL be documented into its corresponding, publicly accessible Attestation Rulebook. The location of European Commission -managed, open Attestation Rulebooks is the [Attestation Rulebooks Catalogue repository](https://github.com/eu-digital-identity-wallet/eudi-doc-attestation-rulebooks-catalog).
-
-#### 4.2.2 Rulebook template
-
-The Attestation Rulebooks Catalogue repository offers a generic [rulebook template](https://github.com/eu-digital-identity-wallet/eudi-doc-attestation-rulebooks-catalog/tree/main/template) for creation of Rulebooks.
-
-#### 4.2.1 Machine-readable attestation schemes
-
-##### 4.2.1.1 SchemaMeta main class
-
-This is a common attestation schema data model, with one specified sub-class `Schema`.
-
-> NOTE: this class model to be constructed similar as in TS2 and TS5 etc. is TBA. It shall contain the machine-readable elements of the scheme which a) are not present in the human-readable rulebook and b) not explicitly covered by the format-specific schema/schemes.
+This is a common attestation schema data model, with specified sub-classes `Schema` for handling the schemas for different attestation types, and `TrustAuthority` for handling the information required for resolving the trust framework related to the attestation type.
 
 | Attribute | Multiplicity | Type       | Description   |
 |-----------|--------------|------------|---------------|
 | `version` | [1..1]       | *string* | version of the schema following SemVer practices  |
 | `rulebookURI` | [1..1]   | *string* | URI to the human-readable Attestation Rulebook that SHALL define all non-machine readable aspects of the attestation type defined                |
-| `trustModelURI` | [0..1]   | *string* | optional, URI to a machine-readable trust management scheme (trust model) or trust anchor to be used with a Non-qualified EAA attestation type. Requied external trust framework realisations outside the ones covered by [Regulation] SHALL be described in the linked human-readable Attestation Rulebook. The trust model with providers of QEAAs, Pub-EAAs and PIDs is based on European Commission -managed Lists of Trusted Lists [ETSI TS 119 612].      |
+| `trustedAuthorities` | [0..1]   | `TrustAuthority` object | optional object that resolves to the applicable trust management scheme (trust model) or trust anchor to be used according to the options available in [OpenID4VP Section 6.1.1](https://openid.net/specs/openid-4-verifiable-presentations-1_0-27.html#section-6.1.1). Current alternatives available via OpenID4VP are X.509 Authority Key Identifier (see Section 4.2.1.1 of [RFC5280](https://doi.org/10.17487/RFC5280)), ETSI Trusted Lists or OpenID Federation. The trust model with providers of QEAAs, Pub-EAAs and PIDs is based on European Commission -managed Lists of Trusted Lists ([ETSI TS 119 612](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/41)), whereas **for non-qualified EAAs the technical specification on List of trusted entities (LoTE) data model ([ETSI TS 119 602](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/278)) is recommended for use, i.e. MAY be used by EAA providers.** Note: OpenID Federation MAY only be used in context of non-qualified EAA types.    |
+| `attestationLoA` |    [1..1]       | *string* | level of assurance (LoA) the attestation is to be provided at. Issuance process for registered LoA SHALL follow minimum requirements set in the [OpenID4VCI] Annex [D.2](https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0-17.html#appendix-D.2) or [CIR for eID assurance levels](https://eur-lex.europa.eu/eli/reg_impl/2015/1502/oj). Allowed value is a string from the set of: `iso_18045_high`, `iso_18045_moderate`, `iso_18045_enhanced-basic`, `iso_18045_basic`, `eu_loa_high`, `eu_loa_substantial` or `eu_loa_low`. |
+| `bindingLevel` |  [1..1]       | *string* | indicates the level of cryptographic key binding required for issuance of the attestation, with three categories (in decreasing strength of binding): binding to a single device ('WSCA'), binding to a secure keystore ('keystore') or no cryptograhpich binding ('none'). Allowed value is a string from the set of: `wsca`, `keystore` or `none`.   |
 | `supportedFormats` | [1..*]       | *array of strings* | array of formats available for the attestation type. Possible string values are `dc+sd-jwt`, `mso_mdoc`, `jwt_vc_json`, `jwt_vc_json-ld` and `ldp_vc`.  |
-| `schemaURIs` | [1..*]       | *array of `Schema` objects* | array of persistent and unique, format specific schema URIs assigned for the attestation schemas by the catalogue of schemes registrar.  |
+| `schemaURIs` | [1..*]       | *array of `Schema` objects* | array of persistent and unique, format specific schema URIs bound to each supported format via a `Schema` object.  |
 
-##### 4.2.1.2 Schema sub-class
+> Note: Separate from the attestation-specific LoA indicator, the Attestation Rulebook template has meta-information placeholder to indicate if provisioning the attestation of attributes requires prior authetication of the User with a particular eID means (such as e.g. a PID).
+
+#### 4.3.2 Schema sub-class
+
+Sub-class `Schema` is an object tuple containing the enumerated format identifier of the schema type, and the designated URI for accessing the JSON schema via the Internet.
 
 | Attribute | Multiplicity | Type       | Description   |
 |-----------|--------------|------------|---------------|
 | `formatIdentifier` | [1..1]       | *string* | string from the set of: `dc+sd-jwt`, `mso_mdoc`, `jwt_vc_json`, `jwt_vc_json-ld` or `ldp_vc`  |
-| `uri` | [1..1]       | *string* | persistent schema URI assigned for particular format of the attestation type.   |
+| `uri` | [1..1]       | *string* | persistent schema URI assigned for each registered format of the attestation type. The URI is provided to the registering entity by the Catalogue provider as part of completed registration.   |
 
-![CatSchemas-DataModel](img/ts11-cat-schemes-datamodel.svg)
+#### 4.3.3 TrustAuthority sub-class
 
-> NOTE1: Figure remains TBA for this or future version
+Sub-class `TrustAuthority` is an object tuple with enumerated type of applicable trust framework and the identifier value, necessary for resolving the trust framework related to the attestation type.
 
-> NOTE2: Editor: The 'supportedFormats' may actually require an object class with format type and scheme-specific URI. Availability of the URI upon registration depends on the catalogue used. European Commission catalogue of schemes may assign the final scheme for schemeURI only upon completed registration.
+| Attribute | Multiplicity | Type       | Description   |
+|-----------|--------------|------------|---------------|
+| `frameworkType` | [1..1]       | *string* | type of the applicable trust model/framework. A string from the set of: `aki`, `etsi_tl`or `openid_federation`.  |
+| `value` | [1..1]       | *string* | base64url (for authorised key identifier (`aki`) of X.509 certificate) or a standard URI-formatted identifier for the Trusted List (for type `etsi_tl`) or Entity Identifier (for type `openid_federation`)  |
 
-##### 4.1.2.2 Format-specific data models
+![CatSchemas-DataModel](img/ts11-cat-schemes-datamodel.png)
 
-The attestation schema/s provided via the Catalogue of schemes API SHALL be provided as appendixes of the Attestation Rulebook upon registration.
+Figure 1. Catalogue of schemas data classes
+
+#### 4.3.4 Format-specific data schemas
+
+The attestation schema/s provided via the Catalogue of schemes API SHALL be provided as appendixes of the Attestation Rulebook by the registering entity upon registration.
 
 The schemas SHALL be provided in JSON format, and SHALL follow the following format:
 
 | Issuance format   | Format identifier   | Schema type  |
 |-------------------|---------------------|--------------|
-| SD-JWT VC         | `dc+sd-jwt`           |The [Verifiable Credential Type (VCT)]() as specified in [OpenID4VCI]() SHALL be used   |
-| ISO mDoc          | `mso_mdoc`            |The [DocumentType (DocType)]() format as specified in [ISO 23220-2]() SHALL be used    |
-| W3C Verifiable Credentials | `jwt_vc_json`, `jwt_vc_json-ld` or `ldp_vc` | [OpenID4VCI](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/3)  three credential formats possible with [W3C Verifiable Credential]() specifications. OpenID4VCI [Appendix A.1](https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0-15.html#name-w3c-verifiable-credentials) describes the options that SHALL be used for each possible type. |
+| SD-JWT VC         | `dc+sd-jwt`           |  Verifiable Credential Type (VCT) as specified in [OpenID4VCI](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/3) SHALL be used.   |
+| ISO mDoc          | `mso_mdoc`            |  DocumentType (DocType) format as specified in [ISO 23220-2](https://www.iso.org/standard/86782.html) SHALL be used.    |
+| W3C Verifiable Credentials | `jwt_vc_json`, `jwt_vc_json-ld` or `ldp_vc` | [OpenID4VCI](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/3) lists three possible credential formats with [W3C Verifiable Credential](https://www.w3.org/TR/2022/REC-vc-data-model-20220303/) specifications - OpenID4VCI [Appendix A.1](https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0-15.html#name-w3c-verifiable-credentials) describes the options that SHALL be used for each possible type. |
 
-Note that if several attestation formats are supported, the registering entity SHALL provide all schemas upon registration. Example schema templates are provided in Appendix **TBA** of this specification.
+Note that if several attestation formats are supported, the registering entity SHALL provide all schemas upon registration. Example schema templates are provided in the Attestation Rulebooks Catalog.
 
-> Ed note: sample schemas to be provided also in the Rulebooks Catalogue repository?
+The online access and management of schemas, published for open access via the URLs listed in `SchemaMeta.SchemaURIs` object after publication is done via the catalogue of schemes API.
 
-The management of schemas, published for open access via the URLs listed in `SchemaMeta.SchemaURIs` object after publication is done via the catalogue of schemes API.
+### 4.4 Attestation schemas information summary
 
-## 5. Application Programming Interface for verification of machine-readable attestation schemes
+Mapping of the required information elements from Section [4.1](#41-requirements) as split between the human-readable Attestation Rulebook and machine-readable schema is presented in following table, with applicable rulebook template section and attestation schema class identifiers in `parent.child` format for each element:
+
+| Information element   | Attestation Rulebook (human-readable)  | Schema definition (machine-readable)  |
+|-----------------------|----------------------------------------|-------------------------|
+| name | 1st page - Attestation Type in title  | `SchemaMeta.Schema.uri`, (format specific) display metadata  |
+| status | 1st page - version table | *Not available*  |
+| version | 1st page - version table | `SchemaMeta.version` |
+| contact | 1st page - contact or feedback link  |  `rulebookURI` |
+| law/standard | Chapter 7 Compliance| *Not available*  |
+| issuance rules | Chapter 3 Attestation encoding, Chapter 4 Attestation usage | `SchemaMeta.attestationLoA`, `SchemaMeta.bindingLevel`  |
+| attestation formats | Chapter 3 Attestation encoding |  `SchemaMeta.supportedFormats` |
+| attribute namespaces  | Chapter 3 Attestation encoding |  `SchemaMeta.Schema.uri`, format specific attribute/claim definitions   |
+| attribute definition| Chapter 2 Attestation attributes and metadata |  `SchemaMeta.Schema.uri` |
+| trust model | Chapter 5 Trust anchors |  `SchemaMeta.TrustAuthority` |
+| Legal EUDIW attestation type | Chapter 2.1 |  `SchemaMeta.TrustAuthority`   |
+
+### 4.5 Registration and governance of Attestation Rulebooks and attestation schemas
+
+The European Commission's registration and governance (maintenance) process for catalogued Attestation Rulebooks and related requirements, and a rulebook template for documenting of individual Attestation Rulebooks and their schema is published at the [Attestation Rulebooks Catalog repository](https://github.com/eu-digital-identity-wallet/eudi-doc-attestation-rulebooks-catalog). This section specifies practices to be used within this catalog, which SHALL be used by QEAA and Pub_EAA providers, and MAY be used by non-qualified EAA providers in the EUDI ecosystem.
+
+#### 4.5.1 Versioning
+
+A new, approved catalogued Attestation Rulebook and its attestation schema SHALL be published by the European Commission with version number 1.0. Lifecycle management of published Attestation Catalogues SHALL utilise [semantic versioning (SemVer)](https://semver.org/) in version numbering.
+
+#### 4.5.2 Maintenance
+
+The management and versioning of published Attestation Rulebooks and attestation schemes SHALL be executed through a versioning system for Attestation Rulebooks in human-readable format, and through the [Application Programming Interface](~#5-application-programming-interface~) for machine-readable attestation schemes.
+
+#### 4.5.3 Authorisation
+
+Operations SHALL be authorised only for the entity (its authorised representatives) that has registered the attestation schema and the accompanying Attestation Rulebook.
+
+> Note: A more complete governance description is work in progress, using the draft CD of ISO 23220-7 as the baseline for building a managed registering authority for attestation catalogues. the ISO specification aims at covering the globally recognised mdoc document types, and can well be used as a reference in this specification when approved as International Standard in the ISO.
+
+## 5. Application Programming Interface for management of machine-readable attestation schemas
 
 ### 5.1 Summary
 
-TBA
+This technical specification defines an Open API compatible application programming interface (API) for managing attestation schemas with the following methods:
 
-### 5.2 API methods for attestation schema queries (Open API)
+GET /schemas: Lists all schemas with filtering and pagination.
 
-#### 5.2.1 Requirements
+PUT /schemas/{schemaId}: Updates a specific schema.
 
-The catalogue of schemes API read methods SHALL be open for public access. Access to management of schemes through POST, PUT or DELETE methods SHALL be available only for authorised and authenticated representatives of the registering entity.
+DELETE /schemas/{schemaId}: Deletes a specific schema.
 
-The public API SHALL provide methods for downloading complete attestation schemes matching with provided query URL or TBD parameters helping in discovery and validation of registered attestation schemes. The permanent attestation scheme URI SHALL be provided to the registering entity's contact person upon successful registration, and is thereafter referable in Wallet-relying Party registrations irrespective of the role (entitlement) of the registering entity, and consequently for attestation scheme validation by Wallet Units and Wallet-Relying Parties.
+ > Note: Any online schema management tools integrated with the API should arrange their user flows according to the method capabilities (e.g. note that the schema management beyond queries basically requires the full schema element for the method calls, not individual attributes). Authorisation mechanism required for the API's PUT or DELETE methods is defined in Section 5.2.x.
 
-#### 5.2.2 Method descriptions
+### 5.2 Requirements
+
+#### 5.2.1. Query access
+
+The catalogue of schemas API read methods SHALL be open for public access. The public API SHALL provide methods for downloading complete attestation schemas matching with provided query URL or TBD parameters helping in discovery and validation of registered attestation schemas.  
+
+#### 5.2.2 Write or delete access
+
+Access to management of schemas through PUT or DELETE methods SHALL be available only for authorised and authenticated representatives of the registering entity.
+
+#### 5.2.3 Delivery of schema URIs
+
+The permanent attestation schema URI SHALL be provided to the registering entity's contact person upon successful registration, and is thereafter referable in Wallet-relying Party registrations irrespective of the role (entitlement) of the registering entity, and consequently for attestation schema validation by Wallet Units and Wallet-Relying Parties.
+
+### 5.3 API method descriptions
+
+#### 5.3.1 GET methods
 
 paths:
-`/schema` (GET):
 
-There is a single ****GET**** /schema endpoint for making parametrised queries. For this purpose, the API specification has the `parameters` section, where:
+`/schemas` (GET):
 
-* Each filterable field (`list TBA`) is defined as a query parameter.
+There is a  **GET** /schemas endpoint for making parametrised queries. For this purpose, the API specification has the `parameters` section, where:
+
+* Each filterable field (`id`, `supportedformat`, `attestationloa`, `bindinglevel`, `trustedAuthoritiesFrameworkType`, `trustedAuthoritiesValue` `schemauri`, `rulebookuri`) is defined as a query parameter.
 * `in: query`: Specifies that the parameter is a query parameter.
 * `name`: The name of the query parameter.
 * `schema`: Defines the data type of the query parameter.
 * `description`: Provides a brief explanation of what the query parameter filters by.
 
-Query parameters supported by the GET method are
-
-* TBA
-
 Where query results match at least one attestation schema, the JWS-signed method response SHALL provide:
 
-* JSON (also CBOR required, if mDoc schema exists?) formatted schema registered to matching query URI (Ed note: do we need to provide the full contents of `SchemaMeta` class for given instance?)
+* the full contents of `SchemaMeta` class for matching instance in JSON format.
 
-If no query parameters are included, the method returns the full list of registered attestation schemes in the Catalogue of Attestations.
+> Note/Question: Potentially also CBOR and/or CDDL versions of schemaMeta contents required, for which format types?
 
-The JWS-signed response body for a successful GET `(200)` will be an array of matching `SchemaMeta` objects.
+If no query parameters are included, the method returns the full list of registered attestation schemas in the catalog.
 
-The OpenAPI 3.1 compatible REST API methods for the above are provided in Annex A.5
+The JWS-signed response body for a successful GET `(200)` will be a paginated list of matching `SchemaMeta` objects.
 
-### 5.3 Protection against DDOS attacks and accidental overuse of the GET methods
+ `/schemas/{schemaId}` (GET):
+
+There is a separate  /schemas/{schemaId} endpoint for requesting single SchemaMeta contents with a **GET** method, based on schema's provisioned unique identifier `Id`, with the following `parameters` section:
+
+* `in: path`: Specifies that the parameter is a path parameter.
+* `name: schemaId` The unique identifier of schema as the path name.
+
+The JWS-signed response body for a successful GET `(200)` will be a `Id`-value matching `SchemaMeta` object's contents in JSON format.
+
+#### 5.3.2 PUT methods
+
+paths:
+
+ `/schemas/{schemaId}` (PUT):
+
+The /schemas/{schemaId} endpoint allows use of **PUT** for updating the completed SchemaMeta contents based on schema's provisioned unique identifier `Id`.
+
+The JWS-signed response body for a successful PUT `(200)` will be the updated `SchemaMeta` object's contents in JSON format.
+
+#### 5.3.3 DELETE methods
+
+paths:
+
+ `/schemas/{schemaId}` (DELETE):
+
+The /schemas/{schemaId} endpoint allows use of **DELETE** for deleting an attestation schema based on schema's unique identifier `Id`.
+
+The response for a successful DELETE operation is `(204)`, `(404)` if a schema with specified unique identifier was not found.
+
+#### 5.3.4 OpenAPI specification
+
+The OpenAPI 3.1 compatible REST API methods for the above are provided in [Annex A.3](#a3-openapi-specification-for-catalogue-of-schemas-api-normative).
+
+### 5.4 Protection against DDOS attacks and accidental overuse of the GET methods
 
 The API implementation SHALL take into consideration the vulnerabilities that an open, comprehensive query interface enables for both malicious or non-malicious users of the interface. First well-known vulnerability is sensitivity for Distributed Denial-of-Service (DDoS) attacks, the other valid one especially for the GET/schema endpoint is the server load that very complex query parameter combinations from badly planned or non-intended/accidental misuse of the query mechanism can cause at the Registrar's server-side solution.
 
-### 5.4 DDoS attack protection guidelines
+### 5.5 DDoS attack protection guidelines
 
 Following policy/recommendation SHOULD be implemented (with solution-fitted combinations) in the national Registry API implementations to protect the API from DDoS attacks:
 
@@ -265,7 +347,7 @@ Following policy/recommendation SHOULD be implemented (with solution-fitted comb
 * Have robust ****API monitoring**** for request rates, latency, error rates, server resource utilisation and source IP addresses with proper alerting in place.
 * Utilise ****network segmentation**** - e.g., isolate the API servers in a private subnet behind the WAF, and from the actual Registrar database to improve robustness of your network architecture against hostile attacks.
 
-### 5.5 Protection against unintentional misuse
+### 5.6 Protection against unintentional misuse
 
 The implementers SHOULD consider how to limit the load of the API from perfectly legal but unintentionally complex or frequent API calls to the query endpoints. Possible solutions for this are:
 
@@ -277,39 +359,55 @@ The European Commission SHALL publish in their respective API documentation what
 
 | Reference                    | Description        |
 |------------------------------|--------------------|
-| [Regulation]                 | [European Digital Identity Regulation (EU 910/2014)](~https://eur-lex.europa.eu/eli/reg/2014/910/oj/eng~) |
-| [CIR for EAAs]               | [Commission Implementing Regulation \(EU\) 2025/1569 of 29 July 2025 laying down rules for the application of Regulation \(EU\) No 910/2014 of the European Parliament and of the Council as regards qualified electronic attestations of attributes and electronic attestations of attributes provided by or on behalf of a public sector body responsible for an authentic source](~http%3A//data.europa.eu/eli/reg_impl/2025/1569/oj~) |
+| [Regulation]                 | [European Digital Identity Regulation (EU 910/2014)](https://eur-lex.europa.eu/eli/reg/2014/910/oj/eng) |
+| [CIR for EAAs]               | [Commission Implementing Regulation \(EU\) 2025/1569 of 29 July 2025 laying down rules for the application of Regulation \(EU\) No 910/2014 of the European Parliament and of the Council as regards qualified electronic attestations of attributes and electronic attestations of attributes provided by or on behalf of a public sector body responsible for an authentic source](http://data.europa.eu/eli/reg_impl/2025/1569/oj) |
+| [CIR for eID assurance levels] | [Commission Implementing Regulation (EU) 2015/1502 of 8 September 2015 on setting out minimum technical specifications and procedures for assurance levels for electronic identification means pursuant to Article 8(3) of Regulation (EU) No 910/2014 of the European Parliament and of the Council on electronic identification and trust services for electronic transactions in the internal market](https://eur-lex.europa.eu/eli/reg_impl/2015/1502/oj)  |
 | [OOTS Common Services]       |    [OOTS Technical Design Documents - Common Services](https://ec.europa.eu/digital-building-blocks/sites/spaces/TDD/pages/909707674/Chapter+3+Common+Services+v1.2.2+July+2025)                   |
-| [Specification of common formats and API for relying-party registration information] | [The European Commission Specification of common formats and API for Relying Party Registration information](~https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts7-common-interface-for-data-deletion-request.md~) |
-| [ETSI TS 119 478]                                 | [ETSI TS 119 478 V0.0.2 Electronic Signatures and Trust Infrastructures (ESI); Specification of interfaces related to Authentic Sources](link TBA) (draft) |
+|  [OOTS Technical Design Documents] | [OOTS Technical Design Documents](https://ec.europa.eu/digital-building-blocks/sites/spaces/TDD/pages/605325079/OOTS%2BTechnical%2BDesign%2BDocuments%2BReleases) |
+| [Specification of common formats and API for relying-party registration information] | [The European Commission Specification of common formats and API for Relying Party Registration information](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts7-common-interface-for-data-deletion-request.md) |
+| [Provider information specification]   | [The European Commission Technical Specification of systems enabling the notification and subsequent publication of Provider information](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts2-notification-publication-provider-information.md) |
+| [ETSI TS 119 478]                                 | [ETSI TS 119 478 V0.0.2 Electronic Signatures and Trust Infrastructures (ESI); Specification of interfaces related to Authentic Sources](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/26) (draft) |
 | [ETSI TS 119 612]                                 | [ETSI TS 119 612 V2.3.1 Electronic Signatures and Trust Infrastructure (ESI); Trusted Lists](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/41) |
 | [ETSI TS 119 602]                                 | [ETSI TS 119 602 V0.0.1 Electronic Signatures and Trust Infrastructure (ESI); List of trusted entities; Data model](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/278) (draft) |
 | [OpenID4VCI]    |   [OpenID for Verifiable Credential Issuance 1.0 - draft 17](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/3) (draft)                  |
+| [OpenID4VP]     |  [OpenID for Verifiable Credential Presentation 1.0 - draft 27](https://openid.net/specs/openid-4-verifiable-presentations-1_0-27.html) (draft) |
 | [ISO 23220-2]   |   [ISO/IEC TS 23220-2:2024 - Cards and security devices for personal identification — Building blocks for identity management via mobile devices, Part 2: Data objects and encoding rules for generic eID systems](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/388)                          |
 | [ISO 23220-7]   |   [ISO/IEC AWI 23220-7 - Cards and security devices for personal identification — Building blocks for identity management via mobile devices, Part 7: Registration Authority Procedures for Mobile Document](https://www.iso.org/standard/90046.html) (draft)                  |
+|  [ISO 18045]   |    [Information security, cybersecurity and privacy protection — Evaluation criteria for IT security — Methodology for IT security evaluation:2022](https://www.iso.org/standard/72889.html)  |
+| [RFC 5280]  | [Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile](https://doi.org/10.17487/RFC5280) |
+|  [RFC 3986]   | [Uniform Resource Identifier (URI): Generic Syntax](https://datatracker.ietf.org/doc/html/rfc3986)        |
+| |  |
 
 ## Annex A
+
+> Note: Set of meaningful annexes (esp. 1, 4, 5 & 6) for TS11 are open for discussion, as:
+> * schema examples exist for different format types in their native SDO publications
+> * Catalogue of Attributes may end up having a RDF schema if hosted in DCAT/SDG based system
 
 ### A.1 JSON Schema for attributes in Catalogue of Attributes (normative)
 
 TBA
 
-### A.2 JSON Schema for SD-JWT VC attestation schemas in Catalogue of Schemes (normative)
+### A.2 JSON Schema for Catalogue of Schemas data model (normative)
+
+The file [￼`ts11-json-cat-schemas-data-model`￼](api/ts11-json-cat-schemas-data-model.json) contains the JSON schema for the Catalogue of Schemas data model.
+
+### A.3 OpenAPI Specification for Catalogue of Schemas API (normative)
+
+The file [￼`ts11-cat-of-schemas-openapi`￼](api/ts11-cat-of-schemas-jwt-openapi31.yml) contains the [OpenAPI](https://spec.openapis.org/oas/latest.html) specification of the JSON and REST based application programming interface methods described in [Section 5](#5-application-programming-interface-for-management-of-machine-readable-attestation-schemas).
+
+### A.4 JSON Schema for SD-JWT VC attestation schemas in Catalogue of Schemas (normative)
 
 TBA
 
-### A.3 JSON Schema for ISO mdoc attestation schemas in Catalogue of Schemes (normative)
+### A.5 JSON Schema for ISO mdoc attestation schemas in Catalogue of Schemas (normative)
 
 TBA
 
-### A.4 JSON Schemas for W3C VC format attestation schemas in Catalogue of Schemes (informative)
+### A.6 JSON Schemas for W3C VC format attestation schemas in Catalogue of Schemas (informative)
 
 TBA
 
-### A.5 OpenAPI Specification for Catalogue of Schemes API (normative)
+### A.7 XML Schemas (informative)
 
-The file [￼`ts11-openapi31-attesttionschemes-api.yml`￼](~api/ts11-openapi31-attestationschemes-api.yml~) contains the [OpenAPI](~https://spec.openapis.org/oas/latest.html~) specification of the JSON and REST based application programming interface methods described in [Section 5](~#5-application-programming-interface~).
-
-### A.6 XML Schemas (informative)
-
-TBA
+The file [`ts11-xds-cat-schemas-data-model`](api/ts11-xds-cat-schemas-data-model.xds) contains the XML schema for the Catalogue of Schemas data model.

@@ -1,0 +1,131 @@
+{  
+  "$schema": "http://json-schema.org/draft-04/schema#",
+	"id": "http://data.europa.eu/eudi/attestationschemas.json",
+  "title": "SchemaMeta",
+  "description": "A common attestation schema data model",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "The unique, server-assigned identifier for the schema",
+      "type": "string",
+      "format": "uuid"
+    },
+    "version": {
+      "description": "Version of the schema following SemVer practices",
+      "type": "string"
+    },
+    "rulebookURI": {
+      "description": "URI to the human-readable Attestation Rulebook",
+      "type": "string",
+      "format": "uri"
+    },
+    "trustedAuthorities": {
+      "description": "Optional object that resolves to the applicable trust management scheme (trust model) or trust anchor to be used",
+      "type": "object",
+        "$ref": "#/$defs/TrustAuthority"
+    },
+    "attestationLoA": {
+      "description": "Level of Assurance the attestation is to be provided at",
+      "type": "string",
+      "enum": [
+        "iso_18045_high",
+        "iso_18045_moderate",
+        "iso_18045_enhanced-basic",
+        "iso_18045_basic",
+        "eu_high",
+        "eu_substantial",
+        "eu_high"
+      ]
+    },
+    "bindingLevel": {
+      "description": "Required level of cryptographic key binding",
+      "type": "string",
+      "enum": [
+        "WSCD",
+        "keystore",
+        "none"
+      ]
+    },
+    "supportedFormats": {
+      "description": "Array of formats available for the attestation type",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "dc+sd-jwt",
+          "mso_mdoc",
+          "jwt_vc_json",
+          "jwt_vc_json-ld",
+          "ldp_vc"
+        ]
+      },
+      "minItems": 1
+    },
+    "schemaURIs": {
+      "description": "Array of format-specific schema URIs",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Schema"
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "version",
+    "rulebookURI",
+    "attestationLoA",
+    "bindingLevel",
+    "supportedFormats",
+    "schemaURIs"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "Schema": {
+      "title": "Schema",
+      "description": "Defines a format-specific schema URI",
+      "type": "object",
+      "properties": {
+        "formatIdentifier": {
+          "description": "Identifier for the specific format",
+          "type": "string",
+          "enum": [
+            "dc+sd-jwt",
+            "mso_mdoc",
+            "jwt_vc_json",
+            "jwt_vc_json-ld",
+            "ldp_vc"
+          ]
+        },
+        "uri": {
+          "description": "Persistent schema URI for the particular attestation format",
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": ["formatIdentifier", "uri"],
+      "additionalProperties": false
+    },
+    "TrustAuthority": {
+      "title": "TrustAuthority",
+      "description": "Applicable trust model/framework type and identifier for attestation type",
+      "type": "object",
+      "properties": {
+        "frameworkType": {
+          "description": "Trust framework type from OID4VP Section 6.1.1.",
+          "type": "string",
+          "enum": [
+            "aki",
+            "etsi_tl",
+            "openid_federation"
+          ]
+        },
+        "value": {
+          "description": "base64url or uri-formatted identifier according to the type",
+          "type": "string"
+        }
+      },
+      "required": ["frameworkType", "value"],
+      "additionalProperties": false
+    }
+  }
+}
