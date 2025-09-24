@@ -1,0 +1,21 @@
+classDiagram
+    class Attribute {
+        +rdfs:Literal[] name
+        +rdfs:Literal identifier
+        +rdfs:Literal description
+        +string semDescription
+        +string version
+        +string nameSpace
+        +vcard:Kind[] contactInfo
+        +[Provider information specification]:Law legalBasis
+        +AuthenticSourceEVS[] authenticSources
+    }
+
+    class AuthenticSourceEVS {
+        +string country
+        +string nationalSubID
+        +string integrationType
+        +string endpoint
+    }
+
+    Attribute "1" *-- "1..*" AuthenticSourceEVS : contains

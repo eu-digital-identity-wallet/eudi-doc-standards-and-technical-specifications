@@ -1,0 +1,272 @@
+openapi: 3.1.0
+info:
+  title: Catalogue of schemas API
+  version: v1 # Please provide the API version
+  description: |
+    An API for managing and retrieving machine-readable attestation schemas. 
+    It allows for querying schemas based on various criteria and provides methods for updating and deleting them.
+  contact:
+    name: API Support
+    url: https://support.example.com
+    email: support@example.com
+servers:
+  - url: https://example.com/schemacatalog/v1 # Please provide applicable URL
+    description: Production Server
+tags:
+  - name: Schemas
+    description: Operations for managing attestation schemas
+
+paths:
+  /schemas:
+    get:
+      tags:
+        - Schemas
+      summary: List Attestation Schemas
+      description: |
+        Retrieves a paginated list of attestation schemas as a JWS-signed object, with options to filter by various properties.
+      operationId: listSchemas
+      parameters:
+        - name: id
+          in: query
+          description: Filter by the unique identifier of the schema.
+          schema:
+            type: string
+            format: uuid
+        - name: supportedFormats
+          in: query
+          description: Filter schemas by one or more supported formats.
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [dc+sd-jwt, mso_mdoc, jwt_vc_json, jwt_vc_json-ld, ldp_vc]
+          style: form
+          explode: false
+        - name: attestationLoA
+          in: query
+          description: Filter schemas by the level of assurance.
+          schema:
+            type: string
+            enum: [iso_18045_high, iso_18045_moderate, iso_18045_enhanced-basic, iso_18045_basic, eu_loa_high, eu_loa_substantial, eu_loa_low]
+        - name: bindingLevel
+          in: query
+          description: Filter schemas by the cryptographic key binding level.
+          schema:
+            type: string
+            enum: [wsca, keystore, none]
+        - name: trustedAuthoritiesFrameworkType
+          in: query
+          description: Filter by the framework type of the trusted authority.
+          schema:
+            type: string
+            enum: [aki, etsi_tl, openid_federation]
+        - name: trustedAuthoritiesValue
+          in: query
+          description: Filter by the uri or base64url of the trusted authority.
+          schema:
+            type: string
+        - name: schemaUri
+          in: query
+          description: Filter schemas that contain a specific schema URI.
+          schema:
+            type: string
+            format: uri
+        - name: rulebookUri
+          in: query
+          description: Filter by the exact rulebook URI.
+          schema:
+            type: string
+            format: uri
+        - name: limit
+          in: query
+          description: The number of items to return.
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          description: The number of items to skip for pagination.
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: A JWS-signed object containing the paginated list of attestation schemas.
+          headers:
+            x-jku-url:
+              description: URL pointing to the JSON Web Key Set (JWKS) used to verify the signature.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/jwt:
+              schema:
+                type: string
+                format: JWS
+                description: |
+                  A JWS-signed JWT in compact serialisation format.
+                  The JWT payload, once decoded and verified, conforms to the 'SignedSchemaListPayload' schema.
+        '400':
+          description: Invalid query parameters.
+
+  /schemas/{schemaId}:
+    parameters:
+      - name: schemaId
+        in: path
+        required: true
+        description: The unique identifier of the schema.
+        schema:
+          type: string
+          format: uuid
+    put:
+      tags:
+        - Schemas
+      summary: Update an Attestation Schema
+      description: Updates an existing attestation schema by its unique identifier.
+      operationId: updateSchema
+      requestBody:
+        required: true
+        description: The complete SchemaMeta object to update.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SchemaMeta'
+      responses:
+        '200':
+          description: Successfully updated schema.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SchemaMeta'
+        '400':
+          description: Invalid request body provided.
+        '404':
+          description: Schema with the specified ID not found.
+    delete:
+      tags:
+        - Schemas
+      summary: Delete an Attestation Schema
+      description: Deletes an attestation schema by its unique identifier.
+      operationId: deleteSchema
+      responses:
+        '204':
+          description: Successfully deleted the schema.
+        '404':
+          description: Schema with the specified ID not found.
+
+components:
+  schemas:
+    SignedSchemaListPayload:
+      title: SignedSchemaListPayload
+      description: The schema for the payload contained within the signed JWT response.
+      type: object
+      properties:
+        iss:
+          type: string
+          format: uri
+          description: "Issuer: The identifier of the API."
+        iat:
+          type: integer
+          description: "Issued At: The timestamp at which the JWT was issued."
+        data:
+          $ref: '#/components/schemas/PaginatedSchemaList'
+      required: [iss, iat, data]
+      
+    PaginatedSchemaList:
+      title: PaginatedSchemaList
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Total number of schemas matching the query.
+        limit:
+          type: integer
+          description: The limit for this page.
+        offset:
+          type: integer
+          description: The offset for this page.
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/SchemaMeta'
+            
+    SchemaMeta:
+      title: SchemaMeta
+      description: A common attestation schema data model.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The unique identifier of the schema.
+          readOnly: true
+        version:
+          description: Version of the schema following SemVer practices.
+          type: string
+        rulebookURI:
+          description: URI to the human-readable Attestation Rulebook.
+          type: string
+          format: uri
+        trustedAuthorities:
+          description: Optional object that resolves to the applicable trust management scheme.
+          $ref: '#/components/schemas/TrustAuthority'
+        attestationLoA:
+          description: Level of Assurance the attestation is to be provided at.
+          type: string
+          enum: [iso_18045_high, iso_18045_moderate, iso_18045_enhanced-basic, iso_18045_basic, eu_loa_high, eu_loa_substantial, eu_loa_low]
+        bindingLevel:
+          description: Required level of cryptographic key binding.
+          type: string
+          enum: [wsca, keystore, none]
+        supportedFormats:
+          description: Array of formats available for the attestation type.
+          type: array
+          items:
+            type: string
+            enum: [dc+sd-jwt, mso_mdoc, jwt_vc_json, jwt_vc_json-ld, ldp_vc]
+          minItems: 1
+        schemaURIs:
+          description: Array of format-specific schema URIs.
+          type: array
+          items:
+            $ref: '#/components/schemas/Schema'
+          minItems: 1
+      required:
+        - version
+        - rulebookURI
+        - attestationLoA
+        - bindingLevel
+        - supportedFormats
+        - schemaURIs
+      additionalProperties: false
+
+    Schema:
+      title: Schema
+      description: Defines a format-specific schema URI.
+      type: object
+      properties:
+        formatIdentifier:
+          description: Identifier for the specific format.
+          type: string
+          enum: [dc+sd-jwt, mso_mdoc, jwt_vc_json, jwt_vc_json-ld, ldp_vc]
+        uri:
+          description: Persistent schema URI for the particular attestation format.
+          type: string
+          format: uri
+      required: [formatIdentifier, uri]
+      additionalProperties: false
+
+    TrustAuthority:
+      title: TrustAuthority
+      description: Applicable trust model/framework type and identifier for attestation type.
+      type: object
+      properties:
+        frameworkType:
+          description: Trust framework type from OID4VP Section 6.1.1.
+          type: string
+          enum: [aki, etsi_tl, openid_federation]
+        value:
+          description: base64url or uri-formatted identifier according to the type.
+          type: string
+      required: [frameworkType, value]
+      additionalProperties: false

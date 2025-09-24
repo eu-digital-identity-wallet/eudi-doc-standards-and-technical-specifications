@@ -1,0 +1,25 @@
+---
+classDiagram
+    class SchemaMeta {
+        +string id
+        +string version
+        +string rulebookURI
+        +TrustAuthority trustedAuthorities
+        +string attestationLoA
+        +string bindingLevel
+        +string[] supportedFormats
+        +Schema[] schemaURIs
+    }
+    class Schema {
+        +string formatIdentifier
+        +string uri
+
+    }
+    class TrustAuthority {
+        +string frameworkType
+        +string value
+
+    }
+    SchemaMeta "1" *-- "1..*" Schema : contains
+    SchemaMeta "1" *-- "1..1" TrustAuthority : contains
+

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://data.europa.eu/eudi/attestationschemas/v1"
+           xmlns:tns="http://data.europa.eu/eudi/attestationschemas/v1"
+           elementFormDefault="qualified">
+
+    <!-- Root Element Definition -->
+    <xs:element name="SchemaMeta" type="tns:SchemaMetaType">
+        <xs:annotation>
+            <xs:documentation>A common attestation schema data model</xs:documentation>
+        </xs:annotation>
+    </xs:element>
+
+    <!-- Main Complex Type: SchemaMetaType -->
+    <xs:complexType name="SchemaMetaType">
+        <xs:sequence>
+            <xs:element name="id" type="xs:string" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>The unique, server-assigned identifier for the schema</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="version" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Version of the schema following SemVer practices</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="rulebookURI" type="xs:anyURI">
+                <xs:annotation>
+                    <xs:documentation>URI to the human-readable Attestation Rulebook</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="trustedAuthorities" type="tns:TrustAuthorityType" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>Optional object that resolves to the applicable trust management scheme (trust model) or trust anchor to be used</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="attestationLoA" type="tns:AttestationLoAType">
+                <xs:annotation>
+                    <xs:documentation>Level of Assurance the attestation is to be provided at</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="bindingLevel" type="tns:BindingLevelType">
+                <xs:annotation>
+                    <xs:documentation>Required level of cryptographic key binding</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="supportedFormats" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>Array of formats available for the attestation type</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="format" type="tns:SupportedFormatType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="schemaURIs" type="tns:SchemaType" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>Array of format-specific schema URIs</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Auxiliary Complex Type: SchemaType -->
+    <xs:complexType name="SchemaType">
+        <xs:annotation>
+            <xs:documentation>Defines a format-specific schema URI</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="formatIdentifier" type="tns:SupportedFormatType">
+                <xs:annotation>
+                    <xs:documentation>Identifier for the specific format</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="uri" type="xs:anyURI">
+                <xs:annotation>
+                    <xs:documentation>Persistent schema URI for the particular attestation format</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Auxiliary Complex Type: TrustAuthorityType -->
+    <xs:complexType name="TrustAuthorityType">
+        <xs:annotation>
+            <xs:documentation>Applicable trust model/framework type and identifier for attestation type</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="frameworkType" type="tns:FrameworkType">
+                <xs:annotation>
+                    <xs:documentation>Trust framework type from OID4VP Section 6.1.1.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="value" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>base64url or uri-formatted identifier according to the type</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Enumeration Simple Types -->
+    <xs:simpleType name="AttestationLoAType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="iso_18045_high"/>
+            <xs:enumeration value="iso_18045_moderate"/>
+            <xs:enumeration value="iso_18045_enhanced-basic"/>
+            <xs:enumeration value="iso_18045_basic"/>
+            <xs:enumeration value="eu_high"/>
+            <xs:enumeration value="eu_substantial"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="BindingLevelType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="WSCD"/>
+            <xs:enumeration value="keystore"/>
+            <xs:enumeration value="none"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="SupportedFormatType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="dc+sd-jwt"/>
+            <xs:enumeration value="mso_mdoc"/>
+            <xs:enumeration value="jwt_vc_json"/>
+            <xs:enumeration value="jwt_vc_json-ld"/>
+            <xs:enumeration value="ldp_vc"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="FrameworkType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="aki"/>
+            <xs:enumeration value="etsi_tl"/>
+            <xs:enumeration value="openid_federation"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+</xs:schema>
