@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/Attribute.json",
+  "title": "Attribute",
+  "description": "Schema for Attribute data class",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "The name of the attribute, shall be provided at least in English. Language for a string is indicated with @CC tag.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "identifier": {
+      "description": "A unique identifier for the attribute in form of a URI according to RFC3986",
+      "type": "string",
+      "format": "uri"
+    },
+    "description": {
+      "description": "A human-friendly description of the attribute, to be provided at least in English. Language for a string is indicated with @CC tag.",
+      "type": "string"
+    },
+    "semDescription": {
+      "description": "URI pointing to semantic description of the attribute in the OOTS Semantic Repository",
+      "type": "string",
+      "format": "uri"
+    },
+    "nameSpace": {
+      "description": "Optional URI assigned for the attribute's exact namespace (if not the one pointed at by namespace element in identifier, which can be a local SDG namespace).",
+      "type": "string",
+      "format": "uri"
+    },
+    "contactInfo": {
+      "description": "Array of URIs that provide the contact information of the entity which requested to include the attribute in the catalogue of attributes.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+      "minItems": 1
+    },
+    "legalBasis": {
+      "description": "Reference to the legal basis for the attribute.",
+      "type": "string"
+    },
+    "authenticSources": {
+      "description": "An array of data services for verification of the attribute value from an authentic source.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/DataService"
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "name",
+    "identifier",
+    "semDescription",
+    "authenticSources"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "DataService": {
+      "title": "DataService",
+      "description": "Represents a data service providing an endpoint for authentic source.",
+      "type": "object",
+      "properties": {
+        "country": {
+          "description": "Specifies the member state through a country code."
+          "type": "string"
+        },
+        "nationalSubID": {
+          "description": "optional, narrows down a respective authentic source in the member state defined in country.",
+          "type": "string"
+        },
+        "endpointDescription": {
+          "description": "A description of the services available via the endpoint. The property gives specific details of the actual endpoint instances.",
+          "type": "string"
+        },
+        "endpointURI": {
+          "description": "URI of the root location or primary endpoint of the service (an IRI) for either verifying or retrieving data from the service.",
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "country",
+        "endpointDescription",
+        "endpointURI"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
+

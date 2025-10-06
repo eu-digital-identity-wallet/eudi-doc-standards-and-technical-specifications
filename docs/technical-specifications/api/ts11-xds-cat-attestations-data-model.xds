@@ -29,19 +29,19 @@
                     <xs:documentation>URI to the human-readable Attestation Rulebook</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="trustedAuthorities" type="tns:TrustAuthorityType" minOccurs="0">
+            <xs:element name="trustedAuthorities" type="tns:TrustAuthorityType" minOccurs="0" maxOccurs="unbounded">
                 <xs:annotation>
-                    <xs:documentation>Optional object that resolves to the applicable trust management scheme (trust model) or trust anchor to be used</xs:documentation>
+                    <xs:documentation>Optional object(s) that resolve to the applicable trust management scheme (trust model) or trust anchor to be used</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="attestationLoA" type="tns:AttestationLoAType">
+            <xs:element name="attestationLoS" type="tns:AttestationLoSType">
                 <xs:annotation>
-                    <xs:documentation>Level of Assurance the attestation is to be provided at</xs:documentation>
+                    <xs:documentation>Level of Security the attestation is to be provided at</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="bindingLevel" type="tns:BindingLevelType">
+            <xs:element name="bindingType" type="tns:BindingTypeType">
                 <xs:annotation>
-                    <xs:documentation>Required level of cryptographic key binding</xs:documentation>
+                    <xs:documentation>Required type of cryptographic key binding</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="supportedFormats" maxOccurs="unbounded">
@@ -97,25 +97,29 @@
                     <xs:documentation>base64url or uri-formatted identifier according to the type</xs:documentation>
                 </xs:annotation>
             </xs:element>
+            <xs:element name="isLOTE" type="xs:boolean" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>SHALL be set TRUE when framework type is an ETSI Trusted List (etsi_tl) but the trusted list behind the value URI is a list of trusted entities (LoTE)</xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:sequence>
     </xs:complexType>
 
     <!-- Enumeration Simple Types -->
-    <xs:simpleType name="AttestationLoAType">
+    <xs:simpleType name="AttestationLoSType">
         <xs:restriction base="xs:string">
             <xs:enumeration value="iso_18045_high"/>
             <xs:enumeration value="iso_18045_moderate"/>
             <xs:enumeration value="iso_18045_enhanced-basic"/>
             <xs:enumeration value="iso_18045_basic"/>
-            <xs:enumeration value="eu_high"/>
-            <xs:enumeration value="eu_substantial"/>
         </xs:restriction>
     </xs:simpleType>
 
-    <xs:simpleType name="BindingLevelType">
+    <xs:simpleType name="BindingTypeType">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="WSCD"/>
-            <xs:enumeration value="keystore"/>
+            <xs:enumeration value="claim"/>
+            <xs:enumeration value="key"/>
+            <xs:enumeration value="biometric"/>
             <xs:enumeration value="none"/>
         </xs:restriction>
     </xs:simpleType>
