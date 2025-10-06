@@ -1,16 +1,16 @@
 openapi: 3.1.0
 info:
-  title: Catalogue of schemas API
+  title: Catalogue of attestations API
   version: v1 # Please provide the API version
   description: |
     An API for managing and retrieving machine-readable attestation schemas. 
-    It allows for querying schemas based on various criteria and provides methods for updating and deleting them.
+    It allows for querying attestation schemas based on various criteria and provides methods for updating and deleting them.
   contact:
     name: API Support
     url: https://support.example.com
     email: support@example.com
 servers:
-  - url: https://example.com/schemacatalog/v1 # Please provide applicable URL
+  - url: https://example.com/attestationcatalog/v1 # Please provide applicable URL
     description: Production Server
 tags:
   - name: Schemas
@@ -28,7 +28,7 @@ paths:
       parameters:
         - name: id
           in: query
-          description: Filter by the unique identifier of the schema.
+          description: Filter by the unique identifier of the attestation schema.
           schema:
             type: string
             format: uuid
@@ -42,18 +42,18 @@ paths:
               enum: [dc+sd-jwt, mso_mdoc, jwt_vc_json, jwt_vc_json-ld, ldp_vc]
           style: form
           explode: false
-        - name: attestationLoA
+        - name: attestationLoS
           in: query
-          description: Filter schemas by the level of assurance.
+          description: Filter schemas by the level of security.
           schema:
             type: string
-            enum: [iso_18045_high, iso_18045_moderate, iso_18045_enhanced-basic, iso_18045_basic, eu_loa_high, eu_loa_substantial, eu_loa_low]
-        - name: bindingLevel
+            enum: [iso_18045_high, iso_18045_moderate, iso_18045_enhanced-basic, iso_18045_basic]
+        - name: bindingType
           in: query
-          description: Filter schemas by the cryptographic key binding level.
+          description: Filter schemas by the cryptographic key binding type.
           schema:
             type: string
-            enum: [wsca, keystore, none]
+            enum: [claim, key, biometric, none]
         - name: trustedAuthoritiesFrameworkType
           in: query
           description: Filter by the framework type of the trusted authority.
@@ -67,7 +67,7 @@ paths:
             type: string
         - name: schemaUri
           in: query
-          description: Filter schemas that contain a specific schema URI.
+          description: Filter attestation schemas that contain a specific schema URI.
           schema:
             type: string
             format: uri
@@ -114,7 +114,7 @@ paths:
       - name: schemaId
         in: path
         required: true
-        description: The unique identifier of the schema.
+        description: The unique identifier of the attestation schema.
         schema:
           type: string
           format: uuid
@@ -133,7 +133,7 @@ paths:
               $ref: '#/components/schemas/SchemaMeta'
       responses:
         '200':
-          description: Successfully updated schema.
+          description: Successfully updated attestation schema.
           content:
             application/json:
               schema:
@@ -141,7 +141,7 @@ paths:
         '400':
           description: Invalid request body provided.
         '404':
-          description: Schema with the specified ID not found.
+          description: Attestation schema with the specified ID not found.
     delete:
       tags:
         - Schemas
@@ -150,9 +150,9 @@ paths:
       operationId: deleteSchema
       responses:
         '204':
-          description: Successfully deleted the schema.
+          description: Successfully deleted the attestation schema.
         '404':
-          description: Schema with the specified ID not found.
+          description: Attestation schema with the specified ID not found.
 
 components:
   schemas:
@@ -208,16 +208,16 @@ components:
           type: string
           format: uri
         trustedAuthorities:
-          description: Optional object that resolves to the applicable trust management scheme.
+          description: Optional object(s) that resolve to the applicable trust management scheme(s).
           $ref: '#/components/schemas/TrustAuthority'
-        attestationLoA:
-          description: Level of Assurance the attestation is to be provided at.
+        attestationLoS:
+          description: Level of Security the attestation is to be provided at.
           type: string
-          enum: [iso_18045_high, iso_18045_moderate, iso_18045_enhanced-basic, iso_18045_basic, eu_loa_high, eu_loa_substantial, eu_loa_low]
-        bindingLevel:
-          description: Required level of cryptographic key binding.
+          enum: [iso_18045_high, iso_18045_moderate, iso_18045_enhanced-basic, iso_18045_basic]
+        bindingType:
+          description: Required type of cryptographic key binding.
           type: string
-          enum: [wsca, keystore, none]
+          enum: [claim, key, biometric, none]
         supportedFormats:
           description: Array of formats available for the attestation type.
           type: array
@@ -234,8 +234,8 @@ components:
       required:
         - version
         - rulebookURI
-        - attestationLoA
-        - bindingLevel
+        - attestationLoS
+        - bindingType
         - supportedFormats
         - schemaURIs
       additionalProperties: false
@@ -268,5 +268,8 @@ components:
         value:
           description: base64url or uri-formatted identifier according to the type.
           type: string
+        isLOTE:
+          description: optional boolean value that is set TRUE when the applicable trust framework type is an ETSI Trusted List (etsi_tl) but the trusted list behind the value URI is a list of trusted entities (LoTE).
+          type: boolean
       required: [frameworkType, value]
       additionalProperties: false

@@ -2,20 +2,19 @@ classDiagram
     class Attribute {
         +rdfs:Literal[] name
         +rdfs:Literal identifier
-        +rdfs:Literal description
+        +rdfs:Literal[] description
         +string semDescription
-        +string version
         +string nameSpace
-        +vcard:Kind[] contactInfo
+        +URI[] contactInfo
         +[Provider information specification]:Law legalBasis
-        +AuthenticSourceEVS[] authenticSources
+        +DataService[] authenticSources
     }
 
-    class AuthenticSourceEVS {
+    class DataService {
         +string country
         +string nationalSubID
-        +string integrationType
-        +string endpoint
+        +rdfs:Resource endpointDescription
+        +string endpointURI
     }
 
-    Attribute "1" *-- "1..*" AuthenticSourceEVS : contains
+    Attribute "1" *-- "1..*" DataService : contains

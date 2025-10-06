@@ -20,29 +20,30 @@
       "format": "uri"
     },
     "trustedAuthorities": {
-      "description": "Optional object that resolves to the applicable trust management scheme (trust model) or trust anchor to be used",
-      "type": "object",
+      "description": "Optional object(s) that resolve to the applicable trust management scheme (trust model) or trust anchor to be used",
+      "type": "array",
+      "items": {
         "$ref": "#/$defs/TrustAuthority"
+      },
+      "minItems": 0
     },
-    "attestationLoA": {
-      "description": "Level of Assurance the attestation is to be provided at",
+    "attestationLoS": {
+      "description": "Level of Security the attestation is to be provided at",
       "type": "string",
       "enum": [
         "iso_18045_high",
         "iso_18045_moderate",
         "iso_18045_enhanced-basic",
-        "iso_18045_basic",
-        "eu_high",
-        "eu_substantial",
-        "eu_high"
+        "iso_18045_basic" 
       ]
     },
-    "bindingLevel": {
-      "description": "Required level of cryptographic key binding",
+    "bindingType": {
+      "description": "Required type of cryptographic key binding",
       "type": "string",
       "enum": [
-        "WSCD",
-        "keystore",
+        "claim",
+        "key",
+        "biometric",
         "none"
       ]
     },
@@ -73,8 +74,8 @@
   "required": [
     "version",
     "rulebookURI",
-    "attestationLoA",
-    "bindingLevel",
+    "attestationLoS",
+    "bindingType",
     "supportedFormats",
     "schemaURIs"
   ],
@@ -122,6 +123,10 @@
         "value": {
           "description": "base64url or uri-formatted identifier according to the type",
           "type": "string"
+        },
+        "isLOTE": {
+          "description": "optional boolean qualifier set TRUE for LoTE type of ETSI trusted list",
+          "type": "boolean"
         }
       },
       "required": ["frameworkType", "value"],

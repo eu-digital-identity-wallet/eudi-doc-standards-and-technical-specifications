@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="https://example.com/schemas/attribute/v1"
+           xmlns:tns="https://example.com/schemas/attribute/v1"
+           elementFormDefault="qualified">
+
+    <!-- Root Element Definition -->
+    <xs:element name="Attribute" type="tns:AttributeType"/>
+
+    <!-- Complex Type: AttributeType -->
+    <xs:complexType name="AttributeType">
+        <xs:sequence>
+            <xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>The name of the attribute, shall be provided at least in English. Language for a string is indicated with @CC tag.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="identifier" type="xs:string">
+                 <xs:annotation>
+                    <xs:documentation>A unique identifier for the attribute in form of a URI according to RFC3986.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+                 <xs:annotation>
+                    <xs:documentation>A human-friendly description of the attribute, to be provided at least in English. Language for a string is indicated with @CC tag.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="semDescription" type="xs:string">
+                 <xs:annotation>
+                    <xs:documentation>URI pointing to semantic description of the attribute in the OOTS Semantic Repository.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="nameSpace" type="xs:string" minOccurs="0">
+                 <xs:annotation>
+                    <xs:documentation>Optional URI assigned for the attribute's exact namespace (if not the one pointed at by namespace element in identifier, which can be a local SDG namespace).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="contactInfo" type="xs:anyURI" minOccurs="1" maxOccurs="unbounded">
+                 <xs:annotation>
+                    <xs:documentation>Array of URIs that provide the contact information of the entity which requested to include the attribute in the catalogue of attributes.</xs:documentation>
+                </sxs:annotation>
+            </xs:element>
+            <xs:element name="legalBasis" type="xs:string" minOccurs="0">
+                 <xs:annotation>
+                    <xs:documentation>Reference to the legal basis for the attribute.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="authenticSources" type="tns:DataServiceType" maxOccurs="unbounded">
+                 <xs:annotation>
+                    <xs:documentation>An array of data services for verification of the attribute value from an authentic source.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Complex Type: DataServiceType -->
+    <xs:complexType name="DataServiceType">
+         <xs:annotation>
+            <xs:documentation>Represents an authentic data source endpoint.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="country" type="xs:string"/>
+                <xs:annotation>
+                    <xs:documentation>Specifies the member state through a country code.</xs:documentation>
+                </xs:annotation>
+            <xs:element name="nationalSubID" type="xs:string" minOccurs="0"/>
+                <xs:annotation>
+                    <xs:documentation>Optional, narrows down a respective authentic source in the member state defined in country.</xs:documentation>
+                </xs:annotation>
+            <xs:element name="endpointDescription" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>A description of the services available via the endpoint. The property gives specific details of the actual endpoint instances.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="endpointURI" type="xs:anyURI"/>
+                <xs:annotation>
+                    <xs:documentation>URI of the root location or primary endpoint of the service (an IRI) for either verifying or retrieving data from the service.</xs:documentation>
+                </xs:annotation>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
+
