@@ -7,7 +7,7 @@
     <xsd:complexType name="Claim">
         <xsd:sequence>
             <xsd:element name="path" type="xsd:string"/>
-            <xsd:element name="values" type="xsd:string"/>
+            <xsd:element name="values" type="tns:ArrayOfString" minOccurs="0"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -30,6 +30,7 @@
         <xsd:sequence>
             <xsd:element name="purpose" type="tns:ArrayOfMultiLangString" minOccurs="1"/>
             <xsd:element name="privacyPolicy" type="tns:ArrayOfPolicy" minOccurs="1"/>
+            <xsd:element name="intendedUseIdentifier" type="xsd:string"/>
             <xsd:element name="createdAt" type="xsd:string"/>
             <xsd:element name="revokedAt" type="xsd:string" minOccurs="0"/>
             <xsd:element name="credential" type="tns:ArrayOfCredential" minOccurs="1"/>
@@ -100,7 +101,7 @@
             <xsd:extension base="tns:Provider">
                 <xsd:sequence>
                     <xsd:element name="entitlement" type="tns:ArrayOfString" minOccurs="1"/>
-                    <xsd:element name="intendedUse" type="tns:ArrayOfIntendedUse" minOccurs="1"/>
+                    <xsd:element name="intendedUse" type="tns:ArrayOfIntendedUse" minOccurs="0"/>
                     <xsd:element name="isPSB" type="xsd:boolean" minOccurs="1"/>
                     <xsd:element name="providesAttestations" type="tns:Credential" minOccurs="0"/>
                     <xsd:element name="srvDescription" minOccurs="0">
@@ -119,8 +120,9 @@
                     <xsd:element name="supervisoryAuthority" type="tns:LegalEntity" minOccurs="0"/>
                     <xsd:element name="supportURI" type="tns:ArrayOfString" minOccurs="1"/>
                     <xsd:element name="tradeName" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="registryURI" type="xsd:string"/>
                     <xsd:element name="usesIntermediary" type="tns:ArrayOfWalletRelyingParty" minOccurs="0"/>
-                    <xsd:element name="isIntermediary" type="xsd:boolean" minOccurs="0"/>
+                    <xsd:element name="isIntermediary" type="xsd:boolean" minOccurs="1"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
