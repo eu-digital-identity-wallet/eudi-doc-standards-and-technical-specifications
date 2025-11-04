@@ -171,7 +171,9 @@ The following is a non-normative example of the SCA Attestation, for account-bas
 
 The associated SCA Attestation Rulebook mandates the use of specific metadata in the SCA Attestation, extends their specifications where necessary, and introduces new metadata sources to enhance trust, interoperability, and usability in the context of payments.
 
-This section provides a high-level overview of the metadata; the complete, normative specifications are contained in [SCA Attestation Rulebook].  
+This section provides a high-level overview of the metadata; the complete, normative specifications are contained in [SCA Attestation Rulebook].
+
+> FA: The normative specifications extending the SD-JWT metadata specs should be defined here in TS12 and not in the attestation rulebook. 
 
 #### 2.4.1 SCA Attestation Type Metadata
 
@@ -206,74 +208,38 @@ The following is a non-normative example of the SCA Attestation type metadata:
 
 #### 2.4.2 Transactional Data Schema
 
-The referenced in previous section JSON schema of a `transaction_data` object, specifies a set of parameters out of those envisioned by [OID4VP].
+This specification extends the transaction data object defined by [OID4VP] by an additional `data` parameter, which holds an object describing the actual transaction details. The `data` object is described by the JSON schema referenced in `schema` the SD-JWT metadata mentioned above.
 
-It uses i.a. the following parameters:
-
-+ `transaction_id` - identifier of the payment transaction, to be consented by the Wallet Unit User,
-+ `display` - an object containing parameters that the Wallet is to present to the User when obtaining consent for an SCA Attestation presentation; the Wallet Unit needs to retrieve the localized string from the localization catalog, which is specified in the `i18n` parameter of the SCA Attestation metadata.
-
-The following is a non-normative example of `transactional_data_schema`:
+The following is a non-normative example of the transaction data object:
 
 ```
 {
-    "$schema": "https://json-schema.org/draft/2019-09/schema#",
-    "title": "SinglePaymentRequest",
-    "type": "object",
-    "properties": {
-        "type": {
-            "type": "string"
-        },
-        "credential_ids": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        },
-        "transaction_data_hashes_alg": {
-            "type": "string"
-        },
-        "transaction_id": {
-            "type": "string"
-        },	
-        "display": {
-            "type": "object",
-            "title": "Payment",
-            "description": "Payment details",
-            "additionalProperties": false,
-            "required": [
-                "amount",
-                "currency",
-                "payee"
-            ],
-            "properties": {
-                "amount": {
-                    "type": "string",
-                    "minLength": 1,
-                    "maxLength": 8,
-                    "title": "single_payment.display.amount.title",
-                    "description": "single_payment.display.amount.description"
-                },
-                "currency": {
-                    "type": "string",
-                    "title": "single_payment.display.currency.title",
-                    "description": "single_payment.display.currency.description",
-                    "pattern": "^[A-Z]{3}$",
-                    "minLength": 3,
-                    "maxLength": 3
-                },
-                "payee": {
-                    "type": "string",
-                    "title": "single_payment.display.payee.title",
-                    "description": "single_payment.display.payee.description",
-                    "maxLength": 140
-                }
-            }
-        }
-    },
-    "additionalProperties": false
+  "type": "https://pay.example/trx/single_payment",
+  "credential_ids": ["payment_credential"],
+  "transaction_data_hashes_alg": "sha-256",
+  "data": {...}
 }
 ```
+
+The specification defines the following mandatory parameters:
+
++ `transaction_id` - identifier of the payment transaction, to be consented by the Wallet Unit User,
++ `display` - an object containing parameters that the Wallet MUST present to the User when obtaining consent for an SCA Attestation presentation; the Wallet Unit needs to retrieve the localized string from the localization catalog, which is specified in the `i18n` parameter of the SCA Attestation metadata.
+
+The following is a non-normative example of the transaction data object including the `data` object:
+
+```
+{
+  "type": "https://pay.example/trx/single_payment",
+  "credential_ids": ["payment_credential"],
+  "transaction_data_hashes_alg": "sha-256",
+  "data": {
+    "transaction_id": "b0f75d4d-996b-46df-abb6-e3ddec390d2b",
+    "display": {...}
+  }
+}
+```
+> FA: Removed example of the JSON schema as we include them in a separate file. 
 
 The catalogue of permitted and applicable to this specification transaction data schemas is contained in [SCA Attestation Rulebook].
 
