@@ -4,7 +4,7 @@
 
 ## Abstract
 
-The present document specifies the technical specification and requirements for
+The present document specifies the modular technical specification and requirements for
 the implementation of Zero-Knowledge Proof (ZKP) based on arithmetic circuits
 in the EUDI Wallet.
 
@@ -14,6 +14,8 @@ in the EUDI Wallet.
 
 | Version | Date | Description |
 |---------|------------|------------|
+| `0.9` | 7.111.2025 | Improvements based on internal review
+| `0.8` | 24.10.2025 | Improvements based on first focus meeting
 | `0.7` | 14.10.2025 | Improvements based on internal review
 | `0.6` | 09.10.2025 | Detailed circuit description extended, initial description of presentation protocols |
 | `0.5` | 02.10.2025 | Initial description for section 4.2 Detailed circuit description |
@@ -137,18 +139,53 @@ The circuit evaluates these inputs and outputs *true* if the defined conditions 
 "the attestation contains an age attribute greater than 18").  
 
 A Wallet Unit can then generate a ZKP demonstrating that it possesses a valid witness which, when  
-used with the specified circuit and public statement, results in the circuit outputting *true*.  
+used with the specified circuit and public statement, results in the circuit outputting *true*.
 
-### 3.1 Setup
+Defining ZK based on arithmetic circuits is a modular approach that is well 
+suited to the problem of digital identity for standardized credential formats. 
+Several recent ZK schemes, which rely on different techniques and complexity 
+assumptions, claim to process arithmetic circuits. For examples, ZK schemes 
+that rely on elliptic curve cryptography, such as Bulletproofs [BBDPWM2017] 
+and ZKAttest [FLM2021], can produce proofs concerning arithmetic circuits. 
+Similarly, ZK Schemes such as Ligero [Ame2017] and Longfellow [Fri2024] also 
+process arithmetic circuits, but only rely on the security of a hash function 
+such as SHA-256, and claim to be several factors more efficient.
 
-The solution class considered herein does not require a trusted setup phase. However, the arithmetic circuits used for cryptographic computations within the Wallet Unit must be designed, implemented, and distributed with great care to ensure correctness and security.  
+### 3.1 Security properties
+A ZKP system must satisfy three key properties:
+* Zero-Knowledge: If the statement is true, the verifier learns nothing beyond 
+the fact that the statement is correct.
+* Completeness: If the statement is true and both the prover and verifier follow 
+the protocol correctly, the verifier will be convinced of its validity.
+* Soundness: If the statement is false, a dishonest prover cannot convince an 
+honest verifier that it is true, **except with some negligible probability**.
 
-### 3.2 Issuance
+*Statistical soundness*. A zkSNARK has statistical soundness if, even against 
+an adversary with unbounded computational power, the probability that a false 
+statement is very low.  
 
-PID Providers or Attestation Providers remain unaffected by this scheme.  
-No changes are required to the existing attestation issuance process.  
 
-### 3.3 Presentation
+
+### 3.2 High-level overview
+
+A circuit-based ZK system for the EUDI Wallet ARF involves the following functions
+
+#### Setup
+
+The solution class considered herein does not require a trusted setup phase. 
+However, the arithmetic circuits used for cryptographic computations within the 
+Wallet Unit must be designed, implemented, and distributed with great care to 
+ensure correctness and security.  
+
+#### Issuance
+
+PID Providers or Attestation Providers remain unaffected by this scheme. No 
+changes are required to the existing attestation issuance process. This property 
+is considered to be the biggest advantage of this approach, because the privacy 
+properties offered by the ZK proof do not require changes to the issuance 
+infrastructure  
+
+#### Presentation
 
 To generate a zero-knowledge proof of attestation possession, the Wallet Unit encodes the attestation  
 as private inputs (witnesses) to an arithmetic circuit representing the desired statement.  
@@ -157,70 +194,103 @@ The Wallet Unit then executes the zkSNARK prover algorithm over the circuit usin
 producing a succinct proof. This proof can be verified by any relying party using only the public inputs
 and the circuit.  
 
-### 3.4 Performance
+### 3.3  Performance
+
 
 As evidence that this approach is well-suited for the privacy needs of the EUDI wallet, we here
 present performance results from the literature.
 According to [Fri2024], the Longfellow ZK library can generate a proof that an [ISO/IEC 18013-5] attestation is valid  
-and includes an `age_over_18` attribute in approximately 1.2 seconds on a Pixel 6 Pro device.  
+and includes an `age_over_18` attribute in approximately 800ms on a Pixel 6 Pro device.  
 Verification of the proof requires about 0.6 seconds, and the proof size is around 400 KB.  
 
-### Discussion
-- Who will be responsible for designing, implementing, evaluating, and distributing
-circuits? One approach is that there will be a centralized entity. Another is to 
-allow a different circuit per Attestation Provider. 
-- Shall we consider optimizations on the provider side?
 
 ## 4 Detailed circuit description
 
 (**Work in progress**)
 
 This section outlines a small set of circuit classes that will be useful in the EUDI wallet.  
-The aim is to define a circuit `C(x,w)` that takes a public input `x` and a private input `w` and validates that the presentation defined by `x`. Thus, the public input `x` must include all of the information that *defines* a presentation claim, and must *exclude* any private or linkable information.
+The aim is to define a circuit `C(x,w)` that takes a public input `x` and a private input `w` 
+and validates that the presentation defined by `x`. Thus, the public input `x` 
+must include all of the information that *defines* a presentation claim, and 
+must *exclude* any private or linkable information.
 
-The circuits here are expressed so that any ZK system that operates on arithmetic circuits should be able to encode the relevant theorem statement.  For deployment and management purposes, it is important to reduce the number of circuits needed to support all applications.  At the same time, it is also important to design circuits that are small, easily auditable, and performant---naturally both concerns conflict with one another.
+The circuits here are expressed so that any ZK system that operates on arithmetic 
+circuits should be able to encode the relevant theorem statement.  For deployment 
+and management purposes, it is important to reduce the number of circuits needed 
+to support all applications.  At the same time, it is also important to design 
+circuits that are small, easily auditable, and performant---naturally both 
+concerns conflict with one another.
 
-A circuit must be parameterized by a few universal quantities: the input size of the theorem statement. The theorem statement includes public parameters, such as a list of issuers, a time of day, a list of constraints on attributes, and private witnesses such as the original identity document, signatures by the issuer and device-bound keys, as well as auxiliary information that aids in verifying the statement.  The size of both of these components is a natural parameter for the circuit.  As such, the circuits shall be parameterized by the following quantities:
+A circuit must be parameterized by a few universal quantities: the input size of 
+the theorem statement. The theorem statement includes public parameters, such as 
+a list of Attestation Providers, a time of day, a list of constraints on attributes, and private 
+witnesses such as the original identity document, signatures by the issuer and 
+device-bound keys, as well as auxiliary information that aids in verifying the 
+statement. The size of both of these components is a natural parameter for the 
+circuit.  As such, the circuits shall be parameterized by the following quantities:
 
 1. The size of the input document format in bytes.
 2. The number of attributes disclosed in the presentation and their maximum size.
 3. The number of potential valid issuers under which the document has been signed.
 
-For example, a reasonable parameter selection might be (2000,3,64, 27) which supports 2000byte documents that allow disclosure of up to 3 identity attributes of up to 64 bytes that have been issued under a key that itself is signed by one of among 27 possible CA keys.
+For example, a reasonable parameter selection might be (2000,3,64, 27) which 
+supports 2000byte documents that allow disclosure of up to 3 identity attributes 
+of up to 64 bytes that have been issued under a key that itself is signed by 
+one of among 27 possible Attestation Provider keys.
 
 ### Further specialization by scheme
 
-Based on current best practices for ZK, it may also be favorable to further specialize circuits that are tailored for certain signature schemes and hash functions.  For example, a circuit may be specialized to only support ECDSA signatures for the P256 elliptic curve using SHA-256 as the hash function.
+Based on current best practices for ZK, it may also be favorable to further 
+specialize circuits that are tailored for certain signature schemes and hash 
+functions.  For example, a circuit may be specialized to only support ECDSA 
+signatures for the P256 elliptic curve using SHA-256 as the hash function.
 
 ### Further specialization by predicate
 
-The current MDOC and SD-JWT standards only allow asserting equality on the disclosed attributes. Some future standards allow a more expressive query language (e.g., OID4VP DCQL). It may be suitable to specialize circuits based on the predicates that are allowed for attributes. For example, for current EUDI functionality, it may be suitable to specialize circuits that only support checking for equality with a given string on the attributes that are presented.
+The current MDOC and SD-JWT standards only allow asserting equality on the 
+disclosed attributes. Some future standards allow a more expressive query 
+language (e.g., OID4VP DCQL). It may be suitable to specialize circuits based 
+on the predicates that are allowed for attributes. For example, for current 
+EUDI functionality, it may be suitable to specialize circuits that only support 
+checking for equality with a given string on the attributes that are presented.
 
 ### Circuit for ISO 18013-5 Attestations
 
-This section begins with a high-level specification for a circuit that verifies an ISO 18013-5 mdoc credential. The aim is to
-describe the constraints that should be verified, and then iteratively refine the constraints until a low-level circuit can be extracted.
+This section begins with a high-level specification for a circuit that verifies 
+an ISO 18013-5 mdoc credential. The aim is to
+describe the constraints that should be verified, and then iteratively refine 
+the constraints until a low-level circuit can be extracted.
 
-Per the framework above, the generic class of circuits defined in this section are meant to be specialized by their universal, scheme, and predicate parameters.  For example, the simplest example can be a (2000,3,64,1) credential that supports (ECDSA P256, SHA-256) and only the equality predicate for attributes.
+Per the framework above, the generic class of circuits defined in this section 
+are meant to be specialized by their universal, scheme, and predicate parameters.  
+For example, the simplest example can be a (2000,3,64,1) credential that supports 
+(ECDSA P256, SHA-256) and only the equality predicate for attributes.
 
-* The public information vector `x` contains (a) the x and y coordinates of the issuer's public key certificate, ipkx, and ipky, (b) the namespace, attribute name, and expected attribute value for each attribute that is disclosed, (c) the hash of the transcript, e2, used to define the freshness of the session and device-binding, and (d) the time `now`, in mdoc format, used to determine whether the credential has not expired and is currently valid.
+* The public information vector `V` contains (a) the x and y coordinates of the 
+Attestation Provider's public key certificate, ipkx, and ipky, (b) the namespace, attribute 
+name, and expected attribute value for each attribute that is disclosed, (c) 
+the hash of the transcript, e2, used to define the freshness of the session and 
+device-binding, and (d) the time `now`, in mdoc format, used to determine whether 
+the credential has not expired and is currently valid.
 
 * For now, we defer defining the private inputs, and instead specify the set of constraints that need to be validated:
-   1. There exist values e, (r,s) such that 0 < e,r,s < p, and verify_p256(ipkx, ipky, e, (r,s)) = true. In other words, there exists a signature under the issuer's public key on a message whose SHA-256 hash is equal to e.
-   2. <Note, it is better to have the CA key given as input, and verify that ipkx, ipky is signed by the CA>
+   1. There exist values e, (r,s) such that 0 < e,r,s < p, and verify_p256(ipkx, ipky, e, (r,s)) = true. In other words, there exists a signature under the Attestation Provider's public key on a message whose SHA-256 hash is equal to e.
+   2. Note, it is better to have the  Access Certificate Authority key given as input, and verify that ipkx, ipky is signed by the  Access Certificate Authority
    3. There exist values (r2, s2) and a device key (dpkx, dpky) such that verify_p256(dpkx, dpky, e2, (r2,s2)) = true.  This constraint verifies that the challenge message is signed by some key.
    4. There exists a byte string `mdoc` of length at most MAX such that SHA-256(mdoc) = e, and `mdoc` is a valid CBOR-encoded string.
    5. There exist strings validUntil and validFrom stored in the appropriate index in the `mdoc`, and if holds that 'validFrom` < `now` < `validUntil`.
    6. The byte strings (dpkx, dpky) occur in `mdoc` at ...<location path>.
    7. Add constraints that verify the attributes.
       * for each revealed attribute, there exists a preimage `pre` and an index `i` into the `mdoc` (give path) such that SHA-256(pre) = `attr_i` from the mdoc.
-      * The `pre` byte string encodes the attribute name and attribute value that are in the public parameter `x`. (Explain more precisely)
+      * The `pre` byte string encodes the attribute name and attribute value that are in the public parameter `V`. (Explain more precisely)
 
 #### Details on each step
 
 In this section, we specify each of the above steps in more detail.
 
-### Circuit for ZK-JWT Attestation
+### Circuit for JWT Attestation
+This section begins with a high-level specification for a circuit that verifies a 
+credential that is issued as a Json Web Token (JWT).
 
 ### EUDI Wallet integration
 
@@ -244,7 +314,7 @@ parameter of the `requestInfo` field, which is part of the `DeviceRequest` mdoc
 request structure, and the `ZkDocument` structure, which can be used in a
 `DeviceResponse`. `ZkRequest` is defined as follows:
 
-``` cddl
+```cddl
 ZkRequest = {
    "systemSpecs": [+ ZkSystemSpec],
    * tstr => RFU
@@ -275,7 +345,43 @@ circuitHash = bstr
 
 Where `circuitHash` includes the sha-256 digest of the circuit to be used.
 
+`ZkDocument` is defined as follows:
+
+```cddl
+ZkDocument = {
+  "documentData": ZkDocumentDataBytes,
+  "proof": bstr,
+  * tstr => RFU
+}
+
+ZkDocumentDataBytes = #6.24(bstr .cbor ZkDocumentData)
+
+ZkDocumentData = {
+  "docType": DocType,
+  "zkSystemId": ZkSystemId,
+  "timestamp": full-date,
+  ? "issuerSigned" : ZkNameSpaces,
+  ? "deviceSigned" : ZkNameSpaces,
+  ? "msoX5chain": COSE_X509,
+  * tstr => RFU
+}
+
+ZkNameSpaces = {
+  + NameSpace => [ + ZkSignedItem ]
+}
+
+ZkSignedItem = {
+  "elementIdentifier": DataElementIdentifier,
+  "elementValue": DataElementValue,
+  * tstr => RFU
+}
+```
+
 ### mdoc using DCQL
+
+The Digital Credentials Query Language (DCQL) is defined in [OID4VP]
+
+#### Request
 
 ```json
 "dcql_query": {
@@ -285,10 +391,12 @@ Where `circuitHash` includes the sha-256 digest of the circuit to be used.
       "meta": {
         "doctype_value": "org.iso.18013.5.1.mDL",
         "zk_system_type": [{
+          "zkSystemId":"zkp-1",
           "system": "longfellow-libzk-v1",
-           "circuit_hash": "f88a39e561ec0be02bb3dfe38fb609ad154e98decbbe632887d850fc612fea6f",
-         }],
-       "verifier_message": "challenge"
+          "params":{
+            "circuit_hash": "f88a39e561ec0be02bb3dfe38fb609ad154e98decbbe632887d850fc612fea6f"
+          }
+         }]
       },
      "claims": [{
          "path": ["org.iso.18013.5.1", "age_over_18"]
@@ -296,7 +404,13 @@ Where `circuitHash` includes the sha-256 digest of the circuit to be used.
     }]
 ```
 
+#### Response
+The response is a `DeviceResponse` as defined in ISO/IEC 18013-5 but instead of a 
+`Document` it includes a `ZkDocument`
+
 ### SD-JWT using DCQL
+
+#### Request
 
 ```json
  "dcql_query": {
@@ -306,10 +420,12 @@ Where `circuitHash` includes the sha-256 digest of the circuit to be used.
         "meta": {
           "vct_values": ["urn:eudi:pid:1"],
           "zk_system_type": [{
+            "zkSystemId":"zkp-1",
             "system": "longfellow-libzk-v1",
-            "circuit_hash": "f88a39e561ec0be02bb3dfe38fb609ad154e98decbbe632887d850fc612fea6f",
-            }],
-          "verifier_message": "challenge"
+            "params":{
+              "circuit_hash": "f88a39e561ec0be02bb3dfe38fb609ad154e98decbbe632887d850fc612fea6f"
+            }
+         }]
         },
         "claims": [{
             "path": ["age_over_18"]
@@ -319,17 +435,62 @@ Where `circuitHash` includes the sha-256 digest of the circuit to be used.
     ]
   }
 ```
+#### Response
+The response consists of a base64url-encoded JSON object containing the attestation
+type, the selected `zkSystemId`, a timestamp, the requested attributes 
+and their values, followed by a period (“.”) and then the base64url-encoded proof.
+
+An example of the former JSON object follows:
+
+```json
+{
+  "vct": "urn:eudi:pid:1",
+  "timestamp": "2024-11-08 14:30:00",
+  "zkSystemId": "zkp-1",
+  "attributes": {
+    "age_over_18": true
+  }
+}
+```
 
 ## 6 Revocation
 
 (**Work in progress**)
-To enable revocation while preserving privacy, the Attestation Provider
-periodically publishes a list of revoked attestation identifiers. This list is
-sorted in ascending order based on the identifiers of the revoked attestations.
-The attestation  provider also signs consecutive pairs of revoked identifiers.
-Each signature includes a freshness epoch number. The collection of signed
-identifier pairs, along with the associated epoch, is then published as part of
-the revocation list.
+This section presents a method of revoking credentials that is well-suited for 
+incorporation into an arithmetic circuit that can be processed by a ZK proof 
+system. Let us first illustrate the problem with ZK and standard revocation 
+mechanisms. The easiest method for revocation is for the revoker to publish a 
+single list of revoked credentials that is digitally signed by the revoker. 
+A relying party first downloads this list from the revoker, and verifies its 
+signature, and then, when given a new presentment, checks whether the credential 
+id is a member of the list. Unfortunately, when these steps are expressed in 
+an arithmetic circuit, the entire list must be given as input to the circuit. 
+In addition, relying parties must download the entire list of revoked credentials.
+
+An alternative approach is for the revoker to create a Merkle tree of "valid" 
+credentials each day, then to sign the root of the Merkle tree, and require that 
+each user include a Merkle path from their credential to the root with each 
+presentment. This system has the benefit that relying parties only need a 
+single signature. However, the revoker must process the entire list of issued 
+and valid credentials each day. Expressing the verification check in a ZK circuit 
+is better than before: instead of processing the entire list of revoked 
+credentials, it suffices to include and verify a logarithmic-size Merkle 
+path in the presentment with respect to the root.
+
+Cryptographic accumulators have been suggested for use in revocation. However, 
+in many accumulator systems, the revoker must compute a different witness for 
+each user, and must privately convey the witness to the user in order for the 
+user to prove inclusion (or exclusion) in the accumulator. This makes deployment 
+of such a scheme difficult at scale.
+
+The scheme suggested here avoids all of these problems. The revoker only needs 
+to perform a computation that is proportional to the number of revoked parties 
+each epoch. The user only requires a constant-sized witness (that can be public 
+and downloaded independently), and only requires performing a constant amount 
+of work (with respect to the total number of revoked or issued credentials in 
+the system) to prove that their credential is valid during presentment. Finally, 
+relying parties also only require a constant amount of information to validate 
+a proof.
 
 For each attestation a Wallet Unit only needs to download the relevant signed identifier pairs
 that correspond to the position of an attestation identifier within the list.
@@ -337,7 +498,14 @@ To prove that a given attestation identified by `ID` has not been revoked, the
 wallet unit generates a zero-knowledge proof of knowledge of a valid signature
 over a pair of revoked identifiers `(Lid, Rid)` such that: `Lid < ID < Rid`
 
-**TO BE PROVIDED** How the revocation list is represented?
+## System parameters
+
+The system requires that all parties maintain the following information
+
+1. The public signing key, `ipk`, of the revoking party.
+2. An epoch number, ep, that indicates the date of the revocation.
+
+### List representation
 
 **TO BE PROVIDED** How a proof is included in a presentation?
 
@@ -345,9 +513,12 @@ over a pair of revoked identifiers `(Lid, Rid)` such that: `Lid < ID < Rid`
 
 (**Work in progress**)
 
-## References
+## 8 Optimizations
 
-| Reference | Description |
-| --- | --- |
+## References
+| Reference | Description|
+|---|---|
 | [Ame2017] | Scott Ames, Carmit Hazay, Yuval Ishai,  Muthuramakrishnan Venkitasubramaniam, "Ligero: Lightweight Sublinear Arguments Without a Trusted Setup", in ACM CCS 2017
 | [Fri2024] | Matteo Frigo and abhi shelat, Anonymous credentials from ECDSA, Cryptology ePrint Archive, Paper 2024/2010, 2024, available at <https://eprint.iacr.org/2024/2010> |
+| [BBDPWM2017] | Benedikt Bunz, Jonathan Bootle, Dan Boneh, Andrew Poelestra, Pieter Wuille, Greg Maxwell, Bulletproofs: Short proofs for confidential transactions and more |
+| [FLM2021] | Armando Faz-Hernandex, Watson Ladd, Deepak Maram, ZKAttest: Ring and Group Signatures for Existing ECDSA Keys |
