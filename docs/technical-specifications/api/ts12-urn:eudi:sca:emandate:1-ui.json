@@ -1,0 +1,14 @@
+{
+    "affirmative_action_label": [
+        {
+            "lang": "default",
+            "value": "Sign Mandate"
+        }
+    ],
+    "denial_action_label": [
+        {
+            "lang": "default",
+            "value": "Cancel Mandate"
+        }
+    ]
+}

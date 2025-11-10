@@ -1,0 +1,58 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "urn:eudi:sca:login_risk_transaction:1",
+    "type": "object",
+    "properties": {
+        "transaction_id": {
+            "type": "string",
+            "maxLength": 36,
+            "minLength": 1,
+            "examples": [
+                "8D8AC610-566D-4EF0-9C22-186B2A5ED793"
+            ]
+        },
+        "display": {
+            "type": "object",
+            "title": "sca_login_risk.title",
+            "description": "sca_login_risk.description",
+            "additionalProperties": true,
+            "required": [
+                "service",
+                "action",
+                "date_time"
+            ],
+            "properties": {
+                "date_time": {
+                    "type": "string",
+                    "title": "sca_login_risk.display.date_time.title",
+                    "format": "date-time",
+                    "examples": [
+                        "2025-11-13T20:20:39+00:00"
+                    ]
+                },
+                "service": {
+                    "type": "string",
+                    "title": "sca_login_risk.display.service.title",
+                    "description": "sca_login_risk.display.service.description",
+                    "maxLength": 50,
+                    "examples": [
+                        "Superbank Onlinebanking"
+                    ]
+                },
+                "action": {
+                    "type": "string",
+                    "title": "sca_login_risk.display.purpose.title",
+                    "description": "sca_login_risk.display.purpose.description",
+                    "maxLength": 140,
+                    "examples": [
+                        "Login to your online account."
+                    ]
+                }
+            }
+        }
+    },
+    "additionalProperties": true,
+    "required": [
+        "display"
+    ]
+}

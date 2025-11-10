@@ -1,0 +1,122 @@
+{
+    "sca_payment.title": [
+        {
+            "lang": "default",
+            "value": "Payment Authentication"
+        }
+    ],
+    "sca_payment.description": [
+        {
+            "lang": "default",
+            "value": "Payment Authentication"
+        }
+    ],
+    "sca_payment.display.date_time.title": [
+        {
+            "lang": "default",
+            "value": "Time"
+        }
+    ],
+    "sca_payment.display.date_time.description": [
+        {
+            "lang": "default",
+            "value": "Time"
+        }
+    ],
+    "sca_payment.display.amount.value.title": [
+        {
+            "lang": "default",
+            "value": "Amount"
+        }
+    ],
+    "sca_payment.display.amount.value.description": [
+        {
+            "lang": "default",
+            "value": "Amount"
+        }
+    ],
+    "sca_payment.display.amount.currency.title": [
+        {
+            "lang": "default",
+            "value": "Currency"
+        }
+    ],
+    "sca_payment.display.amount.currency.description": [
+        {
+            "lang": "default",
+            "value": "Currency"
+        }
+    ],
+    "sca_payment.display.payee.title": [
+        {
+            "lang": "default",
+            "value": "Payee"
+        }
+    ],
+    "sca_payment.display.payee.description": [
+        {
+            "lang": "default",
+            "value": "Payee"
+        }
+    ],    
+    "sca_payment.display.recurring.occurrences.title": [
+        {
+            "lang": "default",
+            "value": "Number of payments"
+        }
+    ],
+    "sca_payment.display.recurring.occurrences.description": [
+        {
+            "lang": "default",
+            "value": "Number of payments"
+        }
+    ],
+    "sca_payment.display.recurring.totalAmount.title": [
+        {
+            "lang": "default",
+            "value": "Total amount"
+        }
+    ],
+    "sca_payment.display.recurring.totalAmount.description": [
+        {
+            "lang": "default",
+            "value": "Total amount"
+        }
+    ],
+    "sca_payment.display.recurring.minDistance.title": [
+        {
+            "lang": "default",
+            "value": "Minimum time between payments"
+        }
+    ],
+    "sca_payment.display.recurring.minDistance.description": [
+        {
+            "lang": "default",
+            "value": "Minimum time between payments"
+        }
+    ],
+    "sca_payment.display.recurring.variableAmount.title": [
+        {
+            "lang": "default",
+            "value": "Variable amount"
+        }
+    ],
+    "sca_payment.display.recurring.variableAmount.description": [
+        {
+            "lang": "default",
+            "value": "Variable amount"
+        }
+    ],
+    "sca_payment.display.recurring.apr.title": [
+        {
+            "lang": "default",
+            "value": "Annual Percentage Rate"
+        }
+    ],
+    "sca_payment.display.recurring.apr.description": [
+        {
+            "lang": "default",
+            "value": "Annual Percentage Rate"
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+{
+    "affirmative_action_label": [
+        {
+            "lang": "default",
+            "value": "Confirm Payment"
+        }
+    ],
+    "denial_action_label": [
+        {
+            "lang": "default",
+            "value": "Cancel Payment"
+        }
+    ]
+}

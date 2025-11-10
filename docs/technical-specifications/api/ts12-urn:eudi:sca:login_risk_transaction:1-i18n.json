@@ -1,0 +1,50 @@
+{
+    "sca_login_risk.title": [
+        {
+            "lang": "default",
+            "value": "Login"
+        }
+    ],
+    "sca_login_risk.description": [
+        {
+            "lang": "default",
+            "value": "Login"
+        }
+    ],
+    "sca_login_risk.display.date_time.title": [
+        {
+            "lang": "default",
+            "value": "Time"
+        }
+    ],
+    "sca_login_risk.display.date_time.description": [
+        {
+            "lang": "default",
+            "value": "Time"
+        }
+    ],
+    "sca_login_risk.display.service.title": [
+        {
+            "lang": "default",
+            "value": "Service"
+        }
+    ],
+    "sca_login_risk.display.service.description": [
+        {
+            "lang": "default",
+            "value": "Service"
+        }
+    ],
+    "sca_login_risk.display.action.title": [
+        {
+            "lang": "default",
+            "value": "Action"
+        }
+    ],
+    "sca_login_risk.display.action.description": [
+        {
+            "lang": "default",
+            "value": "Action"
+        }
+    ]
+}
