@@ -1,0 +1,154 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "urn:eudi:sca:emandate:1",
+    "type": "object",
+    "properties": {
+        "transaction_id": {
+            "type": "string",
+            "maxLength": 36,
+            "minLength": 1,
+            "examples": [
+                "8D8AC610-566D-4EF0-9C22-186B2A5ED793"
+            ]
+        },
+        "display": {
+            "type": "object",
+            "title": "emandate.title",
+            "description": "emandate.description",
+            "additionalProperties": true,
+            "required": [
+                "start_date",
+                "purpose",
+                "date_time"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "object",
+                    "properties": {
+                        "required": [
+                            "value",
+                            "currency"
+                        ],
+                        "value": {
+                            "type": "string",
+                            "$comment": "The amount given with fractional digits, where fractions must be compliant to the currency definition. Up to 14 significant figures. Negative amounts are signed by minus. The decimal separator is a dot..",
+                            "title": "emandate.display.amount.value.title",
+                            "description": "emandate.display.amount.value.description",
+                            "minLength": 4,
+                            "maxLength": 15,
+                            "examples": [
+                                "1595.00",
+                                "14.22",
+                                "0.53"
+                            ]
+                        },
+                        "currency": {
+                            "type": "string",
+                            "$comment": "ISO 4217 Alpha 3 currency code.",
+                            "title": "emandate.display.currency.title",
+                            "description": "sca_login.display.currency.description",
+                            "pattern": "^[A-Z]{3}$",
+                            "minLength": 3,
+                            "maxLength": 3,
+                            "examples": [
+                                "EUR",
+                                "NOK"
+                            ]
+                        }
+                    }
+                },
+                "execution_date": {
+                    "type": "string",
+                    "$comment": "Execution date of the (first) payment. Absence of this optional attribute indicates immediate execution.",
+                    "format": "date-time",
+                    "title": "sca_payment.display.date_time.title",
+                    "examples": [
+                        "2025-11-13T20:20:39+00:00"
+                    ]
+                },
+                "reference": {
+                    "type": "string",
+                    "maxLength": 50,
+                    "title": "emandate.display.reference.title",
+                    "description": "sca_login.display.reference.description",
+                    "minLength": 1,
+                    "examples": [
+                        "8D8AC610-566D-4EF0-9C22-186B2A5ED793"
+                    ]
+                },
+                "purpose": {
+                    "type": "string",
+                    "title": "emandate.display.purpose.title",
+                    "description": "sca_login.display.purpose.description",
+                    "maxLength": 1000,
+                    "examples": [
+                        "Pay monthly bill"
+                    ]
+                },
+                "nbf": {
+                    "type": "string",
+                    "format": "date-time",
+                    "title": "emandate.display.recurring_schedule.start_date.title",
+                    "examples": [
+                        "2025-11-13T20:20:39+00:00"
+                    ]
+                },
+                "exp": {
+                    "type": "string",
+                    "format": "date-time",
+                    "title": "emandate.display.recurring_schedule.end_date.title",
+                    "description": "End of a recurring payment.",
+                    "examples": [
+                        "2025-12-13T20:20:39+00:00"
+                    ]
+                },
+                "recurring": {
+                    "type": "object",
+                    "$comment": "Indicates a recurring payment.",
+                    "properties": {
+                        "occurrences": {
+                            "type": "integer",
+                            "$comment": "The number of occurrences of individual payment.  Absence of this attribute (when optional) indicates unlimited occurrences.",
+                            "minimum": 2,
+                            "title": "sca_payment.display.recurring.occurrences.title",
+                            "examples": [
+                                4
+                            ]
+                        },
+                        "total_amount": {
+                            "type": "number",
+                            "$comment": "The total amount of all payments under this transaction. Required when “occurrences” is present, else optional.",
+                            "title": "sca_payment.display.recurring.totalAmount.title",
+                            "examples": [
+                                1200.50,
+                                -15.40
+                            ]
+                        },
+                        "min_distance": {
+                            "type": "integer",
+                            "$comment": "The number of occurrences of individual payment. Absence of this attribute (when optional) indicates unlimited occurrences.",
+                            "minimum": 1,
+                            "title": "sca_payment.display.recurring.minDistance.title",
+                            "examples": [
+                                30,
+                                15
+                            ]
+                        },
+                        "variable_amount": {
+                            "type": "boolean",
+                            "$comment": "Indicates if subsequent transactions may have a different amount compared to the first transaction. Absence of this optional attribute indicates that the amount does not vary.",
+                            "title": "sca_payment.display.recurring.variableAmount.title",
+                            "examples": [
+                                true
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "additionalProperties": true,
+    "required": [
+        "display"
+    ]
+}
