@@ -20,14 +20,19 @@
                     <xs:documentation>A unique identifier for the attribute in form of a URI according to RFC3986.</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="description" type="xs:string" minOccurs="1" maxOccurs="unbounded">
                  <xs:annotation>
                     <xs:documentation>A human-friendly description of the attribute, to be provided at least in English. Language for a string is indicated with @CC tag.</xs:documentation>
                 </xs:annotation>
             </xs:element>
-            <xs:element name="semDescription" type="xs:string">
+            <xs:element name="semanticDataSpecification" type="xs:string" minOccurs="0">
                  <xs:annotation>
-                    <xs:documentation>URI pointing to semantic description of the attribute in the OOTS Semantic Repository.</xs:documentation>
+                    <xs:documentation>Optional URI pointing to semantic data specification of the attribute in the OOTS Semantic Repository.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="distributions" type="tns:SchemaDistributionType" minOccurs="1" maxOccurs="unbounded">
+                 <xs:annotation>
+                    <xs:documentation>Array of SchemaDistribution objects that contain the URL pointing to each schema distribution's access URL and its media type.</xs:documentation>
                 </xs:annotation>
             </xs:element>
             <xs:element name="nameSpace" type="xs:string" minOccurs="0">
@@ -79,5 +84,21 @@
         </xs:sequence>
     </xs:complexType>
 
+    <!-- Complex Type: SchemaDistributionType -->
+    <xs:complexType name="SchemaDistributionType">
+         <xs:annotation>
+            <xs:documentation>A schema distribution object that contains a schema distribution's access URL and media type.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="accessURL" type="xs:string"/>
+                <xs:annotation>
+                    <xs:documentation>The URL which gives access to the schema distribution.</xs:documentation>
+                </xs:annotation>
+            <xs:element name="mediaType" type="xs:string" />
+                <xs:annotation>
+                    <xs:documentation>The media type of the attribute's data model schema instance, string value 'application/json-schema' for the mandatory JSON schema.</xs:documentation>
+                </xs:annotation>
+        </xs:sequence>
+    </xs:complexType>
 </xs:schema>
 
