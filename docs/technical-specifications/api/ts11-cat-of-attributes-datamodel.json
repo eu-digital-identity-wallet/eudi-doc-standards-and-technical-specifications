@@ -21,10 +21,18 @@
       "description": "A human-friendly description of the attribute, to be provided at least in English. Language for a string is indicated with @CC tag.",
       "type": "string"
     },
-    "semDescription": {
-      "description": "URI pointing to semantic description of the attribute in the OOTS Semantic Repository",
+    "semanticDataSpecification": {
+      "description": "optional URI pointing to semantic data specification of the attribute in the OOTS Semantic Repository",
       "type": "string",
       "format": "uri"
+    },
+     "distributions": {
+      "description": "array of SchemaDistribution objects that contain the URL pointing to each schema distribution's access URL and its media type.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SchemaDistribution"
+      },
+      "minItems": 1
     },
     "nameSpace": {
       "description": "Optional URI assigned for the attribute's exact namespace (if not the one pointed at by namespace element in identifier, which can be a local SDG namespace).",
@@ -37,7 +45,7 @@
       "items": {
         "type": "string",
         "format": "uri"
-      }
+      },
       "minItems": 1
     },
     "legalBasis": {
@@ -56,7 +64,8 @@
   "required": [
     "name",
     "identifier",
-    "semDescription",
+    "description",
+    "distributions",
     "authenticSources"
   ],
   "additionalProperties": false,
@@ -67,11 +76,11 @@
       "type": "object",
       "properties": {
         "country": {
-          "description": "Specifies the member state through a country code."
+          "description": "Specifies the member state through a country code.",
           "type": "string"
         },
         "nationalSubID": {
-          "description": "optional, narrows down a respective authentic source in the member state defined in country.",
+          "description": "Optional identifier, that narrows down a respective authentic source in the member state defined in country.",
           "type": "string"
         },
         "endpointDescription": {
@@ -88,6 +97,27 @@
         "country",
         "endpointDescription",
         "endpointURI"
+      ],
+      "additionalProperties": false
+    },
+    "SchemaDistribution": {
+      "title": "Schema distribution",
+      "description": "A schema distribution object that contains a schema distribution's access URL and media type.",
+      "type": "object",
+      "properties": {
+        "accessURL": {
+          "description": "The URL which gives access to the schema distribution.",
+          "type": "string",
+          "format": "uri"
+        },
+        "mediaType": {
+          "description": "The media type of the attribute's data model schema instance, string value 'application/json-schema' for the mandatory JSON schema.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "accessURL",
+        "mediaType"
       ],
       "additionalProperties": false
     }
