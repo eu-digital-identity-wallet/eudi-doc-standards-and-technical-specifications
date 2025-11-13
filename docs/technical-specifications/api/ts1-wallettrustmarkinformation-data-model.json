@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "http://data.europa.eu/eudi/wallettrustmarkinformation.json",
+  "title": "WalletTrustMarkInformation",
+  "description": "Combines the information required for configuring EUDI Wallet Trust Mark in a certified Wallet Solution.",
+  "type": "object",
+  "properties": {
+    "TrustMarkResourceURL": {
+      "description": "URL of the official EUDI Wallet Trust Mark graphics and User Info resources for rendering in the Wallet user interface.",
+      "type": "string",
+      "format": "uri"
+    },
+    "ListOfCerfifiedWalletsURL": {
+      "description": "URL of the public list of certified EUDI Wallet Solutions in EU.",
+      "type": "string",
+      "format": "uri"
+    },
+    "ListOfCerfifiedWalletsQRCode": {
+      "description": "QR Code containing the information of ListOfCertifiedWalletsURL.",
+      "type": "string",
+      "contentEncoding": "base64"
+    },
+    "WalletSolutionInfoPageURL": {
+      "description": "URL to the certified Wallet Solution's own information page under the list of certified EUDI Wallet Solutions page. Constructed from the ListOfCertifiedWalletsURL URL appended with a '?'+ the WalletSolutionID Identifier of the Wallet Solution.",
+      "type": "string",
+      "format": "uri"
+    },
+    "WalletSolutionInfoPageQRCode": {
+      "description": "QR Code containing the information of WalletSolutionInfoPageURL.",
+      "type": "string",
+      "contentEncoding": "base64"
+    },
+    "WalletVerifierToolURL": {
+      "description": "URL pointing to the official EUDI Wallet Verification Tool's (an Attestation Provider Service) _/.well-known/openid-credential-issuer_ endpoint.",
+      "type": "string",
+      "format": "uri"
+    }
+  },
+  "required": [
+    "TrustMarkResourceURL",
+    "ListOfCerfifiedWalletsURL",
+    "WalletSolutionInfoPageURL"
+  ],
+  "additionalProperties": false
+}
