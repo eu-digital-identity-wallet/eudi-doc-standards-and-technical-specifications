@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$id": "http://data.europa.eu/eudi/TrustMarkResource.json",
+  "title": "TrustMarkResource",
+  "description": "Defines the TrustMarkResource object, including a single image and its associated localized texts",
+  "type": "object",
+  "properties": {
+    "image": {
+      "title": "Image Resource",
+      "type": "object",
+      "description": "The image resource properties",
+      "properties": {
+        "name": {
+          "description": "The filename or identifier for the image",
+          "type": "string"
+        },
+        "url": {
+          "description": "The relative path or full URL to the image",
+          "type": "string",
+          "format": "uri-reference"
+        }
+      },
+      "required": ["name", "url"],
+      "additionalProperties": false
+    },
+    "text": {
+      "title": "Text Resource",
+      "type": "object",
+      "description": "The text resource properties and localizations",
+      "properties": {
+        "name": {
+          "description": "TrustMarkUserInfo",
+          "type": "string"
+        },
+        "localizations": {
+          "description": "An object mapping language codes (e.g., 'en', 'fr') to localized text strings",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "minProperties": 1
+        }
+      },
+      "required": ["name", "localizations"],
+      "additionalProperties": false
+    }
+  },
+  "required": ["image", "text"],
+  "additionalProperties": false
+}
