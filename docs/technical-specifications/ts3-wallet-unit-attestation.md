@@ -17,6 +17,7 @@ The present document specifies how WUA is used in connection with PID Providers 
 | `0.4`   | 16.05.2025 | Improvements after commenting. |
 | `1.0`   | 20.08.2025 | Changes to WUA Use Cases section (removed references to presentation WUA).       |
 | `1.1`   | 05.11.2025 | Editorial changes, rename “Wallet App Attestation (WAA)” to “Wallet Instance Attestation (WIA)”, remove the "ephemeral WIA", and add attestation proof type. |
+| `1.2`   | 11.11.2025 | Editorial changes, included requirements for WUAs related to keystore(s). | 
 
 ## 1 Introduction and Overview
 The WUA (Wallet Unit Attestation) topic has been discussed in the European Digital Identity Cooperation Group. As a result a number of High Level Requirements (HLRs) have been proposed. The present document is set to enable actors in the EUDIW ecosystem to follow the HLRs while ensuring the interoperability of the ecosystem. The HLRs are available in the [ARF ANNEX 2 Topic 9](https://eu-digital-identity-wallet.github.io/eudi-doc-architecture-and-reference-framework/latest/annexes/annex-2/annex-2-high-level-requirements/#a239-topic-9---wallet-unit-attestation).
@@ -45,9 +46,9 @@ This STS will specify the following:
 The key words "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC2119](https://datatracker.ietf.org/doc/html/rfc2119) [RFC8174](https://datatracker.ietf.org/doc/html/rfc8174) when, and only when, they are written in all capital letters.
 
 # 2 Solution Description
-EUDI Wallets shall use two types of attestations in relation to issuance: 1) A *Wallet Instance Attestation* (WIA) that attests *only* the integrity of the app and 2) a *Wallet Unit Attestation* (WUA) that attests the security of keys in the WSCD and that the Wallet Unit has not been revoked.
+EUDI Wallets shall use two types of attestations in relation to issuance: 1) A *Wallet Instance Attestation* (WIA) that attests *only* the integrity of the app and 2) a *Wallet Unit Attestation* (WUA) that attests the security of keys stored in the Wallet Unit and that the Wallet Unit has not been revoked.
 
-The WIA allows PID and Attestation Providers to protect their endpoints by only communicating with Wallet Applications which integrity are ensured by the Wallet Providers. WUAs on the other hand allow PID and Attestation Providers to ensure that they only issue attestations that are cryptographically bound to keys that are properly protected (i.e., in a WSCD with sufficiently high attack resistance), as well as to revoke their credentials in case a Wallet Provider revokes a Wallet Unit.
+The WIA allows PID and Attestation Providers to protect their endpoints by only communicating with Wallet Applications which integrity are ensured by the Wallet Providers. WUAs on the other hand allow PID and Attestation Providers to ensure that they only issue attestations that are cryptographically bound to keys that are properly protected (i.e., in a WSCD/keystore with sufficiently high attack resistance), as well as to revoke their credentials in case a Wallet Provider revokes a Wallet Unit.
 
 A high level overview of the current solution is given in the table below:
 
@@ -55,7 +56,7 @@ A high level overview of the current solution is given in the table below:
 |---------------------|----------------------------------------------------------------------------------|
 | Format              | Both WIA and WUA shall be JSON Web Tokens (JWTs) signed by the Wallet Provider. See [Section 2.1 Format](#21-format).   |
 | Transport           | The WIA shall be a client attestation sent to token endpoint at Authorization Server.  The WUA shall be a `key_attestation` element sent within the `CredentialRequest` of OID4VCI (either as `attestation` proof type or in the header of a `jwt` proof type). The `key_attestation` element is extended to include a `eudi_wallet_info` element, containing EUDI Wallet specific information.  See [Section 2.2 Transport](#22-transport).   |
-| Content             | The WIA shall contain only very basic information about the application. Certain WUA information will be transferred in existing elements of the OID4VCI protocol, e.g., revocation information and the public key corresponding to a private key stored in the WSCA/WSCD. Other WIA and WUA information will be a contained in a `eudi_wallet_info` element. The concrete contents are discussed in [Section 2.3 Content](#23-content). |
+| Content             | The WIA shall contain only very basic information about the application. Certain WUA information will be transferred in existing elements of the OID4VCI protocol, e.g., revocation information and the public key corresponding to a private key stored in the WSCD or keystore. Other WIA and WUA information will be a contained in a `eudi_wallet_info` element. The concrete contents are discussed in [Section 2.3 Content](#23-content). |
 | Life Cycle          | The WIA shall be have a very short time-to-live. The WUA shall be issued by Wallet Providers that may issue WUAs with different validity periods to the same. They must however maintain the revocation status for the entire validity period of the WUA if longer than 24 hours. See [Section 2.4 Life Cycle](#24-life-cycle).    |
 | Revocation          | WIA shall not, due to their short time-to-live, have any revocation mechanism associated. Revocation of WUAs shall be done using chunked Status List. See [Section 2.5 Revocation](#25-revocation).|
 
@@ -95,7 +96,7 @@ When a PID Provider or Attestation Provider receives a WIA, then they SHALL chec
 
 When a PID Provider or Attestation Provider receives a WIA, then they SHALL check that it has not expired.
 
-When a PID Provider or Attestation Provider receives a WIA, then they SHALL check the signature of the PoP verifies under the present in the `cnf`.
+When a PID Provider or Attestation Provider receives a WIA, then they SHALL check the signature of the PoP verifies under the public key present in the `cnf`.
 
 ### 2.2.2 Transport of WUA
 The WUA SHALL be a `key_attestation` as defined in [Appendix D of OpenID for Verifiable Credential Issuance v1.0](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/3) but extended with a  `eudi_wallet_info` as presented in [Section 2.3 Content](#23-content).
@@ -126,7 +127,11 @@ PID and Attestation Providers SHALL verify that the signature of the `jwt` eleme
 If a PID or Attestation Providers receives a WUA in a `jwt` proof type, then they SHALL verify that the `jwt` element includes a valid `c_nonce` from their `nonce_endpoint` in the `nonce` field of the `jwt`.
 
 ## 2.3 Content
-The high-level requirements of the ARF require a number of different attributes being transferred as part of the WIA and WUA. Some of these attributes are already defined by the OID4VCI specification, in which case OIDC4VCI will be used. In particular, the `user_authentication` and `secure_storage` attributes of the `key_attestation` SHALL be used to indicate the 'attack potential resistance' of the WSCD where the attested keys are stored.  Other attributes are specific for the EUDI Wallet ecosystem, these are placed in a `eudi_wallet_info` element in both the WIA and WUA.
+A Wallet Provider SHALL provide a Wallet Unit with different WUAs for the Wallet Units WSCD and for each of its keystores.
+
+The high-level requirements of the ARF require a number of different attributes being transferred as part of the WIA and WUA. Some of these attributes are already defined by the OID4VCI specification, in which case OIDC4VCI will be used. In particular, the `key_storage` attribute of the `key_attestation` SHALL be used to indicate the 'attack potential resistance' of the place where the attested keys are stored in a WUA.  Other attributes, specific for the EUDI Wallet ecosystem, are placed in a `eudi_wallet_info` element in both the WIA and WUA.
+
+> For a WUA about a WSCD the `key_storage` and `user_authentication` attributes shall be `iso_18045_high` as the WSCD by definition must ensure LoA High. 
 
 > As the content of the `eudi_wallet_info` is related to the content of the Trusted List, this content specification must be updated when the content of the Trusted List has been defined. In particular, the information in `general_info` must be aligned with the Trusted List, such that the information is uniquely linked to an entry on the Trusted List.
 
@@ -134,8 +139,8 @@ The `eudi_wallet_info` object contains the following informational content:
 
 | Attribute | Multiplicity | Type | Description |
 |---------------|--------------|-----------------------------------|--------|
-| `general_info` | REQUIRED in both WIA and WUA| [`general_info`](#231-generalinfo) | specifies generic information on the Wallet Unit. |
-| `wscd_info` | REQUIRED in WUA | [`wscd_info`](#232-wscdinfo) | specifies information on the WSCD containing the attested keys. |
+| `general_info` | REQUIRED in both WIA and WUA| [`general_info`](#231-general_info) | specifies generic information on the Wallet Unit. |
+| `key_storage_info` | REQUIRED in a WUA about a WSCD. OPTIONAL for a WUA about a keystore. | [`key_storage_info`](#232-key_storage_info) | specifies information on the key storage containing the attested keys. |
 
 ### 2.3.1 `general_info`
 The `general_info` object has the following content:
@@ -149,29 +154,32 @@ The `general_info` object has the following content:
 
 > As the certification scheme has not yet been defined, the exact content of `wallet_solution_certification_information` is undefined. This content will be defined in a future update. Note that the fields are subject to match the specification for Trusted Lists once it is released.
 
-### 2.3.2 `wscd_info`
-The `wscd_info` object has the following content:
+### 2.3.2 `key_storage_info`
+The `key_storage_info` object has the following content:
 
 | Attribute | Multiplicity | Type | Description |
 |---------------|--------------|-----------------------------------|--------|
-| `wscd_type` | RECOMMENDED | *string* | Technical implementation of the WSCD, one of the following values: "REMOTE", "LOCAL_EXTERNAL", "LOCAL_INTERNAL", "LOCAL_NATIVE" or "HYBRID" as described in the ARF. |
-| `wscd_certification_information` | REQUIRED | *JSON / string* | Information about the certification achieved by the WSCD, such as under which scheme (for instance, Common Criteria, GlobalPlatform), the requirements that were evaluated (for example, the Protection Profile used), the evaluation level, and perhaps other applicable information. |
+| `storage_type` | RECOMMENDED | *string* | Technical implementation of the WSCD or keystore, one of the following values: "REMOTE", "LOCAL_EXTERNAL", "LOCAL_INTERNAL", "LOCAL_NATIVE" or "HYBRID" as described in the ARF. |
+| `storage_certification_information` | REQUIRED | *JSON / string* | Information about the certification achieved by the WSCD or keystore, such as under which scheme (for instance, Common Criteria, GlobalPlatform), the requirements that were evaluated (for example, the Protection Profile used), the evaluation level, and perhaps other applicable information. |
 
-> As the certification scheme has not yet been defined, the exact content of `wscd_certification_information` is undefined. This content will be defined in a future update. Note that the OID4VCI specification does specify a `certification` attribute in the `key_attestation` element, that could be used instead of `wscd_ certification_information`, if the certification data is to be made available on a URI.
-
+> As the certification scheme has not yet been defined, the exact content of `storage_certification_information` is undefined. This content will be defined in a future update but it shall be possible to determine if a the key storage is a WSCD based upon the information in this field. Note that the OID4VCI specification does specify a `certification` attribute in the `key_attestation` element, that could be used instead of `storage_ certification_information`, if the certification data is to be made available on a URI.
 
 ### 2.3.3 Content of WIA
-The content of the WIA is given by [Appendix E of OpenID for Verifiable Credential Issuance v1.0](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/3). In addition to the required attributes from the specification, the WIA SHALL also include the `eudi_wallet_info` claim, containing `general_info` described in [*general_info*](#231-generalinfo). 
+The content of the WIA is given by [Appendix E of OpenID for Verifiable Credential Issuance v1.0](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/3). In addition to the required attributes from the specification, the WIA SHALL also include the `eudi_wallet_info` claim, containing `general_info` described in [*general_info*](#231-general_info). 
 
 ### 2.3.4 Content of WUA
 The content of the WUA is given by the `key_attestation` definition specified in [Appendix D of OpenID for Verifiable Credential Issuance v1.0](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/3). If a WUA is sent as an attestation proof type, then it SHALL also include a `c_nonce` as specified in [Appendix F.3 of OpenID for Verifiable Credential Issuance v. 1.0](https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0-final.html#appendix-F.3).
-In addition to the required attributes, the WUA SHALL also include the `eudi_wallet_info` claim, containing both `general_info` described in [*general_info*](#231-generalinfo) and `wscd_info` described in [*wscd_info*](#232-wscdinfo). The WUA SHALL also include the `status` object.
+In addition to the required attributes, the WUA SHALL also include the `eudi_wallet_info` claim, containing both `general_info` described in [*general_info*](#231-general_info) and `key_storage_info` described in [*key_storage_info*](#232-key_storage_info). The WUA SHALL also include the `status` object as specified in appendix D.1 of OID4VCI..
 
 > OID4VCI natively supports revocation, hence the `status` object of the `key_attestation` element SHALL be used to handle revocation. In particular, the value of `idx`  is what allows the Wallet Provider to identify the Wallet Unit (i.e. the revocation identifier) and is therefore what is required by the PID provider to request a revocation of the Wallet Unit.
 
 > Note that the `key_attestation` element contains the signed keys in `jwk` format. The `jwk` format specifies that each key must contain an algorithm type. Hence, this provides protection against downgrade attacks for attested keys.
 
 > Also note that the `key_attestation` element contains an `iss` element, i.e. the issuer identifier, which also includes the Wallet Provider identity.
+
+
+During PID issuance, the PID Provider SHALL ensure that the PID they issue is bound to a key originating from a WUA whose key storage is a WSCD.
+
 
 ## 2.4 Life Cycle
 WIAs are short-lived and to be consumed upon usage, hence this section only specifies the life cycle of the WUAs.
@@ -181,7 +189,7 @@ A Wallet Provider SHALL choose the technical validity period of the WUA and SHAL
 
 A Wallet Provider MAY choose to issue WUAs with different validity periods. When choosing the validity period, the Wallet Provider SHALL at least consider security, user privacy and interoperability, and the needs of the PID Provider.
 
-A Wallet Provider SHALL ensure that a Wallet can always present a with a validity period of at least 1 month.
+A Wallet Provider SHALL ensure that a Wallet can always present a WUA for their WSCD with a validity period of at least 1 month.
 
 A Wallet Unit SHALL send a WUA with a validity of at least one month to PID Providers during PID issuance.
 
@@ -196,9 +204,9 @@ In case a Wallet Unit is to be revoked, a Wallet Provider SHALL revoke all WUAs 
 During re-issuance of a PID or Attestation (i.e., if for example the technical validity of a PID or Attestation expires before the administrative validity period expires), then the Wallet Unit (or Attestation Provider) SHALL send a new WUA (i.e., a WUA that has not been used in relation to issuance before) in the *Credential Request* to the PID or Attestation Provider.
 
 ### 2.4.2 PID Provider and Attestation Provider responsibilities
-The technical validity period of a PID or Attestation SHALL end before the technical validity period of the WUA shown to the PID in the issuance process.
+The technical validity period of a PID or Attestation SHALL end before the technical validity period of the WUA shown to the PID provider in the issuance process.
 
-Other Attestation Providers MAY choose a technical validity period of the attestations they issue independently of the technical validity for the WUA used during issuance.
+Other Attestation Providers (i.e., non PID providers) MAY choose a technical validity period of the attestations they issue independently of the technical validity for the WUA used during issuance.
 
 A PID Provider SHALL check the revocation status of the WUA received in relation to issuance at least once every 24 hours for the validity period of the PID. If the WUA is revoked, then the PID Provider SHALL revoke the PID. If PID Providers issue PIDs with a validity period of less than 24 hours, they only need to verify the validity period of the WUA upon issuance.
 
@@ -207,7 +215,7 @@ As the revocation status list is publicly available, the Attestation Providers M
 > Note it is required to be a new WUA as the keys should be different from previous WUA in order to prevent linkability of keys upon presentation.
 
 ## 2.5 Revocation
-If a WUA has a validity period longer than 24 hours, then Status lists, as defined in [IETF Token Status List](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/11) SHALL be used as revocation mechanism as described in Appendix D and E of the OID4VCI specification for WUAs, i.e. the `status` element of `key_attestation` SHALL be used.
+If a WUA has a validity period longer than 24 hours, then Status lists, as defined in [IETF Token Status List](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/11) SHALL be used as revocation mechanism as described in Appendix D of the OID4VCI specification, i.e. the `status` element of `key_attestation` SHALL be used.
 
 To ease scalability, the Wallet Provider can use the following optimisations:
 * The status list SHOULD be divided up when issuers have a sizeable amount of users or issued attestations. The strategy for chunking is left to issuer discretion. Considerations include size of a status list for downloading and privacy of the user. For privacy reasons, a status list SHOULD relate to at least 10000 attestations.
@@ -311,10 +319,9 @@ Example of the `eudi_wallet_info` object:
      "wallet_solution_version": "1.0.1",
      "wallet_solution_certification_information": "https://example.org/certification/SmartWalletMobile/1-0-1/"
   },
-  "wscd_info": {
-     "wscd_type" : "REMOTE HSM",	
-     "wscd_certification_information" : "GlobalPlatform",
-     "wscd_attack_resistance" : 2
+  "key_storage_info": {
+     "storage_type" : "REMOTE HSM",	
+     "storage_certification_information" : "GlobalPlatform",
   }
 }
 ```
