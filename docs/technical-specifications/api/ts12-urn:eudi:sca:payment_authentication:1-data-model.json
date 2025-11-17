@@ -1,11 +1,9 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "title": "urn:eudi:sca:payment_authentication:1",
     "type": "object",
     "properties": {
         "transaction_id": {
             "type": "string",
-            "$comment": "Unique identifier of the transaction.",
             "maxLength": 36,
             "minLength": 1,
             "examples": [
@@ -14,33 +12,67 @@
         },
         "payee_id": {
             "type": "string",
-            "$comment": "An identifier of the payee that is understood by the payment system used to process the transaction.",
             "maxLength": 50,
             "minLength": 1,
             "examples": [
                 "8D8AC610-566D-4EF0-9C22-186B2A5ED793"
             ]
         },
-        "display": {
+        "execution_date": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+                "2025-11-13T20:20:39+00:00"
+            ]
+        },
+        "amount": {
             "type": "object",
-            "title": "sca_payment.title",
-            "description": "sca_payment.description",
-            "additionalProperties": true,
-            "required": [
-                "amount",
-                "payee"
-            ],
             "properties": {
-                "execution_date": {
-                    "type": "string",
-                    "$comment": "Execution date of the (first) payment. Absence of this optional attribute indicates immediate execution.",
-                    "format": "date-time",
-                    "title": "sca_payment.display.date_time.title",
+                "required": [
+                    "value",
+                    "currency"
+                ],
+                "value": {
+                    "type": "number",
+                    "minLength": 4,
+                    "maxLength": 16,
                     "examples": [
-                        "2025-11-13T20:20:39+00:00"
+                        1595.00,
+                        14.22,
+                        0.53,
+                        -40.78
                     ]
                 },
-                "amount": {
+                "currency": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3}$",
+                    "minLength": 3,
+                    "maxLength": 3,
+                    "examples": [
+                        "EUR",
+                        "SEK"
+                    ]
+                }
+            }
+        },
+        "payee": {
+            "type": "string",
+            "maxLength": 100,
+            "examples": [
+                "Awesome Merchant"
+            ]
+        },
+        "recurring": {
+            "type": "object",
+            "properties": {
+                "occurrences": {
+                    "type": "integer",
+                    "minimum": 2,
+                    "examples": [
+                        4
+                    ]
+                },
+                "total_amount": {
                     "type": "object",
                     "properties": {
                         "required": [
@@ -49,9 +81,6 @@
                         ],
                         "value": {
                             "type": "number",
-                            "$comment": "The amount consisting of major units as the integer component and an optional fraction part consisting of the decimal point followed by minor units, with the number of fractional digits as per ISO 4217. Negative amounts are signed by minus. Maximum 16 characters.",
-                            "title": "sca_payment.display.amount.value.title",
-                            "description": "sca_payment.display.amount.value.description",
                             "minLength": 4,
                             "maxLength": 16,
                             "examples": [
@@ -63,80 +92,37 @@
                         },
                         "currency": {
                             "type": "string",
-                            "$comment": "ISO 4217 Alpha 3 currency code.",
-                            "title": "sca_payment.display.currency.title",
-                            "description": "sca_login.display.currency.description",
                             "pattern": "^[A-Z]{3}$",
                             "minLength": 3,
                             "maxLength": 3,
                             "examples": [
                                 "EUR",
-                                "NOK"
+                                "SEK"
                             ]
                         }
                     }
                 },
-                "payee": {
-                    "type": "string",
-                    "$comment": "The name of the payee to whom the payment is being made.",
-                    "title": "sca_payment.display.payee.title",
-                    "description": "sca_login.display.payee.description",
-                    "maxLength": 100,
+                "min_distance": {
+                    "type": "integer",
+                    "minimum": 1,
                     "examples": [
-                        "Awesome Merchant"
+                        30,
+                        15
                     ]
                 },
-                "recurring": {
-                    "type": "object",
-                    "$comment": "Indicates a recurring payment.",
-                    "properties": {
-                        "occurrences": {
-                            "type": "integer",
-                            "$comment": "The number of occurrences of individual payment. Required when “apr” is present, else optional. Absence of this attribute (when optional) indicates unlimited occurrences.",
-                            "minimum": 2,
-                            "title": "sca_payment.display.recurring.occurrences.title",
-                            "examples": [
-                                4
-                            ]
-                        },
-                        "total_amount": {
-                            "type": "number",
-                            "$comment": "The total amount of all payments under this transaction. Required when “occurrences” is present, else optional.",
-                            "title": "sca_payment.display.recurring.totalAmount.title",
-                            "examples": [
-                                1200.50,
-                                -15.40
-                            ]
-                        },
-                        "min_distance": {
-                            "type": "integer",
-                            "$comment": "The number of occurrences of individual payment. Required when “apr” is present, else optional. Absence of this attribute (when optional) indicates unlimited occurrences.",
-                            "minimum": 1,
-                            "title": "sca_payment.display.recurring.minDistance.title",
-                            "examples": [
-                                30,
-                                15
-                            ]
-                        },
-                        "variable_amount": {
-                            "type": "boolean",
-                            "$comment": "Indicates if subsequent transactions may have a different amount compared to the first transaction. Absence of this optional attribute indicates that the amount does not vary.",
-                            "title": "sca_payment.display.recurring.variableAmount.title",
-                            "examples": [
-                                true
-                            ]
-                        },
-                        "apr": {
-                            "type": "number",
-                            "$comment": "Annual Percentage Rate of the installment. Presence of this optional attribute indicates that the transaction is an interest-bearing installment.",
-                            "minimum": 0.0,
-                            "maximum": 100.0,
-                            "title": "sca_payment.display.recurring.apr.title",
-                            "examples": [
-                                4.6
-                            ]
-                        }
-                    }
+                "variable_amount": {
+                    "type": "boolean",
+                    "examples": [
+                        true
+                    ]
+                },
+                "apr": {
+                    "type": "number",
+                    "minimum": 0.0,
+                    "maximum": 100.0,
+                    "examples": [
+                        4.6
+                    ]
                 }
             }
         }
@@ -144,6 +130,7 @@
     "additionalProperties": true,
     "required": [
         "transaction_id",
-        "display"
+        "amount",
+        "payee"
     ]
 }
