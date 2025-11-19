@@ -28,14 +28,10 @@
         "amount": {
             "type": "object",
             "properties": {
-                "required": [
-                    "value",
-                    "currency"
-                ],
                 "value": {
                     "type": "number",
-                    "minLength": 4,
-                    "maxLength": 16,
+                    "maximum": 1000000000.0,
+                    "minimum": -1000000000.0,
                     "examples": [
                         1595.00,
                         14.22,
@@ -53,7 +49,11 @@
                         "SEK"
                     ]
                 }
-            }
+            },
+            "required": [
+                    "value",
+                    "currency"
+            ]
         },
         "payee": {
             "type": "string",
@@ -75,14 +75,10 @@
                 "total_amount": {
                     "type": "object",
                     "properties": {
-                        "required": [
-                            "value",
-                            "currency"
-                        ],
                         "value": {
                             "type": "number",
-                            "minLength": 4,
-                            "maxLength": 16,
+                            "maximum": 1000000000.0,
+                            "minimum": -1000000000.0,
                             "examples": [
                                 1595.00,
                                 14.22,
@@ -100,7 +96,11 @@
                                 "SEK"
                             ]
                         }
-                    }
+                    },
+                    "required": [
+                            "value",
+                            "currency"
+                        ]
                 },
                 "min_distance": {
                     "type": "integer",
