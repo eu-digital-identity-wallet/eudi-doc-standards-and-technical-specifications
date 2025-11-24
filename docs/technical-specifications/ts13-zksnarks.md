@@ -3,7 +3,8 @@
 # Specification for the implementation of Zero-Knowledge Proofs based on arithmetic circuits in the EUDI Wallet
 
 ## Note
-This TS represents exploratory work that will subsequently be handed over to ETSI for further development and formal specification.
+
+This technical specification captures exploratory work aimed at clarifying the technical considerations and outlining a possible approach, which will be tested in the [Age Verification](https://ageverification.dev/). It is not intended to be a final specification. Instead, it will be handed over to ETSI for further refinement, consolidation and formal standardisation. In particular, the continued development of this specification is expected to take place under ETSI TS 119 476-2, where the detailed technical requirements and normative provisions will be fully defined.
 
 ## Abstract
 
