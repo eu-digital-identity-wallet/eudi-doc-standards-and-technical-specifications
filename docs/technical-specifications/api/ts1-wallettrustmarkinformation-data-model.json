@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "$id": "http://data.europa.eu/eudi/wallettrustmarkinformation.json",
-  "title": "WalletTrustMarkInformation",
+  "title": "EUDI Wallet Trust Mark Information",
   "description": "Combines the information required for configuring EUDI Wallet Trust Mark in a certified Wallet Solution.",
   "type": "object",
   "properties": {

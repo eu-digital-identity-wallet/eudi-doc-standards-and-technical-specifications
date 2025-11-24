@@ -18,6 +18,7 @@ The present document specifies the technical specification and requirements for 
 | `0.4`   | 03.04.2025 | Updated version based on discussions in 1st and 2nd focus group meetings   |
 | `1.0`   | 25.04.2025 | Final version (v1.0)                                                       |
 | `1.1`   | 14.11.2025 | Updated version (v1.1) with JSON schemas for Trust Mark resources          |
+| `1.1.1` | 18.11.2025 | Editorial and typo fixes to version v1.1                                   |
 
 ## 1 Introduction and Overview
 
@@ -27,10 +28,10 @@ The purpose of a visible and recognisable trust mark is to add trust in the EUDI
 
 ### 1.1 Requirements in Regulation EU 2024/1183
 
-* According to Article 3 (50), the EUDI Wallet Trust Mark is defined as **"a verifiable, simple and recognisable indication which is communicated in a clear manner that a European Digital Identity Wallet has been provided in accordance with this Regulation.”**
+* According to Article 3 (50), the EUDI Wallet Trust Mark is defined as **"a verifiable, simple and recognisable indication which is communicated in a clear manner that a European Digital Identity Wallet has been provided in accordance with this Regulation."**
 
 * According to Article 5a (5)(a) (iv), **the Trust Mark must be displayed to the User**.
-* According to Article 5a (8)(a), **the Member States shall provide validation mechanisms free-of-charge, in order to: (a) ensure that the authenticity and validity of European Digital Identity Wallets can be verified;**
+* According to Article 5a (8)(a), **the Member States shall provide validation mechanisms free-of-charge, in order to: (a) ensure that the authenticity and validity of European Digital Identity Wallets can be verified**.
 * According to the Article 5d, the European Commission publishes the list of certified EUDI Wallets as an official list in the Official Journal of the European Union, thus acting as a reference for which Wallet Solutions are certified. **Removal from the list means certification is no longer valid**.
 
 ### 1.2 Scope for the Trust Mark Requirements and Design
@@ -40,8 +41,6 @@ The EUDI Wallet Trust Mark must be designed and copyright protected, as a kind o
 The European Commission is responsible for the EUDI Wallet Trust Mark in terms of graphic design, ownership of the logo registration process and takes responsibility for drafting rules and usage guidelines, and distribution to the designated actors within the ecosystem.
 
 As the Regulation does not specify what verifiable means, or where it shall be displayed, the realisation of the EUDI Wallet Trust Mark was conducted via collecting the business requirements, identifying any complexity limitations if any, and considering the priorities of the involved ecosystem stakeholders (Member States).
-
- > Note (to be removed before v1.0): Current version of the specificaiton reflexes the majority of opinions gathered from the Member States that attended the first meeting handling version 0.3, and those Member States' experts that provided review comments online after the meeting. The technical complexity of the solution was agreed to be minimised - as the ARF already defines technical solution ensuring the cryptographic trust of an individual Wallet Unit (the Wallet Unit Attestation).  
 
  The proposed mandatory high-level requirements define a solution that focuses on providing the EUDI Trust Mark logo only to valid Wallet Units ('EUDI Wallet Trust Mark'), and providing with it a direct link to the EU list of certified EUDI Wallets and/or the individual Wallet Solution page, located within the eIDAS Dashboard web site. The requirements are presented in the actor-oriented requirement format: **"As an *actor* I shall/should *verb* to achieve *my required goal*"**.
 
@@ -53,7 +52,7 @@ This document does not address the visual or user experience related design elem
 
 ### 1.3 Background: Existing European trust marks as a reference
 
-To our knowledge, the European Commission has launched a few business-to-consumer type trust mark programmes related to EU Regulations: the earlier being the EU Trust Mark for Qualified Trust Services (launched as an Implementing Act for eIDAS Regulation) and the newer Ecommerce Europe Trustmark for safe and ethical cross-border ecommerce. These trust marks are both bound to EU regulation, but are probably facing very different types of end customers and their awareness among EU Member State citizens is probably not actively studied. These are included to provide a comparison/starting point for the EUDI Wallet Trust Mark specification.
+To our knowledge, the European Commission has launched several business-to-consumer trust mark programmes related to EU Regulations: the earlier being the EU Trust Mark for Qualified Trust Services (launched as an Implementing Act for eIDAS Regulation) and the newer Ecommerce Europe Trustmark for safe and ethical cross-border ecommerce. These trust marks are both bound to EU regulation, but are probably facing very different types of end customers and their awareness among EU Member State citizens is probably not actively studied. These are included to provide a comparison/starting point for the EUDI Wallet Trust Mark specification.
 
 #### 1.3.1 EU Trust Mark for Qualified Trust Services
 
@@ -115,7 +114,7 @@ The EUDI Wallet Trust Mark functionality related requirements are presented in t
 
 > Note: This hints at the duty of the Commission to create clear documentation and guidance on distinguishing real EUDI Wallets from fake ones.
 
-**EWTM-U2**: As a a potential User of a EUDI Wallet, I want to see if I’m about to install a Certified EUDI Wallet Solution issued, recognised or mandated by a Member State.
+**EWTM-U2**: As a potential User of a EUDI Wallet, I want to see if I’m about to install a Certified EUDI Wallet Solution issued, recognised or mandated by a Member State.
 
 > Note: In lack of certification information at the official app downloading services this means providing such information as seen feasible - e.g. via the Wallet onboarding/download information pages hosted by the Member States and the European Commission.
 
@@ -143,7 +142,7 @@ The EUDI Wallet Trust Mark functionality related requirements are presented in t
 
 **EWTM-U10**: As a physically impaired User of a EUDI Wallet, I want to have accessibility support within realisation of the requirements set in **EWTM-U4** - **EWTM-9**.
 
-> Note: Accessibility considerations from [WCAG 2.1](https://www.w3.org/TR/WCAG21/) such as screen reader compatibility, color contrast, or keyboard navigation must to be addressed in the end-user implementation and guidelines to be provided. Users with visual impairments, cognitive disabilities, or low digital literacy may face challenges in:
+> Note: Accessibility considerations from [WCAG 2.1](https://www.w3.org/TR/WCAG21/) such as screen reader compatibility, color contrast, or keyboard navigation must be addressed in the end-user implementation and guidelines to be provided. Users with visual impairments, cognitive disabilities, or low digital literacy may face challenges in:
 >
 > * perceiving the Trust Mark (e.g., reliance on visual-only indicators),
 > * understanding certification status (e.g., clarity of meaning in B1-level local language) or
@@ -213,9 +212,9 @@ The data object `WalletTrustMarkInformation` contents are defined in Table 1, an
 
 | Name of data object          | Description        | Encoding                            |   Status  |
 |------------------------------|--------------------|:-----------------------------------:| --------- |
-| TrustMarkResourceURL         | URL of the official EUDI Wallet Trust Mark graphics and User Info resources [`TrustMarkResource`](#411-trustmarkresource-object) for rendering in the Wallet user interface; contents provided and hosted by the EC. | URL | Mandatory |
-| ListOfCerfifiedWalletsURL    |  URL of the public list of certified EUDI Wallet Solutions in EU; provided and hosted by the EC. | URL | Mandatory |
-| ListOfCerfifiedWalletsQRCode |  QR Code containing the information of ListOfCertifiedWalletsURL | ISO-8859-1 Byte mode QR code | Optional |
+| TrustMarkResourceURL         | URL of the official EUDI Wallet Trust Mark graphics and User Info resources [`TrustMarkResource`](#411-trustmarkresource-object), used for rendering in the Wallet user interface; contents provided and hosted by the EC. | URL | Mandatory |
+| ListOfCertifiedWalletsURL    |  URL of the public list of certified EUDI Wallet Solutions in EU; provided and hosted by the EC. | URL | Mandatory |
+| ListOfCertifiedWalletsQRCode |  QR Code containing the information of ListOfCertifiedWalletsURL | ISO-8859-1 Byte mode QR code | Optional |
 | WalletSolutionInfoPageURL    | URL to the certified Wallet Solution's own information page under the list of certified EUDI Wallet Solutions page. Constructed from the ListOfCertifiedWalletsURL URL appended with a '?'+ the WalletSolutionID Identifier of the Wallet Solution. *Note: This allows, as necessary, a direct search query from the Wallet user interface to open the individual Wallet Solution page from the list behind the top level of certified Wallets list page*. | URL | Mandatory |
 | WalletSolutionInfoPageQRCode |  QR Code containing the information of WalletSolutionInfoPageURL | ISO-8859-1 Byte mode QR code | Optional  |
 | WalletVerifierToolURL* | URL pointing to the official EUDI Wallet Verification Tool's (an Attestation Provider Service) */.well-known/openid-credential-issuer* endpoint used for retrieval of the attestation provider metadata. | URL  | Optional |
@@ -234,7 +233,7 @@ The example data object has only three localisation strings for brevity, a full 
         "url": "path/to/eudi-wallet-trustmark-logo.png"
       },
       "text": {
-        "name": "TrustMarkUserInfo",
+        "name": "Trust Mark user information, used for rendering in the EUDI Wallet user interface.",
         "localizations": {
           "en": "SampleText-for-Users",
           "fr": "TexteExemple-pour-Utilisateurs",
@@ -253,7 +252,7 @@ the *WalletSolutionInfoPageURL* SHALL point to the individual Wallet Solution's 
 
 #### 4.1.4 QR Code versions of page resources
 
-*ListOfCerfifiedWalletsQRCode* and *WalletSolutionInfoPageQRCode* MAY be provided to the Wallet Unit by the Wallet Provider when issuing the Wallet Unit Attestation. If present, they SHALL be ISO 8859-1 byte mode QR code encoded representations of the original URLs.
+*ListOfCertifiedWalletsQRCode* and *WalletSolutionInfoPageQRCode* MAY be provided to the Wallet Unit by the Wallet Provider when issuing the Wallet Unit Attestation. If present, they SHALL be ISO 8859-1 byte mode QR code encoded representations of the original URLs.
 
 #### 4.1.5 EUDI Wallet Verifier Tool Service* (OPTIONAL)
 
@@ -315,8 +314,8 @@ The WUA issuance (12) by the Wallet Provider happens at Wallet Unit activation a
 
 ### A.1 WalletTrustMarkInformation JSON Schema (normative)
 
-The file [`ts1-wallettrustmarkinformation-data-model.json`](api/ts1-wallettrustmarkinformation-data-model.json) contains the JSON schema definition of the data model specified in [Section 4.1](#41-data-format-and-structure-for-eudi-wallet-trust-mark-resources) above.
+The file [`ts1-wallettrustmarkinformation-data-model.json`](api/ts1-wallettrustmarkinformation-data-model.json) contains the JSON schema definition of the data model specified in [Section 4.1](#41-data-format-and-structure-for-eudi-wallet-trust-mark-resources).
 
 ### A.2 TrustMarkResource JSON Schema (normative)
 
-The file [`ts1-trustmarkresource-data-model.json`](api/ts1-trustmarkresource-data-model.json) contains the JSON schema definition of the data model specified in [Section 4.1.1](#411-trustmarkresource-object) above.
+The file [`ts1-trustmarkresource-data-model.json`](api/ts1-trustmarkresource-data-model.json) contains the JSON schema definition of the data model specified in [Section 4.1.1](#411-trustmarkresource-object).
