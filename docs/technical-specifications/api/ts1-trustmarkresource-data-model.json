@@ -1,21 +1,21 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "$id": "http://data.europa.eu/eudi/TrustMarkResource.json",
-  "title": "TrustMarkResource",
-  "description": "Defines the TrustMarkResource object, including a single image and its associated localized texts",
+  "title": "Trust Mark Resource",
+  "description": "Defines the TrustMarkResource object, including a single image and its associated localised texts.",
   "type": "object",
   "properties": {
     "image": {
       "title": "Image Resource",
       "type": "object",
-      "description": "The image resource properties",
+      "description": "The image resource properties.",
       "properties": {
         "name": {
-          "description": "The filename or identifier for the image",
+          "description": "The filename or identifier for the image.",
           "type": "string"
         },
         "url": {
-          "description": "The relative path or full URL to the image",
+          "description": "The relative path or full URL to the image.",
           "type": "string",
           "format": "uri-reference"
         }
@@ -26,14 +26,14 @@
     "text": {
       "title": "Text Resource",
       "type": "object",
-      "description": "The text resource properties and localizations",
+      "description": "The text resource properties and localisations.",
       "properties": {
         "name": {
-          "description": "TrustMarkUserInfo",
+          "description": "Trust Mark user information, used for rendering in the EUDI Wallet user interface.",
           "type": "string"
         },
-        "localizations": {
-          "description": "An object mapping language codes (e.g., 'en', 'fr') to localized text strings",
+        "localisations": {
+          "description": "An object mapping language codes (e.g., 'en', 'fr') to localised text strings.",
           "type": "object",
           "additionalProperties": {
             "type": "string"
@@ -41,7 +41,7 @@
           "minProperties": 1
         }
       },
-      "required": ["name", "localizations"],
+      "required": ["name", "localisations"],
       "additionalProperties": false
     }
   },
