@@ -2,11 +2,14 @@
 
 # Specification for the implementation of Zero-Knowledge Proofs based on arithmetic circuits in the EUDI Wallet
 
+## Note
+This TS represents exploratory work that will subsequently be handed over to ETSI for further development and formal specification.
+
 ## Abstract
 
 The present document specifies the modular technical specification and requirements for
-the implementation of Zero-Knowledge Proof (ZKP) based on arithmetic circuits
-in the EUDI Wallet.
+the implementation of Zero-Knowledge Proof (ZKP) based on arithmetic circuits, without 
+trusted setup, in the EUDI Wallet.
 
 ### [GitHub discussion](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/discussions/440)
 
@@ -14,7 +17,8 @@ in the EUDI Wallet.
 
 | Version | Date | Description |
 |---------|------------|------------|
-| `0.9` | 7.111.2025 | Improvements based on internal review
+| `0.95` | 24.11.2025 | Improvements based on second focus meeting
+| `0.9` | 7.11.2025 | Improvements based on internal review
 | `0.8` | 24.10.2025 | Improvements based on first focus meeting
 | `0.7` | 14.10.2025 | Improvements based on internal review
 | `0.6` | 09.10.2025 | Detailed circuit description extended, initial description of presentation protocols |
@@ -31,6 +35,16 @@ It defines the requirements and technical specifications for integrating a ZK pr
 mdoc or SD-JWT credential. As there is no algebraic structure in those legacy formats, the ZK statement
 will be expressed as an arithmetic circuit. Any suitable ZK system capable of producing a ZK proof that the
 statement is valid can satisfy these requirements.
+
+Defining ZK based on arithmetic circuits is a modular approach that is well 
+suited to the problem of digital identity for standardized credential formats. 
+Several recent ZK schemes, which rely on different techniques and complexity 
+assumptions, claim to process arithmetic circuits. For examples, ZK schemes 
+that rely on elliptic curve cryptography, such as Bulletproofs [BBDPWM2017] 
+and ZKAttest [FLM2021], can produce proofs concerning arithmetic circuits. 
+Similarly, ZK Schemes such as Ligero [Ame2017] and Longfellow [Fri2024] also 
+process arithmetic circuits, but only rely on the security of a hash function 
+such as SHA-256, and claim to be several factors more efficient.
 
 Regulation (EU) 2024/1183 of the European Parliament and of the Council of 11
 April 2024 amending Regulation (EU) No 910/2014 as regards establishing the
@@ -92,7 +106,7 @@ Specification.
 within the EUDI wallet.  
 - Section 5 discusses changes required to presentation protocols
 - Section 6 discusses revocation
-- Section 7 details how a proof and a circuit are serialized
+
 
 ## 2 High-level requirements
 
@@ -118,17 +132,14 @@ https://datatracker.ietf.org/doc/draft-google-cfrg-libzk/)
 
 **Out of scope**
 The following items are considered out of scope for this Technical Specification:
-* Proximity-based flows (**Note** Proof sizes are on the order of 200KB, which
-makes them impractical for proximity use cases. However this violates HLR ZKP_05
-of Annex 2 of the ARF)
-* Pseudonyms (**Note** This requires changes to the issuance process,
-specifically binding attestations to a secret that is then used to derive
-the pseudonym)  
+* Proximity-based flows 
+* Pseudonyms  
 * Cryptographic validation
 * Combined presentation of attributes
 * Use of ZKP during attestation issuance (e.g., use of ZKP in WUA, use of ZKP for
 proving that two attestation are bound to the same WSCA/WSCD)
 * Issuer hiding
+* Solutions based on arithmetic circuits that require a trusted setup
 
 ## 3 Overview of a circuit-based ZK system.
 
@@ -141,15 +152,6 @@ The circuit evaluates these inputs and outputs *true* if the defined conditions 
 A Wallet Unit can then generate a ZKP demonstrating that it possesses a valid witness which, when  
 used with the specified circuit and public statement, results in the circuit outputting *true*.
 
-Defining ZK based on arithmetic circuits is a modular approach that is well 
-suited to the problem of digital identity for standardized credential formats. 
-Several recent ZK schemes, which rely on different techniques and complexity 
-assumptions, claim to process arithmetic circuits. For examples, ZK schemes 
-that rely on elliptic curve cryptography, such as Bulletproofs [BBDPWM2017] 
-and ZKAttest [FLM2021], can produce proofs concerning arithmetic circuits. 
-Similarly, ZK Schemes such as Ligero [Ame2017] and Longfellow [Fri2024] also 
-process arithmetic circuits, but only rely on the security of a hash function 
-such as SHA-256, and claim to be several factors more efficient.
 
 ### 3.1 Security properties
 A ZKP system must satisfy three key properties:
@@ -160,9 +162,7 @@ the protocol correctly, the verifier will be convinced of its validity.
 * Soundness: If the statement is false, a dishonest prover cannot convince an 
 honest verifier that it is true, **except with some negligible probability**.
 
-*Statistical soundness*. A zkSNARK has statistical soundness if, even against 
-an adversary with unbounded computational power, the probability that a false 
-statement is very low.  
+*Statistical soundness*. A zkSNARK has $\lambda$-bit statistical soundness if for every time-bound $T$ and probability $\epsilon$, if a $T$-bounded adversary succeeds in breaking soundness with probability $\epsilon$, then it must hold that $T/\epsilon \geq 2^\lambda$. For example, if a scheme supports 100-bits of statistical soundness, then any adversary that runs for 2^{80} steps of computation has less than a 1-in-a-million chance of convincing a verifier to accept a proof of a false statement.
 
 
 
@@ -180,7 +180,8 @@ ensure correctness and security.
 #### Issuance
 
 PID Providers or Attestation Providers remain unaffected by this scheme. No 
-changes are required to the existing attestation issuance process. This property 
+changes are required to the existing attestation issuance process, however, as
+discussed in Section 6, a new revocation scheme is required. This property 
 is considered to be the biggest advantage of this approach, because the privacy 
 properties offered by the ZK proof do not require changes to the issuance 
 infrastructure  
@@ -455,7 +456,6 @@ An example of the former JSON object follows:
 
 ## 6 Revocation
 
-(**Work in progress**)
 This section presents a method of revoking credentials that is well-suited for 
 incorporation into an arithmetic circuit that can be processed by a ZK proof 
 system. Let us first illustrate the problem with ZK and standard revocation 
@@ -466,7 +466,6 @@ signature, and then, when given a new presentment, checks whether the credential
 id is a member of the list. Unfortunately, when these steps are expressed in 
 an arithmetic circuit, the entire list must be given as input to the circuit. 
 In addition, relying parties must download the entire list of revoked credentials.
-
 An alternative approach is for the revoker to create a Merkle tree of "valid" 
 credentials each day, then to sign the root of the Merkle tree, and require that 
 each user include a Merkle path from their credential to the root with each 
@@ -476,13 +475,11 @@ and valid credentials each day. Expressing the verification check in a ZK circui
 is better than before: instead of processing the entire list of revoked 
 credentials, it suffices to include and verify a logarithmic-size Merkle 
 path in the presentment with respect to the root.
-
 Cryptographic accumulators have been suggested for use in revocation. However, 
 in many accumulator systems, the revoker must compute a different witness for 
 each user, and must privately convey the witness to the user in order for the 
 user to prove inclusion (or exclusion) in the accumulator. This makes deployment 
 of such a scheme difficult at scale.
-
 The scheme suggested here avoids all of these problems. The revoker only needs 
 to perform a computation that is proportional to the number of revoked parties 
 each epoch. The user only requires a constant-sized witness (that can be public 
@@ -491,29 +488,47 @@ of work (with respect to the total number of revoked or issued credentials in
 the system) to prove that their credential is valid during presentment. Finally, 
 relying parties also only require a constant amount of information to validate 
 a proof.
-
 For each attestation a Wallet Unit only needs to download the relevant signed identifier pairs
 that correspond to the position of an attestation identifier within the list.
 To prove that a given attestation identified by `ID` has not been revoked, the
 wallet unit generates a zero-knowledge proof of knowledge of a valid signature
 over a pair of revoked identifiers `(Lid, Rid)` such that: `Lid < ID < Rid`
 
-## System parameters
+### System parameters
+
+It is assumed that an issued credential has a unique identifier $id$ which can be used to designate the credentials that are revoked.  
 
 The system requires that all parties maintain the following information
 
 1. The public signing key, `ipk`, of the revoking party.
 2. An epoch number, ep, that indicates the date of the revocation.
+2. An epoch number, `ep`, that indicates the date of the revocation.
 
-### List representation
 
-**TO BE PROVIDED** How a proof is included in a presentation?
+### List generation
 
-## 7 Proof and Circuit serialization
+The revoker wishes to revoke credentials in the list `L = {id1, id2, ..., idn}` where `L` is in sorted ascending order so that `id_i < id_{i+1}`. The revoker prepares the revocation list `R_L = { \sigma_i }_{i=1,...,n-1}` where `\sigma_i = sign(ipk, (id_i, id_{i+1}, ep))`. In other words, the  list `R_L` consists of digital signatures under key `ipk` of consecutive pairs of identifiers appearing in list `L` along with the epoch identifier `ep`.
 
-(**Work in progress**)
+Even more specifically, suppose the identifer `id_i` is a 64-bit value, and epoch is a 32-bit value.  The signed message should be formatted by concatenating the little-endian serialization of the three values.
 
-## 8 Optimizations
+This list can be formatted in JSON, and each signature can be accompanied by the pair `id_i, id_{i+1}` for convenience in parsing. 
+For example, consider the list `L={10,11,14,96}` the DER-encoded public key `ipk = 04f142cef554bf1cac09664f76355081a6a6e7adc1aa8b23c6e15c24470d403b06a811d33c8e9d8b6d18894268c96dc468ac92b53ee13deb574d713af67eb2e343`, and epoch 2.
+
+The revocation list consists of 3 signatures on the messages
+```
+0a000000000000000b0000000000000002000000
+0b000000000000000e0000000000000002000000
+0e00000000000000600000000000000002000000
+```
+one suitable `R_L` list is:
+```
+{
+}
+```
+### Revocation clause
+In each presentation proof, the user's proof includes a portion that asserts that "there exists values id_L, id_R, and a signature sigma_j under ipk, and the identifier of their document, id, such that sigma_j is a signature of a message (id_L, id_R, ep) and id_L < id < id_R."
+
+
 
 ## References
 | Reference | Description|
