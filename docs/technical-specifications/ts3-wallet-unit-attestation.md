@@ -18,6 +18,7 @@ The present document specifies how WUA is used in connection with PID Providers 
 | `1.0`   | 20.08.2025 | Changes to WUA Use Cases section (removed references to presentation WUA).       |
 | `1.1`   | 05.11.2025 | Editorial changes, rename “Wallet App Attestation (WAA)” to “Wallet Instance Attestation (WIA)”, remove the "ephemeral WIA", and add attestation proof type. |
 | `1.2`   | 11.11.2025 | Editorial changes, included requirements for WUAs related to keystore(s). | 
+| `1.3`   | 25.11.2025 | Added option to let PID and Attestation Providers communicate WUA expiration preferences to Wallet Unit. |
 
 ## 1 Introduction and Overview
 The WUA (Wallet Unit Attestation) topic has been discussed in the European Digital Identity Cooperation Group. As a result a number of High Level Requirements (HLRs) have been proposed. The present document is set to enable actors in the EUDIW ecosystem to follow the HLRs while ensuring the interoperability of the ecosystem. The HLRs are available in the [ARF ANNEX 2 Topic 9](https://eu-digital-identity-wallet.github.io/eudi-doc-architecture-and-reference-framework/latest/annexes/annex-2/annex-2-high-level-requirements/#a239-topic-9---wallet-unit-attestation).
@@ -168,7 +169,7 @@ The `key_storage_info` object has the following content:
 The content of the WIA is given by [Appendix E of OpenID for Verifiable Credential Issuance v1.0](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/3). In addition to the required attributes from the specification, the WIA SHALL also include the `eudi_wallet_info` claim, containing `general_info` described in [*general_info*](#231-general_info). 
 
 ### 2.3.4 Content of WUA
-The content of the WUA is given by the `key_attestation` definition specified in [Appendix D of OpenID for Verifiable Credential Issuance v1.0](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/3). If a WUA is sent as an attestation proof type, then it SHALL also include a `c_nonce` as specified in [Appendix F.3 of OpenID for Verifiable Credential Issuance v. 1.0](https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0-final.html#appendix-F.3).
+The content of the WUA is given by the `key_attestation` definition specified in [Appendix D of OpenID for Verifiable Credential Issuance v1.0](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/3). If a WUA is sent as an attestation proof type, then it SHALL also include a `c_nonce` as specified in [Appendix F.3 of OpenID for Verifiable Credential Issuance v1.0](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/3).
 In addition to the required attributes, the WUA SHALL also include the `eudi_wallet_info` claim, containing both `general_info` described in [*general_info*](#231-general_info) and `key_storage_info` described in [*key_storage_info*](#232-key_storage_info). The WUA SHALL also include the `status` object as specified in appendix D.1 of OID4VCI..
 
 > OID4VCI natively supports revocation, hence the `status` object of the `key_attestation` element SHALL be used to handle revocation. In particular, the value of `idx`  is what allows the Wallet Provider to identify the Wallet Unit (i.e. the revocation identifier) and is therefore what is required by the PID provider to request a revocation of the Wallet Unit.
@@ -177,23 +178,25 @@ In addition to the required attributes, the WUA SHALL also include the `eudi_wal
 
 > Also note that the `key_attestation` element contains an `iss` element, i.e. the issuer identifier, which also includes the Wallet Provider identity.
 
-
 During PID issuance, the PID Provider SHALL ensure that the PID they issue is bound to a key originating from a WUA whose key storage is a WSCD.
-
 
 ## 2.4 Life Cycle
 WIAs are short-lived and to be consumed upon usage, hence this section only specifies the life cycle of the WUAs.
+
+To allow PID Providers and Attestation Providers to communicate their preferences for the remaining validity period of a WUA, this specification defines a new field for the Credential Issuer Metadata endpoint (see [Section 12.2.2 of OpenID for Verifiable Credential Issuance v1.0](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/3)) that is to be placed within the `key_attestations_required` object: 
+
+- `preferred_ttl`: OPTIONAL. An integer specifying a PID or Attestation Provider's preference for the remaining validity period of the WUA it receives during issuance, in seconds. See [Section 2.4.1](#241-wallet-provider-responsibilities) for how the Wallet Unit and the Wallet Provider must handle this parameter.
 
 ### 2.4.1 Wallet Provider responsibilities
 A Wallet Provider SHALL choose the technical validity period of the WUA and SHALL maintain the revocation mechanism i.e., see [Section 2.5](#25-revocation) for until this period has passed.
 
 A Wallet Provider MAY choose to issue WUAs with different validity periods. When choosing the validity period, the Wallet Provider SHALL at least consider security, user privacy and interoperability, and the needs of the PID Provider.
 
-A Wallet Provider SHALL ensure that a Wallet can always present a WUA for their WSCD with a validity period of at least 1 month.
+A Wallet Provider SHALL ensure that a Wallet Unit can always present a WUA with a remaining validity period of at least 31 days for their WSCD. This means that this WUA SHALL be valid for at least 31 days into the future, at the moment the Wallet Unit sends it to a PID Provider or Attestation Provider.
 
-A Wallet Unit SHALL send a WUA with a validity of at least one month to PID Providers during PID issuance.
+A Wallet Provider SHALL ensure that the Wallet Unit fetches the Credential Issuer Metadata during issuance. If a `preferred_ttl` field is included in this, then the Wallet Unit SHALL send the WUA available to them with `exp` - (current time + `preferred_ttl`)  as small as possible but positive. If no such WUAs are available to the Wallet Unit it SHALL send a key attestation with (current time + `preferred_ttl`) - `exp` as small as possible.
 
-> Note that the validity period has impact on the revocation mechanism. A longer validity period will require the revocation status list to be maintained for a longer period of time. A shorter validity period may result in more frequent issuance of WUAs. It may therefore be beneficial to issue WUAs with several different validity periods to a single wallet such that those with a longer validity period can be used by the Wallet Unit during the issuance of PID where revocation chaining is mandatory and those with a shorter validity period may be used for other attestations.
+> Note that the validity period has impact on the revocation mechanism. A longer validity period will require the revocation status list to be maintained for a longer period of time. A shorter validity period may result in more frequent issuance of WUAs. It may therefore be beneficial to issue WUAs with several different validity periods to a single wallet such that those with a longer validity period can be used by the Wallet Unit during the issuance of PID where revocation chaining is mandatory and those with a shorter validity period may be used for other attestations. By the above requirements a PID or Attestation Provider can always be ensured to receive a WUA valid for at least 1 month by requesting a WUA with a validity `preferred_ttl` of 1 month. 
 
 The `key_attestation` JWT contains a field `exp` denoting the technical expiration period of the `key_attestation`.
 
