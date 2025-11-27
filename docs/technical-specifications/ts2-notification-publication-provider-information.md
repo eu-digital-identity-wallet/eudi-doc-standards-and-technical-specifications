@@ -111,7 +111,7 @@ data model from which the other classes for the individual provider classes deri
 | Attribute           | Multiplicity | Type                    | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 |---------------------|--------------|-------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `providerType` | [1..1]      | *string*                | specifies the **type** of the provider according to its sub-class, as it is necessary for the specification of the API in [clause 3.2](#3-2-components-and-interfaces), whereas the following values are defined in the present document: <ul><li>`WRPRegistrar`</li><li>`WalletProvider`</li><li>`PIDProvider`</li><li>`PubEEAProvider`</li>`WRPAccCertProvider`</li><li>`WalletRelyingParty`</li></ul>                                                                                                                                                                                     |
-| `policy`          | [1..*]       | [*Policy*](#295-policy) | specifies the type and URL of a webpage where the relevant **service policy** (e.g. registration policy or trust service policy) or **privacy policy** or **terms and conditions statement** of the provider are located, where applicable.                                                                                                                                                                                                                                                                                                                                                  |
+| `policy`          | [1..*]       | [*Policy*](#296-policy) | specifies the type and URL of a webpage where the relevant **service policy** (e.g. registration policy or trust service policy) or **privacy policy** or **terms and conditions statement** of the provider are located, where applicable.                                                                                                                                                                                                                                                                                                                                                  |
 | `x5c`             | [0..*]       | *string*                | specifies a sequence of **X.509 certificate chains** according to [RFC 7515](https://www.rfc-editor.org/rfc/rfc7515.html), where each certificate chain is compliant to [RFC 3647](https://www.rfc-editor.org/rfc/rfc3647.html) and [RFC 5280](https://www.rfc-editor.org/rfc/rfc5280.html), if used by the provider for all its services. Specifying more than one certificate chain here allows to support key rollover procedures. In case of a ``TrustServiceProvider`` this element is not present, as the relevant certificate chains are assigned to the individual ``TrustService``. |
 
 ### 2.3 WRPRegistrar
@@ -173,7 +173,7 @@ class. In addition to the attributes of the ``Provider`` class it contains the a
 
 | Attribute       | Multiplicity | Type                                      | Description                                                            |
 |-----------------|--------------|-------------------------------------------|------------------------------------------------------------------------|
-| `walletSol` | [1..*]      | [*WalletSolution*](#297-walletsolution) | specifies details with respect to the **wallet solution**. |
+| `walletSol` | [1..*]      | [*WalletSolution*](#298-walletsolution) | specifies details with respect to the **wallet solution**. |
 
 ### 2.5 PIDProvider
 
@@ -235,7 +235,7 @@ as specified in the following table:
 
 | Attribute | Multiplicity | Type                                 | Description |
 |-----------------------|--------------|--------------------------------------|---|
-| `trustSrv` | [1..*] | [*TrustService*](#296-trustservice) | specifies the **details of the trust service**. |
+| `trustSrv` | [1..*] | [*TrustService*](#297-trustservice) | specifies the **details of the trust service**. |
 
 According to Article 5a Nr. 18 (d) of (EU) No 910/2014 the EU Member States shall notify the European Commission about
 the mechanism for the validation of the identity of the Wallet-Relying Parties. As stipulated by the implementing acts
@@ -426,7 +426,7 @@ class. It contains the attributes specified in the following table:
 | Attribute | Multiplicity | Type | Description                                                                                                                                                                                                  |
 |---------------|--------------|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `lang` | [1..1] | *string* | is the two-letter Alpha-2 **language code** according to ISO 639 (Set 1).                                                                                                                                    |
-| `legalBasis` | [1..1] | *string* | specifies the **legal basis** according to which a [``LegalPerson``](#296-legalperson) is established as such or the access to a specific [``Claim``](#291-claim) is required or recommended. |
+| `legalBasis` | [1..1] | *string* | specifies the **legal basis** according to which a [``LegalPerson``](#294-legalperson) is established as such or the access to a specific [``Claim``](#291-claim) is required or recommended. |
 
 #### 2.9.4 LegalPerson
 
@@ -438,7 +438,7 @@ class and allows to specify the attributes of a legal person. It contains the at
 | `legalName`        | [1..*]       | *string*           | specifies the **legal name** of the legal person, as specified in an official record.                                                                                                                                                                           |
 | `establishedBylaw` | [0..*]      | [*Law*](#293-law) | specifies the **legal basis** on which the legal person is established. This information should in particular be present in case of a public sector body and it shall be present in case of a public sector body, which is responsible for an authentic source. |
 
-#### 2.9.4 NaturalPerson
+#### 2.9.5 NaturalPerson
 
 The ``NaturalPerson`` class is used within the definition of the [``LegalEntity``](#21-legalentity)
 class and allows to specify the attributes of a natural person. It contains the attributes specified in the following table:
@@ -450,7 +450,7 @@ class and allows to specify the attributes of a natural person. It contains the 
 | `dateOfBirth`      | [0..1]      | *string*            | specifies the **data of birth** of the natural person, as specified in official records and the set of person identification data according to the Annex of [(EU) 2024/2977]( http://data.europa.eu/eli/reg_impl/2024/2977/oj), if present.                                       |
 | `placeOfBirth` | [0..1]      | *string*            | specifies the **place of birth** of the natural person, as specified in official records and the set of person identification data according to the Annex of [(EU) 2024/2977]( http://data.europa.eu/eli/reg_impl/2024/2977/oj), if present.                                      |
 
-#### 2.9.5 Policy
+#### 2.9.6 Policy
 
 The ``Policy`` class is used within the definition of the [``Provider``](#21-provider) class. It contains the attributes specified in the following table:
 
@@ -459,7 +459,7 @@ The ``Policy`` class is used within the definition of the [``Provider``](#21-pro
 | `type` | [1..1] | *string* | specifies the **type of the policy** in form of a URI according to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986.html), whereas the following URIs are defined in the present document: <ul><li>http://data.europa.eu/eudi/policy/trust-service-practice-statement - is a **Trust Service Practice statement** according to clause 6.1 of [ETSI EN 319 401](https://www.etsi.org/deliver/etsi_en/319400_319499/319401/03.01.01_60/en_319401v030101p.pdf).</li><li>http://data.europa.eu/eudi/policy/terms-and-conditions - is a **Terms and Conditions** statement according to clause 6.2 of [ETSI EN 319 401](https://www.etsi.org/deliver/etsi_en/319400_319499/319401/03.01.01_60/en_319401v030101p.pdf).</li><li>http://data.europa.eu/eudi/policy/privacy-statement - is a **Privacy Statement** to fulfil the information requirements of Article 12 ff [(EU) 2016/679](http://data.europa.eu/eli/reg/2016/679/oj).</li><li>http://data.europa.eu/eudi/policy/privacy-policy - is a **Privacy Policy** according to the clauses 3.14 and 5.6 of ISO/IEC 29100.</li><li>http://data.europa.eu/eudi/policy/registration-policy - is a **Registration Policy** according to Article 4 of [Draft of the CIR for RP-Registration](https://tinyurl.com/IA-5b-draft).</li> </ul> |
 | `policyURI` | [1..1] | *string* | specifies the **policy URI** in form of a URL according to [RFC1738](https://www.rfc-editor.org/rfc/rfc1738.html) where the policy is published. |
 
-#### 2.9.6 TrustService
+#### 2.9.7 TrustService
 
 The **TrustService** class is used within the definition of the [TrustServiceProvider](#286-trustservice) class. It contains the attributes specified in the following table:
 
@@ -474,7 +474,7 @@ The **TrustService** class is used within the definition of the [TrustServicePro
 | `srvQualifier` | [0..*]       | *string* | specifies the **Service information extensions** of the Trust Service according to clause 5.5.9 of [ETSI TS 119 612](https://www.etsi.org/deliver/etsi_ts/119600_119699/119612/02.03.01_60/ts_119612v020301p.pdf).                                                                                                                    |
 
 
-#### 2.9.7 WalletSolution
+#### 2.9.8 WalletSolution
 
 The **WalletSolution** class is used within the definition of the [WalletProvider](#24-walletprovider) class. It contains the attributes specified in the following table:
 
