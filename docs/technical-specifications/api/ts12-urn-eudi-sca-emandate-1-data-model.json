@@ -47,7 +47,7 @@
             ]
         },
         "payment": {
-            "$ref": "ts12-urn:eudi:sca:payment_authentication:1-data-model.json"
+            "$ref": "ts12-urn-eudi-sca-payment_authentication-1-data-model.json"
         }
     },
     "additionalProperties": true,

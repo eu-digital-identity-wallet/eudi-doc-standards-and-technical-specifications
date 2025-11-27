@@ -21,6 +21,8 @@ The present document specifies structures and processing rules for conducting St
 | `0.95`   | 10.11.2025  | For review |
 | `0.96`   | 14.11.2025  | Further fine-tuning and error corrections |
 | `0.97`   | 17.11.2025  | Adding transaction logging requirements |
+| `0.98`   | 27.11.2025  | API files names update |
+
 
 
 
@@ -482,9 +484,9 @@ The `payload` object contains all the details for a specific transaction type.
 
 Wallet units **MUST** support the processing and rendering of the three basic transaction types defined in this specification. Support for additional transaction types is **OPTIONAL**. For each of the basic types, this specification provides the corresponding [JSON Schema] files.
 
-- [`urn:eudi:sca:payment_authentication:1`](./api/ts12-urn:eudi:sca:payment_authentication:1-data-model.json)
-- [`urn:eudi:sca:login_risk_transaction:1`](./api/ts12-urn:eudi:sca:login_risk_transaction:1-data-model.json)
-- [`urn:eudi:sca:emandate:1`](./api/ts12-urn:eudi:sca:emandate:1-data-model.json)
+- [`urn:eudi:sca:payment_authentication:1`](./api/ts12-urn-eudi-sca-payment_authentication-1-data-model.json)
+- [`urn:eudi:sca:login_risk_transaction:1`](./api/ts12-urn-eudi-sca-login_risk_transaction-1-data-model.json)
+- [`urn:eudi:sca:emandate:1`](./api/ts12-urn-eudi-sca-emandate-1-data-model.json)
 
 #### 4.3.1 Payment Authentication
 
