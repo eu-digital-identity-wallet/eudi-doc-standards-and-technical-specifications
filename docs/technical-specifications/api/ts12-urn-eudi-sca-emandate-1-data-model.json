@@ -2,7 +2,7 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "properties": {
-        "mandate_id": {
+        "transaction_id": {
             "type": "string",
             "maxLength": 36,
             "minLength": 1,
@@ -17,12 +17,34 @@
                 "2025-11-13T20:20:39+00:00"
             ]
         },
-        "reference": {
+        "start_date": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+                "2025-11-13T20:20:39+00:00"
+            ]
+        },
+        "end_date": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+                "2025-12-13T20:20:39+00:00"
+            ]
+        },
+        "reference_number": {
             "type": "string",
             "maxLength": 50,
             "minLength": 1,
             "examples": [
-                "8D8AC610-566D-4EF0-9C22-186B2A5ED793"
+                "A-98765"
+            ]
+        },
+        "creditor_id": {
+            "type": "string",
+            "maxLength": 50,
+            "minLength": 1,
+            "examples": [
+                "FR14ZZZ001122334455"
             ]
         },
         "purpose": {
@@ -32,27 +54,12 @@
                 "Pay monthly bill"
             ]
         },
-        "nbf": {
-            "type": "string",
-            "format": "date-time",
-            "examples": [
-                "2025-11-13T20:20:39+00:00"
-            ]
-        },
-        "exp": {
-            "type": "string",
-            "format": "date-time",
-            "examples": [
-                "2025-12-13T20:20:39+00:00"
-            ]
-        },
-        "payment": {
-            "$ref": "ts12-urn-eudi-sca-payment_authentication-1-data-model.json"
+        "payment_payload": {
+            "$ref": "ts12-urn-eudi-sca-payment-1-data-model.json"
         }
     },
-    "additionalProperties": true,
+    "additionalProperties": false,
     "required": [
-        "purpose",
-        "date_time"
+        "transaction_id"
     ]
 }

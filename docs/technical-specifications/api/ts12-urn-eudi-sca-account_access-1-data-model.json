@@ -17,24 +17,35 @@
                 "2025-11-13T20:20:39+00:00"
             ]
         },
-        "service": {
-            "type": "string",
-            "maxLength": 100,
-            "examples": [
-                "Superbank Onlinebanking"
+        "aisp": {
+            "type": "object",
+            "properties": {
+                "legal_name": {
+                    "type": "string"
+                },
+                "brand_name": {
+                    "type": "string"
+                },
+                "domain_name": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "legal_name",
+                "brand_name",
+                "domain_name"
             ]
         },
-        "action": {
+        "description": {
             "type": "string",
             "maxLength": 140,
             "examples": [
-                "Login to your online account."
+                "Grant access to the account's data."
             ]
         }
     },
     "additionalProperties": false,
     "required": [
-        "transaction_id",
-        "action"
+        "transaction_id"
     ]
 }
