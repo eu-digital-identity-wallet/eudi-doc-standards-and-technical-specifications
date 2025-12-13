@@ -436,7 +436,7 @@ class and allows to specify the attributes of a legal person. It contains the at
 | Attribute          | Multiplicity | Type               | Description                                                                                                                                                                                                                                                     |
 |--------------------|--------------|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `legalName`        | [1..*]       | *string*           | specifies the **legal name** of the legal person, as specified in an official record.                                                                                                                                                                           |
-| `establishedBylaw` | [0..*]      | [*Law*](#293-law) | specifies the **legal basis** on which the legal person is established. This information should in particular be present in case of a public sector body and it shall be present in case of a public sector body, which is responsible for an authentic source. |
+| `establishedByLaw` | [0..*]      | [*Law*](#293-law) | specifies the **legal basis** on which the legal person is established. This information should in particular be present in case of a public sector body and it shall be present in case of a public sector body, which is responsible for an authentic source. |
 
 #### 2.9.4 NaturalPerson
 
