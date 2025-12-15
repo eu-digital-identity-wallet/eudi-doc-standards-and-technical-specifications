@@ -18,6 +18,7 @@ The present document specifies the data formats and application programming inte
 | `0.4`   | 23.05.2025  | Updated version based on focus group meeting 2            |
 | `1.0`   | 13.06.2025  | Published version after Coordination Group review period  |
 | `1.1`   | 14.10.2025  | First maintenance release - JWS API fix, intendedUseIdentifier, registryURI, TS11-implied updates     |
+| `1.2`   | 27.11.2025  | Added Indended use identifier to /wrp GET query parameters list in main specification, reference updates.       |
 
 ## 1. Introduction and Overview
 
@@ -251,7 +252,7 @@ paths:
 
 There is a single **GET** /wrp endpoint for making parametrised queries. For this purpose, the API specification has the `parameters` section, where:
 
-- Each filterable field (`identifier`, `legalname`, `tradename`, `policy`, `entitlement`, `providesattestation`, `usesintermediary`, `isintermediary`, `intendedUseClaimPath`, `intendedUseCredentialMeta`, `intendedUseCredentialFormat`) is defined as a query parameter.
+- Each filterable field (`identifier`, `legalname`, `tradename`, `policy`, `entitlement`, `providesattestation`, `usesintermediary`, `isintermediary`, `intendeduseidentifier`, `intendedUseClaimPath`, `intendedUseCredentialMeta`, `intendedUseCredentialFormat`) is defined as a query parameter.
 - `in: query`: Specifies that the parameter is a query parameter.
 - `name`: The name of the query parameter.
 - `schema`: Defines the data type of the query parameter (mostly `string`, with `boolean` for `isintermediary`).
@@ -287,7 +288,7 @@ A parallel endpoint for the DELETE endpoint, a GET endpoint for requesting a sin
 
 `/wrp/check-intended-use` (GET):
 
-A dedicated check endpoint for allowing a highly specialised endpoint for making narrowed-down `Intended use` related queries from the Registry with four mandatory and one optional parameter (see the [API specification](api/ts5-openapi31-registrar-api.yml) for details). The query parameters of the basic `/wrp` endpoint can be used to have same outcome, but this endpoint provides a JWS-signed boolean `TRUE` or `FALSE` response, based on if the queried parameter set can be found in the Registrar's `Intended use` information for the Wallet-Relying Party.
+A dedicated check endpoint for allowing a highly specialised endpoint for making narrowed-down `Intended use` related queries from the Registry with one mandatory and five optional parameters (see the [API specification](api/ts5-openapi31-registrar-api.yml) for details). The query parameters of the basic `/wrp` endpoint can be used to have same outcome, but this endpoint provides a JWS-signed boolean `TRUE` or `FALSE` response, based on if the queried parameter set can be found in the Registrar's `Intended use` information for the Wallet-Relying Party.
 
 The OpenAPI 3.1 compatible REST API methods for the above are provided in Annex A.2
 
@@ -327,9 +328,9 @@ The Registrar SHALL publish in their respective API documentation what limits it
 | [Provider information specification]                            | [The European Commission Technical Specification of systems enabling the notification and subsequent publication of Provider information](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts2-notification-publication-provider-information.md) |
 | [Specification of Common Interface for Data Deletion Requests] |  [The European Commission Specification of Common Interface for Data Deletion Requests to Relying Parties](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts7-common-interface-for-data-deletion-request.md)   |
 |  [Specification of interfaces and formats for the catalogue of attributes and the catalogue of attestations]   |  [The European Commission Specification for interfaces and formats for the Catalogue of Attributes and the Catalogue of Attestations](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts11-interfaces-and-formats-for-catalogue-of-attributes-and-catalogue-of-schemes.md) |
-| [ETSI TS 119 475]                      | [ETSI TS 119 475 V0.0.9 Electronic Signatures and Trust Infrastructure (ESI); Relying Party attributes supporting EUDI Wallet user's authorisation decisions](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/287) (draft)                                    |
-| [ETSI TS 119 612]                      | [ETSI TS 119 612 V2.3.1 Electronic Signatures and Trust Infrastructure (ESI); Trusted Lists](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/41)                                     |
-| [ETSI EN 319 412-1]                    | [ETSI EN 319 412-1 V1.5.1 Electronic Signatures and Trust Infrastructure (ESI); Certificate Profiles; Part 1: Overview and common data structures](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/143)                                     |
+| [ETSI TS 119 475]                      | [ETSI TS 119 475 V1.1.1 Electronic Signatures and Trust Infrastructure (ESI); Relying Party attributes supporting EUDI Wallet user's authorisation decisions](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/287)                                     |
+| [ETSI TS 119 612]                      | [ETSI TS 119 612 V2.4.1 Electronic Signatures and Trust Infrastructure (ESI); Trusted Lists](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/41)                                     |
+| [ETSI EN 319 412-1]                    | [ETSI EN 319 412-1 V1.6.1 Electronic Signatures and Trust Infrastructure (ESI); Certificate Profiles; Part 1: Overview and common data structures](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/143)                                     |
 | [ISO8601-1]                            | [ISO 8601-1:2019 Date and Time - Representations for information interchange - Part 1: Basic rules](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/405)   |
 | [RFC 9162]                             | [IETF RFC 9162 Certificate Transparency 2.0](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/404) (experimental)   |
 
