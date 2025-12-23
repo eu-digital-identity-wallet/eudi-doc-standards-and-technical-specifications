@@ -18,6 +18,7 @@ trusted setup, in the EUDI Wallet.
 
 | Version | Date | Description |
 |---------|------------|------------|
+| `1.0` | 15.12.2025 | Editorial changes
 | `0.95` | 24.11.2025 | Improvements based on second focus meeting
 | `0.9` | 7.11.2025 | Improvements based on internal review
 | `0.8` | 24.10.2025 | Improvements based on first focus meeting
@@ -128,8 +129,7 @@ Recitals 14, 15, and 59 of the [European Digital Identity Regulation]
 * Attestation format and presentation protocols (**Note** Modifications in the second draft of
 ISO 18013-5. The status of OID4VP is not clear)
 * Revocation
-* Proof and circuit serialization (**Note** This is also done in parallel at
-https://datatracker.ietf.org/doc/draft-google-cfrg-libzk/)
+
 
 **Out of scope**
 The following items are considered out of scope for this Technical Specification:
@@ -141,6 +141,8 @@ The following items are considered out of scope for this Technical Specification
 proving that two attestation are bound to the same WSCA/WSCD)
 * Issuer hiding
 * Solutions based on arithmetic circuits that require a trusted setup
+* Proof and circuit serialization (**Note** This is done  at
+https://datatracker.ietf.org/doc/draft-google-cfrg-libzk/)
 
 ## 3 Overview of a circuit-based ZK system.
 
@@ -163,7 +165,13 @@ the protocol correctly, the verifier will be convinced of its validity.
 * Soundness: If the statement is false, a dishonest prover cannot convince an 
 honest verifier that it is true, **except with some negligible probability**.
 
-*Statistical soundness*. A zkSNARK has $\lambda$-bit statistical soundness if for every time-bound $T$ and probability $\epsilon$, if a $T$-bounded adversary succeeds in breaking soundness with probability $\epsilon$, then it must hold that $T/\epsilon \geq 2^\lambda$. For example, if a scheme supports 100-bits of statistical soundness, then any adversary that runs for 2^{80} steps of computation has less than a 1-in-a-million chance of convincing a verifier to accept a proof of a false statement.
+*Statistical soundness*. A zkSNARK has $\lambda$-bit statistical soundness if 
+for every time-bound $T$ and probability $\epsilon$, if a $T$-bounded adversary 
+succeeds in breaking soundness with probability $\epsilon$, then it must hold 
+that $T/\epsilon \geq 2^\lambda$. For example, if a scheme supports 100-bits 
+of statistical soundness, then any adversary that runs for 2^{80} steps of 
+computation has less than a 1-in-a-million chance of convincing a verifier 
+to accept a proof of a false statement.
 
 
 
@@ -198,7 +206,6 @@ and the circuit.
 
 ### 3.3  Performance
 
-
 As evidence that this approach is well-suited for the privacy needs of the EUDI wallet, we here
 present performance results from the literature.
 According to [Fri2024], the Longfellow ZK library can generate a proof that an [ISO/IEC 18013-5] attestation is valid  
@@ -207,8 +214,6 @@ Verification of the proof requires about 0.6 seconds, and the proof size is arou
 
 
 ## 4 Detailed circuit description
-
-(**Work in progress**)
 
 This section outlines a small set of circuit classes that will be useful in the EUDI wallet.  
 The aim is to define a circuit `C(x,w)` that takes a public input `x` and a private input `w` 
@@ -232,8 +237,9 @@ statement. The size of both of these components is a natural parameter for the
 circuit.  As such, the circuits shall be parameterized by the following quantities:
 
 1. The size of the input document format in bytes.
-2. The number of attributes disclosed in the presentation and their maximum size.
-3. The number of potential valid issuers under which the document has been signed.
+2. The number of attributes disclosed in the presentation. 
+3. The maximum size of disclosed attribute.
+4. The number of potential valid issuers under which the document has been signed.
 
 For example, a reasonable parameter selection might be (2000,3,64, 27) which 
 supports 2000byte documents that allow disclosure of up to 3 identity attributes 
@@ -257,50 +263,62 @@ EUDI functionality, it may be suitable to specialize circuits that only support
 checking for equality with a given string on the attributes that are presented.
 
 ### Circuit for ISO 18013-5 Attestations
-
-This section begins with a high-level specification for a circuit that verifies 
-an ISO 18013-5 mdoc credential. The aim is to
-describe the constraints that should be verified, and then iteratively refine 
-the constraints until a low-level circuit can be extracted.
-
 Per the framework above, the generic class of circuits defined in this section 
 are meant to be specialized by their universal, scheme, and predicate parameters.  
 For example, the simplest example can be a (2000,3,64,1) credential that supports 
 (ECDSA P256, SHA-256) and only the equality predicate for attributes.
 
-* The public information vector `V` contains (a) the x and y coordinates of the 
-Attestation Provider's public key certificate, ipkx, and ipky, (b) the namespace, attribute 
+The public input is a vector `V` that contains (a) the x and y coordinates of the 
+Attestation Provider's public key certificate, denoted by ipkx, and ipky respectively, (b) the namespace, attribute 
 name, and expected attribute value for each attribute that is disclosed, (c) 
 the hash of the transcript, e2, used to define the freshness of the session and 
 device-binding, and (d) the time `now`, in mdoc format, used to determine whether 
 the credential has not expired and is currently valid.
 
-* For now, we defer defining the private inputs, and instead specify the set of constraints that need to be validated:
-   1. There exist values e, (r,s) such that 0 < e,r,s < p, and verify_p256(ipkx, ipky, e, (r,s)) = true. In other words, there exists a signature under the Attestation Provider's public key on a message whose SHA-256 hash is equal to e.
-   2. Note, it is better to have the  Access Certificate Authority key given as input, and verify that ipkx, ipky is signed by the  Access Certificate Authority
-   3. There exist values (r2, s2) and a device key (dpkx, dpky) such that verify_p256(dpkx, dpky, e2, (r2,s2)) = true.  This constraint verifies that the challenge message is signed by some key.
-   4. There exists a byte string `mdoc` of length at most MAX such that SHA-256(mdoc) = e, and `mdoc` is a valid CBOR-encoded string.
-   5. There exist strings validUntil and validFrom stored in the appropriate index in the `mdoc`, and if holds that 'validFrom` < `now` < `validUntil`.
-   6. The byte strings (dpkx, dpky) occur in `mdoc` at ...<location path>.
-   7. Add constraints that verify the attributes.
-      * for each revealed attribute, there exists a preimage `pre` and an index `i` into the `mdoc` (give path) such that SHA-256(pre) = `attr_i` from the mdoc.
-      * The `pre` byte string encodes the attribute name and attribute value that are in the public parameter `V`. (Explain more precisely)
+The private input to the circuit is an mdoc response
 
-#### Details on each step
+Then, the following constraints needs to be validated:
+   1. There exist a digest e, a signature (r,s) such that 0 < e,r,s < p, for which verify_p256(ipkx, ipky, e, (r,s)) = true. In other words, there exists a signature under the Attestation Provider's public key on a message whose SHA-256 hash is equal to e. Note, it is better to have the  Access Certificate Authority key given as input, and verify that ipkx, ipky is signed by the  Access Certificate Authority
+   2. There exist values (r2, s2) and a device key (dpkx, dpky) such that verify_p256(dpkx, dpky, e2, (r2,s2)) = true.  This constraint verifies that the challenge message is signed by some key.
+   3. There exists a byte string `mdoc` of length at most MAX such that SHA-256(mdoc) = e, and `mdoc` is a valid CBOR-encoded string.
+   4. There exist strings validUntil and validFrom stored in the appropriate index in the `mdoc`, and it holds that 'validFrom` < `now` < `validUntil`.
+   5. The byte strings (dpkx, dpky) occur in `mdoc`.
+   6. For each revealed attribute, there exists a preimage `pre` and an index `i` into the `mdoc` such that SHA-256(pre) = `attr_i` from the mdoc.
+   7. The `pre` byte string encodes the attribute name and attribute value that are in the public parameter `V`. 
 
-In this section, we specify each of the above steps in more detail.
+
 
 ### Circuit for JWT Attestation
-This section begins with a high-level specification for a circuit that verifies a 
-credential that is issued as a Json Web Token (JWT).
+This circuit can be used with SD-JWT attestations that do not include any disclosure.
+
+The public input is a vector `V` that contains (a) the x and y coordinates of the 
+Attestation Provider's public key certificate, denoted by ipkx, and ipky respectively, (b) the attribute 
+name, and expected attribute value for each attribute that is disclosed, (c) 
+a nonce, e2, used to define the freshness of the session and 
+device-binding, and (d) the time `now`, in JSON NumericDate format, used to determine whether 
+the credential has not expired and is currently valid.
+
+The private input to the circuit is the SD-JWT attestation and a key binding JWT (KB-JWT). The payload of the KB-JWT is the nonce. The signature of the KB-JWT can be verified using the public key included in the cnf claim of the SD-JWT.
+
+Then, the following constraints needs to be validated:
+   1. There exist a digest e, a signature (r,s) such that 0 < e,r,s < p, for which verify_p256(ipkx, ipky, e, (r,s)) = true. In other words, there exists a signature under the Attestation Provider's public key on a message whose SHA-256 hash is equal to e. Note, it is better to have the  Access Certificate Authority key given as input, and verify that ipkx, ipky is signed by the  Access Certificate Authority
+   2. There exist values (r2, s2) and a device key (dpkx, dpky) such that verify_p256(dpkx, dpky, e2, (r2,s2)) = true.  This constraint verifies that the challenge message is signed by some key.
+   3. There exists a byte string `sd-jwt` of length at most MAX such that SHA-256(sd-jwt) = e, and `sd-jwt` is a valid JSON-encoded string.
+   4. There exist strings exp and nbf in `sd-jwt`, and it holds that nbf < `now` < exp.
+   5. The byte strings (dpkx, dpky) occur in `sd-jwt` in the cnf claim.
+ 
+
 
 ### EUDI Wallet integration
+The following figure illustrates how arithmetic circuits are integrated into the EUDI
+Wallet. A Wallet Instance uses the WSCA/WSCD to generate a suitable proof-of-possession
+of an attestation. A ZKP library is then used to generate the appropriate proofs. Therefore,
+the ZKP library never accesses a secret key, neither does it interact with the WSCA/WSCD.
 
 ![Integration of ZK and wallets](img/ts-13-zkp-wu.png)
 
 ## 5 Presentation protocols
 
-(**Work in progress**)
 From a high-level perspective, an attestation presentation request SHALL include
 ZKP solution specific parameters, whereas attestation presentation responses SHALL
 include the proof, as well as public parameters that can be used for verifying
@@ -319,8 +337,11 @@ request structure, and the `ZkDocument` structure, which can be used in a
 ```cddl
 ZkRequest = {
    "systemSpecs": [+ ZkSystemSpec],
+   "zkRequired": ZkRequired,
    * tstr => RFU
 }
+
+ZkRequired = bool
 
 ZkSystemSpec = {
   "zkSystemId": ZkSystemId
@@ -333,6 +354,7 @@ ZkSystem = tstr
 
 ZkParams = { * tstr => Ext}
 ```
+`ZkRequired` is used by the Relying Party to indicate that only a ZKP response satisisfies the request.
 
 `ZkSystem` is a `tstr` that defines the ZKP type, `ZkParams` contains the
 parameter used by that system, `ZkSystemId` is an identifier set by Relying Party that
@@ -521,11 +543,7 @@ The revocation list consists of 3 signatures on the messages
 0b000000000000000e0000000000000002000000
 0e00000000000000600000000000000002000000
 ```
-one suitable `R_L` list is:
-```
-{
-}
-```
+
 ### Revocation clause
 In each presentation proof, the user's proof includes a portion that asserts that "there exists values id_L, id_R, and a signature sigma_j under ipk, and the identifier of their document, id, such that sigma_j is a signature of a message (id_L, id_R, ep) and id_L < id < id_R."
 
