@@ -21,7 +21,7 @@ The present document specifies how WUA is used in connection with PID Providers 
 | `1.3`   | 25.11.2025 | Added option to let PID and Attestation Providers communicate WUA expiration preferences to Wallet Unit. |
 
 ## 1 Introduction and Overview
-The WUA (Wallet Unit Attestation) topic has been discussed in the European Digital Identity Cooperation Group. As a result a number of High Level Requirements (HLRs) have been proposed. The present document is set to enable actors in the EUDIW ecosystem to follow the HLRs while ensuring the interoperability of the ecosystem. The HLRs are available in the [ARF ANNEX 2 Topic 9](https://eu-digital-identity-wallet.github.io/eudi-doc-architecture-and-reference-framework/latest/annexes/annex-2/annex-2-high-level-requirements/#a239-topic-9---wallet-unit-attestation).
+The WUA (Wallet Unit Attestation) topic has been discussed in the European Digital Identity Cooperation Group. As a result a number of High Level Requirements (HLRs) have been proposed. The present document is set to enable actors in the EUDIW ecosystem to follow the HLRs while ensuring the interoperability of the ecosystem. The HLRs are available in the [ARF ANNEX 2 Topic 9](https://eudi.dev/latest/annexes/annex-2/annex-2.02-high-level-requirements-by-topic/#a236-topic-9-wallet-unit-attestation).
 
 This specification is designed to enable the high level requirements defined in the ARF. Additionally the specification strives to ensure that the WUA mechanism is compatible with the existing technical specifications for the EUDIW ecosystem. I.e., the mechanism must be compatible with ISO18013-5 as well as OID4VCI, OID4VP. The goal of the specification, is that the solution is technically simple and does not introduce unnecessary complexity.
 
