@@ -12,40 +12,35 @@
 			<xs:element name="type" minOccurs="1" maxOccurs="1" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="Identifier"/>
-	<xs:complexType name="Law"/>
 	<xs:complexType name="Law">
 		<xs:sequence>
-			<xs:element name="lang" minOccurs="1" maxOccurs="1" type="xs:string"/>
-			<xs:element name="legalBasis" minOccurs="1" maxOccurs="1" type="xs:string"/>
+			<xs:element name="legislativeIdentifier" minOccurs="1" maxOccurs="1" type="xs:string"/>
+			<xs:element name="legalBasis" minOccurs="0" maxOccurs="1" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="LegalEntity">
 		<xs:sequence>
+			<xs:element name="legalPerson" minOccurs="0" maxOccurs="1" type="LegalEntity"/>
+			<xs:element name="naturalPerson" minOccurs="0" maxOccurs="1" type="NaturalPerson"/>
+			<xs:element name="identifier" minOccurs="0" maxOccurs="unbounded" type="Identifier"/>
+			<xs:element name="postalAddress" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
 			<xs:element name="country" minOccurs="1" maxOccurs="1" type="xs:string"/>
 			<xs:element name="email" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
 			<xs:element name="infoURI" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
 			<xs:element name="phone" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
-			<xs:element name="postalAddress" minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
-			<xs:element name="identifier" minOccurs="0" maxOccurs="unbounded" type="Identifier"/>
-			<xs:element name="is identified by" type="Identifier"/>
-			<xs:element name="legalPerson" minOccurs="0" maxOccurs="1" type="LegalEntity"/>
-			<xs:element name="may be" type="LegalPerson"/>
-			<xs:element name="naturalPerson" minOccurs="0" maxOccurs="1" type="NaturalPerson"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="LegalPerson">
 		<xs:sequence>
 			<xs:element name="legalName" minOccurs="1" maxOccurs="unbounded" type="xs:string"/>
 			<xs:element name="establishedByLaw" minOccurs="0" maxOccurs="unbounded" type="Law"/>
-			<xs:element name="is established by" type="Law"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="NaturalPerson">
 		<xs:sequence>
-			<xs:element name="dateOfBirth" minOccurs="0" maxOccurs="1" type="xs:string"/>
-			<xs:element name="familyName" minOccurs="1" maxOccurs="1" type="xs:string"/>
 			<xs:element name="givenName" minOccurs="1" maxOccurs="1" type="xs:string"/>
+			<xs:element name="familyName" minOccurs="1" maxOccurs="1" type="xs:string"/>
+			<xs:element name="dateOfBirth" minOccurs="0" maxOccurs="1" type="xs:string"/>
 			<xs:element name="placeOfBirth" minOccurs="0" maxOccurs="1" type="xs:string"/>
 		</xs:sequence>
 	</xs:complexType>
@@ -75,7 +70,7 @@
 		<xs:complexContent>
 			<xs:extension base="Provider">
 				<xs:sequence>
-					<xs:element name="CAR" minOccurs="1" maxOccurs="1" type="xs:string"/>
+					<xs:element name="car" minOccurs="1" maxOccurs="1" type="xs:string"/>
 					<xs:element name="EEAIssuer" minOccurs="0" maxOccurs="1" type="xs:string"/>
 				</xs:sequence>
 			</xs:extension>
@@ -96,7 +91,6 @@
 		<xs:complexContent>
 			<xs:extension base="Provider">
 				<xs:sequence>
-					<xs:element name="provides" type="TrustService"/>
 					<xs:element name="trustSrv" minOccurs="1" maxOccurs="unbounded" type="TrustService"/>
 				</xs:sequence>
 			</xs:extension>
