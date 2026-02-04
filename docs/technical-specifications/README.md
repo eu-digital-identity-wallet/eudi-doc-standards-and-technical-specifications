@@ -43,7 +43,7 @@ on GitHub.
 ## Technical Specifications
 
 The initial drafts of the following technical specifications will be developed
-from **March 7, 2025, to August 15, 2025**. Each specification includes links to
+from **March 7, 2025, to February 22, 2026**. Each specification includes links to
 its corresponding GitHub discussion area and roadmap issue.
 
 | Id | Title | | |

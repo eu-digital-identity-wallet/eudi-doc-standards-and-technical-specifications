@@ -4,22 +4,23 @@
 
 ## Note
 
-This technical specification captures exploratory work aimed at clarifying the technical considerations and outlining an approach for integrating zero-knowledge proofs based on multi-message signatures in the EUDI wallet ecosystem. It is not intended to be a final specification. Instead, it will be handed over to ETSI for further refinement, consolidation and formal standardization. In particular, the continued development of this specification is expected to take place under ETSI TS 119 476-2, where the detailed technical requirements and normative provisions will be fully defined.
+This technical specification contains exploratory work aimed at clarifying the technical considerations and outlining an approach for integrating zero-knowledge proofs based on multi-message signatures in the EUDI wallet ecosystem. It is not intended to be a final specification. Instead, it will be handed over to ETSI for further refinement, consolidation and formal standardization. In particular, the continued development of this specification is expected to take place under ETSI TS 119 476-2, where the detailed technical requirements and normative provisions will be fully defined.
 
 ### [GitHub discussion](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/discussions/467)
 
 ## Version
 
-| Version | Date       | Description                                                       |
-|---------|------------|-------------------------------------------------------------------|
-| `0.1`   | 19.12.2025 | Initial version                                                   |
-| `0.2`   | 22.01.2026 | Updates based on first focus group meeting and additional details |
+| Version | Date       | Description                                                                                |
+|---------|------------|--------------------------------------------------------------------------------------------|
+| `0.1`   | 19.12.2025 | Initial version                                                                            |
+| `0.2`   | 22.01.2026 | Updates based on first focus group meeting and additional details                          |
+| `0.3`   | 30.01.2026 | Updates based on second focus group meeting, editorial changes and additional explanations |
 
 ## 1 Introduction and Overview
 
-Multi-Message-Signature (MMS) schemes are a type of signature scheme that allows signing of multiple messages at once and are particularly friendly towards efficient Zero Knowledge Proofs (ZKPs), making them an interesting technology for the EUDI wallet ecosystem.
-On the other hand, the relative immaturity of MMS schemes (compared to more established standard digital signature schemes) requires more effort to integrate into existing digital ecosystems.
-Further, similar to circuit-based approaches for ZKPs, additional care is necessary for revocation of attestations to ensure that this does not harm the privacy benefits of the MMS-based approach.
+Multi-Message-Signature (MMS) schemes are a class of signature schemes that allows signing of multiple messages at once.
+Many MMS schemes are particularly friendly to Zero Knowledge Proof (ZKP) techniques, making them interesting in an EUDI wallet ecosystem context.
+On the other hand, MMS schemes are relatively immature (when compared to more established digital signature schemes) and so require more effort to integrate into a digital ecosystem.
 
 ### 1.1 ZKPs in [European Digital Identity Regulation]
 
@@ -52,14 +53,14 @@ Finally, article 11a.2 of [European Digital Identity Regulation] mandates that:
 
 This document is structured as follows:
 
-- Section 2 outlines the scope of this specification, and in particular which high-level requirements are treated and which are not.
+- Section 2 outlines the scope of this specification, and in particular which high-level requirements are treated, and which are not.
 - Section 3 presents a modular architecture for ZKPs based on MMSs.
-- Section 4 provides an overview of options for MMS schemes, their pros and cons, and makes recommendations for concrete MMS schemes both in short and long-term.
-- Section 5 provides an overview of instantiations of additional modules needed to fulfill the high-level requirements.
+- Section 4 provides an overview of different MMS schemes, their pros and cons. Based on this overview, a recommendation is made for integrating MMS schemes in the short and long-term.
+- Section 5 provides an overview of instantiations of additional modules needed to fulfill the high-level requirements as well as make recommendations for concrete instantiations of the modules.
 - Section 6 discusses issuance of attestations based on MMS schemes.
 - Section 7 discusses presentation protocol designs.
 - Section 8 discusses data model and container format.
-- Section 9 provides an overview of different options for revocation.
+- Section 9 provides an overview of different options for revocation. Based on this overview a recommendation is made for revocation.
 
 ## 2 Scope
 
@@ -69,8 +70,8 @@ That is, this document includes two things:
 2. Based on the assessment, a concrete set of recommendations for integrating a ZK presentation of an attestation using a MMS scheme in the EUDI ecosystem.
 
 Mandatory high-level requirements that are labeled with SHALL or MUST from [Section A.2.3.21. Topic 53 of Annex 2](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/annexes/annex-2/annex-2.02-high-level-requirements-by-topic.md#a2331-topic-53-zero-knowledge-proofs) are generally considered to be in-scope, with some exceptions as noted.
-That being said, the next two sections will explicitly list the requirements considered to be in scope, respectively out of scope, for this Technical Specification.
-Finally, the third section elaborates on the relationship between an electronic identification (eID) means at level of assurance (LoA) high and ZKPs as envisioned in the EUDI Wallet ecosystem.
+That being said, Sections 2.1 and 2.2 will explicitly list the requirements considered to be in scope, respectively out of scope, for this Technical Specification.
+Finally, Section 2.3 elaborates on the relationship between an electronic identification (eID) means at level of assurance (LoA) high and ZKPs as envisioned in the EUDI Wallet ecosystem.
 
 ### 2.1 In scope
 
@@ -88,22 +89,24 @@ Finally, the third section elaborates on the relationship between an electronic 
 
 High-level requirements out of scope:
 
-- ZKP\_01(v): Hiding the issuer of an attestation. 
+- ZKP\_01(v): Hiding the Issuer of an attestation. 
   > This requirement is non-mandatory from ZKP\_01 and hence out of scope for this specification.
 - ZKP\_04: Pseudonyms.
-  > This requirement is not mandatory and out of scope for this specification. 
+  > This requirement is not mandatory and out of scope for this specification.
 - ZKP\_05: Proximity based flows.
   > This requirement is mandatory but out of scope for this specification to match the scope of TS13.
-- ZKP\_06: Generating ZKPs based upon mdocs and SD-JWTs. 
-	> This requirement is not mandatory and out of scope for this specification. 
+- ZKP\_06: Generating ZKPs based upon mdocs and SD-JWT VCs. 
+  > This requirement is not mandatory and, further, it is not possible to use these effectively for ZKPs based on MMSs. Hence, this requirement is out of scope for this specification (see [Section 2.4](#24-incompability-of-mdocs/sd-jwt-vcs-and-zkps-based-on-mmss)).
 - ZKP\_08: Only use of standardized algorithms.
-  > The goal of this specification is to provide a concrete proposal for what algorithms must be standardized to enable ZKPs based on MMSs in the EUDI ecosystem. 
+  > The goal of this specification is to provide guidance for what algorithms to standardize in order to enable ZKPs based on MMS schemes in the EUDI ecosystem.
+  > The specification will, however, take into consideration the extent to which a particular algorithm relies on already standardized algorithms.
 
 Other explicitly excluded topics: 
 - Presentations combining different attestations.
   > This requirement is not mentioned in the HLRs for ZKPs. 
 - Parameters for instantiations of cryptographic schemes.
-  > However, it is within scope to ensure that there is a path forward for reaching a reasonable level of security and when discussing efficiency of different schemes this will be discussed with parameters corresponding to 128 bits of security.
+  > Deciding on concrete parameters choices are not in scope.
+  > However, the specification will consider the feasibility and options there exist for the considered schemes in order to reach a standard (say 128 bits) level of security.
 - Investigation of intellectual property considerations related to cryptographic schemes referenced in this document.
   > At the time of publication, the authors are unaware of any patents that would necessarily be infringed by implementing the recommendations herein. This statement does not constitute a legal opinion or guarantee. However, no explicit intellectual property investigation has been conducted as part of this work. 
 
@@ -113,16 +116,30 @@ By Article 3 1-5 of the [European Digital Identity Regulation], an eID means is 
 Such an eID means has a level of assurance associated with it which by Article 5a 5d of [European Digital Identity Regulation] shall be **high** as defined in [CIR 2015/1502] for EUDI Wallets.
 As this data uniquely identifies the person, it does not make sense to talk about unlinkability of an eID means by itself.
 However, allowing Relying Parties to obtain only partial information from an eID means can be valuable in privacy sensitive use cases.
-Specifically, ZKPs can be used to prove statements about an eID means without identifying the person.
+Specifically, ZKPs can be used to prove statements about an eID means without identifying the User.
 This can for example be used for age verification, where the Relying Party is given a proof that the PID of the User contains an attribute showing that the User is above a certain age, but without revealing either the exact age or the identity of the User.
-In such cases, the Relying Party can rely on many of the underlying guarantees provided by the LoA High eID means (i.e., how it was issued and guaranteed protected by the User) while ensuring that the user remains completely untraceable (i.e., there are no fixed signature values or any other unique points for correlation that are part of the presentation of the proof).
+In such cases, the Relying Party can rely on many of the underlying guarantees provided by the LoA High eID means (i.e., how it was issued and guaranteed protected by the User) while ensuring that the User remains completely untraceable (i.e., there are no fixed signature values or any other unique points for correlation that are part of the presentation of the proof).
 Hence, rather than enabling "ZKPs at LoA High" the goal of this specification is to enable ZKPs (based on MMSs) to be based upon an eID means at LoA High and thereby enable ZKP\_09. 
 
 In relation to ZKPs based on MMSs over eID means at LoA high there are two central requirements for reaching LoA High in [CIR 2015/1502]: 
 1. The eID means must protect against duplication and tampering as well as against attackers with high attack potential [Section 2.2.1 of CIR 2015/1502]. 
 2. Sensitive cryptographic material, if used for issuing electronic identification means and authentication is protected from tampering [Section 2.4.6 of CIR 2015/1502]. Note, this requirement also applies for LoA Substantial. 
 
-For the purpose of this document the first requirement is interpreted to mean that presentations must be bound to certified hardware known as a WSCD. The second requirement is interpreted to mean that PID Providers and Attestation Providers must be able to store the cryptographic keys necessary for issuance in certified hardware also. We will make it explicit in the document when a technical mechanism's primary purpose is to fulfill these requirements as providing ZKPs of eID means at lower level of assurances may also provide value in the EUDI ecosystem. 
+For the purpose of this document the first requirement is interpreted to mean that presentations must be bound to certified hardware known as a WSCD. The second requirement is interpreted to mean that PID Providers and Attestation Providers must be able to store the cryptographic keys necessary for issuance of attestations and revocation of attestations in certified hardware also. We will make it explicit in the document when a technical mechanism's primary purpose is to fulfill these requirements as providing ZKPs of eID means at lower level of assurances may also provide value in the EUDI ecosystem. 
+
+### 2.4 Incompatibility of mdocs/SD-JWT VCs and ZKPs based on MMSs
+
+Mdoc (ISO 18013-5) and SD‑JWT VCs (selective-disclosure JWT-based verifiable credentials) formats were not designed around the multi-message signing model that MMS-based ZKPs require. Hence, several practical and privacy-relevant mismatches make a direct reuse impractical without substantial changes to those formats. 
+Below the core reasons for this are listed:
+  - Signature model mismatch: mdocs and SD‑JWTs are built around a single signature over a serialized credential.
+	ZKPs based on MMS rely on signatures over a vector of individually addressable messages (indexed messages) so that the Holder can prove knowledge of a signature while selectively disclosing attributes. 
+	Mapping a single-signature credential into the multi-message abstraction requires transformation layers that change where and how attributes are represented and signed.
+  - Granularity and encoding mismatch: mdocs and SD‑JWTs encode attributes as nested CBOR/JSON structures or as digests, not as a stable ordered list of discrete messages with fixed indices. 
+	Efficient MMS proofs (and the sub-proofs in the modular architecture) require a well-defined mapping from attributes to message indices and, in some instantiations, preservation of original scalar inputs (e.g., for range proofs). 
+  - Selective-disclosure semantics differ: SD‑JWT and mdocs uses digest-based selective disclosure, whereas MMS-based presentations use cryptographic re-randomization and committed disclosure patterns. The semantics are built into both SD-JWTS and mdocs. 
+
+Because addressing these incompatibilities requires format-level changes, canonicalization rules, or additional transformation layers that would leave only very little of the original specifications, this specification does not try to do so as recommended by ZKP_06.
+Instead, it provides directions for an alternative format designed for ZKPs based on MMSs.
 
 ## 3 Overview of ZKPs based on MMS Schemes
 
@@ -131,33 +148,32 @@ Multi Message Signatures (MMS) are digital signature schemes characterized by tw
 - they allow the signer to *sign tuples of messages* of a fixed length $(m_1,\ldots,m_n)$ in a single signature $\sigma$
 - they support efficient *Zero Knowledge Proofs of knowledge of a signature* $\sigma$ and of the attributes signed in it $(m_1,\ldots,m_n)$ while possibly selectively disclosing some of them.
 
-The use of MMS in designing privacy-preserving digital credentials, that in this document will be referred to as attestations, is driven by the security guarantees provided through the following workflow, which is described in two phases:
+The use of MMS in designing privacy-preserving digital credentials, that in this document will be referred to as attestations, is driven by the security guarantees provided through the following two workflows:
 
-- **Issuance**: An issuer using the key pair $(isk,ipk)$ can issue an attestation by signing with a MMS scheme the attributes $(m_1,\ldots,m_n)$ it wants to include in it, producing the signature $Sign(isk,(m_1,\dots,m_n))=\sigma$. The attestation is defined as $cred=\sigma$, and it is paired with the associated attributes $(m_1,\ldots,m_n)$. Then, $cred$ and $(m_1,\ldots,m_n)$ are given to a holder, who can verify the validity of the attestation running the verification algorithm of the MMS scheme $Verify(ipk,cred,(m_1,\ldots,m_n))$ under $ipk$.
+- **Issuance**: An Issuer using the key pair $(isk,ipk)$ can issue an attestation by signing with a MMS scheme the attributes $(m_1,\ldots,m_n)$ it wants to include in it, producing the signature $Sign(isk,(m_1,\dots,m_n))=\sigma$. The attestation is defined as $cred=\sigma$, and it is paired with the associated attributes $(m_1,\ldots,m_n)$. Then, $cred$ and $(m_1,\ldots,m_n)$ are given to a Holder, who can verify the validity of the attestation by running the verification algorithm of the MMS scheme $Verify(ipk,cred,(m_1,\ldots,m_n))$.
 
-- **Presentation**: When the holder wants to present attributes $`(m_i)_{i\in D}`$ issued by $isk$, it can run the presentation algorithm which outputs a presentation $pres$ which is a ZKP of knowledge of an attestation issued by the issuer with public key $ipk$ for the attributes $`(m_i)_{i\in D}`$. The verifier can run the verification algorithm of the ZKP to be assured that the prover actually owns such an attestation.
+- **Presentation**: When the Holder wants to present attributes $`(m_i)_{i\in D}`$ issued by $isk$, it can run the presentation algorithm which outputs a presentation $pres$ which is a ZKP of knowledge of an attestation issued by the Issuer with public key $ipk$ for the attributes $`(m_i)_{i\in D}`$. The Verifier can run the verification algorithm of the ZKP to be assured that the prover actually owns such an attestation.
 
-This workflow enables holders to generate *unforgeable* and *unlinkable* presentations. The unforgeability is the property that guarantees that only a prover with an attestation issued for $ipk$ and the disclosed attributes $`(m_i)_{i\in D}`$ can create a valid presentation: this property follows from the unforgeability of the underlying MMS scheme and the soundness of the associated ZKP used to generate the presentation. The unlinkability is the property that guarantees that presentations of attributes $`(m_i)_{i\in D}`$ issued for $ipk$ derived from different attestations are indistinguishable: this property follows from the Zero-Knowledge property of the ZKP.
+This workflow enables Holders to generate *unforgeable* and *unlinkable* presentations. Unforgeability is a property that guarantees that only a prover with an attestation issued by $ipk$ and for the disclosed attributes $`(m_i)_{i\in D}`$ can create a valid presentation: this property follows from the unforgeability of the underlying MMS scheme and the soundness of the associated ZKP used to generate the presentation. Unlinkability is a property that guarantees that presentations of attributes $`(m_i)_{i\in D}`$ issued by $ipk$ derived from different attestations are indistinguishable: this property follows from the Zero-Knowledge property of the ZKP.
 
-Regarding the unlinkability property, if we define the anonymity set of a presentation disclosing $(m_i)_{i\in D}$ issued for $ipk$ as the set of the holders who own an attestation for these attributes issued for $ipk$, it is worth stressing that presentations leave the holder anonymous only within the anonymity set of the presentation. Of course, if a holder presents personally identifiable information, the anonymity set is given just the holder itself. It is also worth stressing that the anonymity of the holders within the anonymity set of their presentations holds even if the verifier colludes with the issuer of the presented attestation.
+Regarding the unlinkability property, if we define the anonymity set of a presentation disclosing $`(m_i)_{i\in D}`$ issued by $ipk$ as the set of the Holders who own an attestation for these attributes issued by $ipk$, it is worth stressing that presentations leave the Holder anonymous only within the anonymity set of the presentation. If a Holder presents personally identifiable information, then the anonymity set is just the Holder itself. It is worth stressing that the anonymity of the Holders within the anonymity set of their presentations holds even if the Verifier colludes with the Issuer of the presented attestation.
 
 ### 3.1 A Modular Approach for ZKPs based on MMS Schemes
 
-So far, it has been shown how MMS schemes can be used to present attestations revealing a subset of the attributes and hiding the rest of them.
-In this section it is described how MMS schemes can be employed within a framework enabling modular generation of predicate proofs (e.g. range proofs, set membership proofs) about *hidden attributes* and device binding while presenting attestations. This approach is not necessary per se, but has the following advantages:
+This section describes how MMS schemes can be employed within a framework enabling modular generation of predicate proofs (e.g., range proofs, set membership proofs) about *hidden attributes* and device binding while presenting attestations. This approach is not necessary per se, but has the following advantages:
 
-- it provides simple instructions on how to incorporate predicate proofs and device binding with legacy devices within presentation protocols
-- it enables synergies with related standardisation activities (e.g. Privacy Pass).
+- It provides simple instructions on how to incorporate predicate proofs and device binding with legacy devices within presentation protocols;
+- It enables synergies with related standardisation activities (e.g. Privacy Pass).
 
-For this, we rely on two additional building blocks: Commitment Schemes and Zero Knowledge Proofs.
+For this, we rely on two additional building blocks: ZKPs and commitment Schemes.
 
 #### 3.1.1 Building Blocks
 
-A ZKP system allows asserting the validity of well-defined statements without revealing any information (apart from the validity of the proven statement). It must satisfy the following properties:
+A ZKP system allows a Prover to assert the validity of well-defined statements without revealing any information apart from the validity of the proven statement. It must satisfy the following properties:
 
-- Completeness: If the statement is true and both the prover and verifier follow the protocol correctly, the verifier will be convinced of its validity.
-- Soundness: If the statement is false, a dishonest prover cannot convince an honest verifier that it is true, except with some negligible probability.
-- Zero-Knowledge: If the statement is true, the verifier learns nothing beyond the fact that the statement is correct.
+- Completeness: If the statement is true and both the prover and Verifier follow the protocol correctly, the Verifier will be convinced of its validity.
+- Soundness: If the statement is false, a dishonest prover cannot convince an honest Verifier that it is true, except with some negligible probability.
+- Zero-Knowledge: If the statement is true, a Verifier learns nothing beyond the fact that the statement is true.
 
 A commitment scheme allows a party to create a *commitment* to a value that can later be opened and reveal the committed value. This can be though of as a digital analogue of encapsulating a value in an envelope. This guarantees that (1) the value remains hidden until the commitment is opened, and (2) the committed value cannot be changed after being committed. These properties, *hiding* and *binding* respectively, are captured as follows:
 
@@ -167,32 +183,32 @@ A commitment scheme allows a party to create a *commitment* to a value that can 
 #### 3.1.2 Committed Disclosure
 
 To enable a modular generation of predicate proofs about *hidden attributes*, a commitment scheme is used in addition to the MMS scheme.
-The idea is the following: in the presentation phase, the prover who wants to create a proof about a hidden attribute $m_i$ generates a *fresh commitment* $C_i$ to $m_i$, and proves the equality between the attribute in the attestation and the attribute committed in $C_i$.
-Concretely, the User proves the statement "I know a signature $\sigma$ on attributes $m_1,\ldots, m_n$ issued under the issuer's public key $ipk$ and an opening of the commitment $C_i$ to the $i$-th attribute $m_i$". This statement is proven in an individual proof, which is called the "core" presentation proof.
+The idea is the following: in the presentation phase, the prover who wants to create a proof about a hidden attribute $`m_i`$ generates a *fresh commitment* $`C_i`$ to $`m_i`$, and proves the equality between the attribute in the attestation and the attribute committed in $`C_i`$.
+Concretely, the User proves the statement "I know a signature $\sigma$ on attributes $m_1,\ldots, m_n$ issued under the Issuer's public key $ipk$ and an opening of the commitment $`C_i`$ to the $i$-th attribute $m_i$". This statement is proven in an individual proof, which is called the "core" presentation proof.
 
 Following [LSZ2025] we refer to this capability as *committed disclosure (CD)*. This captures the ability to make (ZKP) presentations that *disclose some attributes and simultaneously disclose commitments to attributes*. Note that this enables ZKP\_01(i) and also ZKP\_02 if the type of an attestation is included as an attribute. Additionally, having attested the consistency of committed attributes with the issued attestation we can prove arbitrary statements about them using appropriate ZKPs. We elaborate on this next.
 
 #### 3.1.3 Proving Additional Functionalities
 
-Let $P$ be some predicate we want to prove on an attribute without revealing it. For example, $P$ can capture "attribute is in the range $[l, h)$". To do so, the User adds it to the *committed attributes* and proves that the corresponding commitment $C_i$ is consistent with the credential - in the sense that it is a commitment to the $i$-th attribute - via the core proof as described in [Committed Disclosure](#312-committed-disclosure). Then another ZKP proof is employed to assert that $C_i$ satisfies $P$. The proven relation captures that:
+Let $P$ be some predicate we want to prove on an attribute without revealing it. For example, $P$ can capture "attribute is in the range $[l, h)$". To do so, the User adds it to the *committed attributes* and proves that the corresponding commitment $`C_i`$ is consistent with the credential---in the sense that it is a commitment to the $i$-th attribute---via the core proof as described in [Committed Disclosure](#312-committed-disclosure). Then another ZKP proof is employed to assert that $C_i$ satisfies $P$. The proven relation captures that:
 
-1. $C_i$ is a commitment to some value $m_i$,
+1. $`C_i`$ is a commitment to some value $m_i$,
 2. $m_i$ satisfies the predicate $P$.
 
-Since the commitments for each presentation are fresh, no linkable information of the attestation holder is given during the presentation; this follows by the hiding property of the commitment and the zero knowledge property of the ZKP. Additionally, the User can only open the presented commitments to the corresponding attributes of the attestation; this follows from the binding property of the commitment scheme and the soundness of the ZKP. This approach naturally generalizes for proving predicates about multiple attributes.
+Since the commitments for each presentation are fresh, no linkable information of the attestation Holder is given during the presentation; this follows by the hiding property of the commitment and the zero knowledge property of the ZKP. Additionally, the User can only open the presented commitments to the corresponding attributes of the attestation; this follows from the binding property of the commitment scheme and the soundness of the ZKP. This approach naturally generalizes to proving predicates about multiple attributes.
 
 #### 3.1.4 Putting it All Together
 
 We next describe the workflow of a presentation with selective disclosure of some attributes and an attestation that the (hidden) $i$-th attribute $m_i$ satisfies predicate $P$.
 
-- The User creates a fresh commitment $C_i$ to the attribute $m_i$ and sends it along with the disclosed attributes to the relying party. It also sends two proofs: (1) the core proof, asserting that the disclosed attributes and the attribute in $C_i$ are contained in an attestation under some issuer's public key $ipk$; and (2) a proof that the opening of $C_i$ satisfies $P$.
+- The User creates a fresh commitment $`C_i`$ to the attribute $`m_i`$ and sends it along with the disclosed attributes to the relying party. It also sends two proofs: (1) the core proof, asserting that the disclosed attributes and the attribute in $`C_i`$ are contained in an attestation under some Issuer's public key $ipk$; and (2) a proof that the opening of $C_i$ satisfies $P$.
 - The relying party verifies the two proofs. Importantly, it uses *the same commitment* for both. This guarantees that the predicate $P$ is satisfied by the attribute $m_i$ contained in the signed attestation.
 
-In the next image we demonstrate the presentation based on the above approach. The verifier only sees the provided commitments, the proofs, and the revealed attributes.
+In the next image we demonstrate a presentation based on the above approach. The Verifier only sees the provided commitments, the proofs, and the revealed attributes.
 
 ![proof-overview](./img/ts14-proof-overview.png)
 
-While any combination of MMS scheme, commitment scheme and ZKP could in theory work to perform the committed disclosure, the building blocks should be "compatible" in the sense that the corresponding "core" proof can be efficiently generated.
+While any combination of MMS scheme, commitment scheme, and ZKP could in theory work to perform the committed disclosure, the building blocks should be "compatible" in the sense that the corresponding "core" proof can be efficiently generated.
 
 Finally, we emphasize that there are already public implementations that follow this approach, in particular [DockNetworks](https://github.com/docknetwork/crypto/tree/main/equality_across_groups), which also has support for some of the more complex predicates such as device binding.
 
@@ -202,14 +218,14 @@ The modular approach that relies on the committed disclosure to prove predicates
 
 **Disadvantages**
 
-- The resulting proof might result to be less compact and computationally more expensive than a tailored predicate proof that extends the ZKP to prove knowledge of the MMS. For instance, the generation and the inclusion in the proof of the fresh commitments already brings a computational and size overhead. That said, for the instantiations proposed in this work this is hardly an issue since the corresponding overheads are just a few bytes and few milliseconds which will barely be noticeable for a user.
+- The resulting proof might result to be less compact and computationally more expensive than a tailored predicate proof that extends the ZKP to prove knowledge of the MMS. For instance, the generation and the inclusion in the proof of the fresh commitments already brings a computational and size overhead. That said, for the instantiations proposed in this work this is hardly an issue since the corresponding overheads are just a few bytes and few milliseconds which will barely be noticeable for a User.
 
 **Advantages**
 
-- Standardization efforts can focus on how to prove predicates on attributes committed using a commitment scheme being oblivious of the underlying MMS scheme. These standards can be applied to any MMS that employs committed disclosure using the same commitment scheme.
+- Standardization efforts can focus on how to prove predicates on attributes committed using a commitment scheme while being oblivious of the underlying MMS scheme. These standards can be applied to any MMS that employs committed disclosure using the same commitment scheme.
 - Arguing about security becomes easier since each component/module can be analyzed individually.
-- Different countries might accept for adoption different lists of predicates on attributes. The framework based on the use of committed disclosure only requires the member states to reach full consensus on the acceptance of equality proofs. These are needed to prove that the freshly generated commitments commit to specific attributes in the attestation. Then, wallets of different member states can implement the specific set of predicate proofs they are willing to adopt.
-- Making changes in the future becomes less challenging: each module can be modified/replaced with minimal impact on other components of the system. Further, extensions to the system can be implemented in an ad-hoc way. Hence, in case the requirements for the ZKP functionality should be updated it is likely that this can be incorporated into this architecture with less effort than a monolithic approach. 
+- Different countries might accept for adoption different lists of predicates on attributes. The framework based on the use of committed disclosure only requires the member states to reach full consensus on the acceptance of equality proofs, as these are needed to prove that freshly generated commitments commit to specific attributes in the attestation. Then, wallets of different member states can implement the specific set of predicate proofs they are willing to adopt.
+- Making changes in the future becomes less challenging: each module can be modified or replaced with minimal impact on other components of the system. Further, extensions to the system can be implemented in an ad-hoc way. Hence, in case the requirements for the ZKP functionality should be updated it is likely that this can be incorporated into this architecture with less effort compared to a monolithic approach. 
 
 We deem that the advantages of this modular approach outweighs the disadvantage and make the following recommendation. 
 
@@ -218,64 +234,63 @@ We deem that the advantages of this modular approach outweighs the disadvantage 
 ## 4 MMS Schemes
 
 A number of MMSs have been proposed in the cryptographic literature.
-Broadly, they can be divided into two categories: they use RSA-like cryptography, or they are based on elliptic curves.
-Generally, MMSs that use elliptic curves are deemed most suitable, as they are more modern and more performant.
+Broadly, they can be divided into two categories: those based on RSA-like cryptography, or those based on elliptic curves.
+Generally, MMSs that use elliptic curves are deemed the most suitable, as they are more modern and more performant.
 Many of these MMSs require a special kind of elliptic curves called pairing-friendly curves.
-These kinds of curves enable efficient algorithms for the RP to verify a disclosure, but support for these kinds of curves in currently available secure hardware is sparse.
+These kinds of curves enable efficient algorithms for the RP to verify a disclosure, but support for pairing-friendly curves in current secure hardware is sparse.
 In this subsection, we discuss a number of elliptic curve-based MMSs as well as some considerations about them in general.
 
 ### 4.1 General Considerations for Elliptic Curve-based MMS Schemes
 
-There are several key considerations for using an elliptic curve-based MMS in the EUDIW context, including those related to issuers, users, and verifiers. Each is outlined in the subsections below.
+There are several key considerations for using an elliptic curve-based MMS in the EUDIW context, including those related to Issuers, Users, and Verifiers. Each is outlined in the subsections below.
 
 One thing that applies to all three parties concerns revocation.
 For mdocs and SD-JWTs, EUDI wallets generally use the Token Status List (draft) standard [IETF-draft-TSL]. This standard endows attestations with a unique identifier that must always be revealed to the RP, which breaks unlinkability.
-It is not immediately clear how to handle revocation of attestations without breaking unlinkability, but whichever revocation mechanism is chosen will require support from issuers, wallets and RPs.
+It is not immediately clear how to handle revocation of attestations without breaking unlinkability, but whichever revocation mechanism is chosen will require support from Issuers, wallets and RPs.
 For more information on various revocation mechanisms that might be suitable, see [Section 9](#9-revocation).
 
 #### 4.1.1 Issuer Considerations
 
-The primary consideration for issuers is that deploying an MMS requires changes to both existing processes and infrastructure. These changes arise from how signatures are generated.
+The primary consideration for Issuers is that deploying an MMS requires changes to both existing processes and infrastructure. These changes arise from how signatures are generated.
 
-Currently it is unclear how PID/(Q)EAA Providers can generate MMS signatures for eID means at LoA High (and LoA Substantial cf. [Section 2.3](#23-eid-means-at-loa-high-and-zkps)), since currently available HSMs generally do not support MMS signatures, nor pairing-friendly elliptic curves.
+It is unclear how PID/(Q)EAA Providers can generate MMSs for eID means at LoA High (and LoA Substantial cf. [Section 2.3](#23-eid-means-at-loa-high-and-zkps)), since currently available HSMs supports neither MMS schemes, nor pairing-friendly elliptic curves.
 Suitable pairing-friendly curves are still under standardization in [IETF-draft-pairing-friendly-curves].
 Broad hardware support for their use as well as hardware support for MMS signature schemes in signing EUDIW attestations is unlikely in the near term due to the absence of finalized standards and the long lead times for deploying hardware at scale.
 One way of easing this issue with this could be to modify the MMS such that it can operate on ordinary elliptic curves instead of pairing-friendly elliptic curves.
 This is discussed in more detail in [Section 4.3](#43-pairing-free-mmss).
 
-Alternatively, it may be possible to minimize the changes required in issuer (hardware) infrastructure by having the issuer create an HSM-backed ECDSA signature on top of the MMS signature to achieve LoA High. 
+Alternatively, it may be possible to minimize the changes required in Issuer (hardware) infrastructure by having the Issuer create an HSM-backed ECDSA signature on top of the MMS signature to achieve LoA High. 
 Users would present attestations combining the zero knowledge proofs of the MMS with circuit-based zero knowledge proofs of the ECDSA signature to prevent linkability that would otherwise be introduced by the ECDSA signature.
-This would achieve unlinkability simultaneously with LoA High, while minimizing changes to issuer infrastructure.
+This would achieve unlinkability simultaneously with LoA High, while minimizing changes to Issuer infrastructure.
 It also offers a migration path to the underlying native MMS once hardware support becomes available.
 How this should be done depends on the specific MMS and requires further study.
-An example for how this could be done for BBS can be found in [Appendix A](#appendix-a) below.
+For BBS, an approach is outlined in [R26].
 
 #### 4.1.2 Wallet Considerations
 
 The wallet must support the MMS signatures too.
-Specifically, signature randomization and selective disclosure using zero-knowledge proofs to enable privacy-preserving presentations.
+Specifically, signature randomization and selective disclosure using ZKPs to enable privacy-preserving presentations.
 This is expected to be feasible, assuming sufficient library support.
 
 A more complex requirement is device binding (as demanded by ZKP\_01(iv)).
-For pairing-based approaches this requirement can be achieved by adding a zero-knowledge proof of knowledge of an ECDSA signature (see [Section 5.1](#51-device-binding)), whereas for pairing-free approaches this can be achieved more directly.
+For pairing-based approaches this requirement can be achieved by adding a ZKP of knowledge of an ECDSA signature (see [Section 5.1](#51-device-binding)), whereas for pairing-free approaches this can be achieved more directly.
 While several academic proposals exist, they have not been thoroughly field-tested.
 
 #### 4.1.3 Verifier Considerations
 
 Verifier requirements include support for the MMS signature scheme, including the ability to validate signatures.
-In the case of pairing-friendly curves, this requires the RP to perform pairing operations.
+In the case of pairing-friendly curves, this requires the Verifier to perform pairing operations.
 Verifiers must also be able to process and validate disclosed attributes in the presentation.
 
 Importantly, all of this can be implemented in software, assuming the availability of finalized standards and mature library support.
 
 ### 4.2 Pairing-Based MMS Schemes
 
-Like ECDSA, many of the MMS schemes recently proposed in the cryptographic literature use elliptic curves, but unlike ECDSA they often require a special kind of elliptic curves, namely *pairing-friendly* elliptic curves.
-A pairing-friendly curve is a curve $\mathbb{G}_1$ which is such that there exists other, related elliptic curves $\mathbb{G}_2$ and $\mathbb{G}_T$, along with an efficiently computable function $e : \mathbb{G}_1 \times \mathbb{G}_2 \to \mathbb{G}_T$ which is *bilinear*.
+Many MMS schemes require so-called *pairing-friendly* elliptic curves, which are different from and incompatible with the elliptic curves required by ECDSA.
+A pairing-friendly curve is a curve $`\mathbb{G}_1`$ which is such that there exists other, related elliptic curves $`\mathbb{G}_2`$ and $`\mathbb{G}_T`$, along with an efficiently computable function $`e : \mathbb{G}_1 \times \mathbb{G}_2 \to \mathbb{G}_T`$ which is *bilinear*.
 Bilinearity means that for all $g, h$ and $a$, $b$ the function $e$ satisfies $e(g^a, h^b) = e(g,h)^{ab}$.
 Additionally it has to be *non-degenerate*, meaning that $e(g, h) = 1$ if and only if $g = 1$ or $h = 1$ (or both).
-Only certain elliptic curves allow the existence of such a function $e$ (and notably, the elliptic curves generally used by ECDSA does not).
-In MMSs, this function (in particular, its bilinearity property) is used by the RP to verify that the disclosed attestation has been validly signed by the issuer.
+In MMSs, this function (in particular, its bilinearity property) is used by the RP to verify that the disclosed attestation has been validly signed by the Issuer.
 
 #### 4.2.1 BBS
 
@@ -289,9 +304,10 @@ Most recently, [TZ23] presents a shorter and more efficient variant, which under
 Compared to other MMSs that offer similar features, BBS signatures are short (consisting of one elliptic curve element and one scalar), as well as efficient to issue, verify, and prove knowledge of.
 In addition, it allows the wallet to prove predicates such as range proofs over the attributes that it does not disclose.
 
-In implementations, BBS generally uses the BLS12-381 pairing-friendly elliptic curve, for which a draft standard has been written [IETF-draft-pairing-friendly-curves].
-Additionally, for the zero knowledge proofs the so-called *Schnorr zero-knowledge proofs in the Fiat-Shamir heuristic* are generally used, which is structured as follows: first the RP sends a nonce (also called challenge), and then the wallet replies with its proofs.
-In terms of protocol messages, this has the same structure as an (ECDSA) Proof-of-Possession (PoP), meaning that this is compatible with the protocol structure of existing protocols such as OpenID4VCI and OpenID4VP for issuance and disclosure of attestations based on ordinary signature schemes (e.g., ECDSA).
+In implementations, BBS is typically instantiated with the BLS12-381 pairing-friendly elliptic curve, for which a draft standard has been written [IETF-draft-pairing-friendly-curves].
+For the zero knowledge proofs the so-called *Schnorr zero-knowledge proofs in the Fiat-Shamir heuristic* are generally used.
+With this approach, the RP first sends a nonce (or challenge) followed by a reply from the wallet containing its zero knowledge proofs.
+In terms of protocol messages, this has the same structure as an ECDSA Proof-of-Possession (PoP), meaning that this is compatible with the protocol structure of existing protocols such as OpenID4VCI and OpenID4VP for issuance and disclosure of attestations based on ordinary signature schemes.
 
 ##### 4.2.1.1 Security level
 
@@ -301,64 +317,64 @@ Recent work [CT2025] presented an explicit algorithm to apply this technique to 
 
 The simplest way to deal with this is to deploy BBS on an elliptic curve that is sufficiently large to compensate.
 [AFG2024] defines the BLS24-509 curve which offers a security level of 192 bits, which is expected to appear in an upcoming version of [IETF-draft-pairing-friendly-curves].
-Due to how Cheon's algorithm works, this is sufficient in the sense that the security level of the BBS deployment is then 128 bits.
+Due to how Cheon's algorithm works, this is sufficient in the sense that the security level of the BBS deployment is then at least 128 bits.
 
 It should be noted that the q-SDH hardness assumption is a well known hardness assumption that has been used by many schemes in the cryptographic literature.
 As a result, it has received a significant amount of attention and study by cryptographers.
 Regardless of that, since 2006 when Cheon's algorithm became known q-SDH has resisted all further cryptanalysis looking for any other potential issues affecting its security level.
 In that sense, q-SDH remains a solid and battle tested hardness assumption.
 
-Given the above analysis, we recommend the following approach.
+Given the above analysis, the following approach could be applied. 
 
 - Since a lot of BBS implementations using the BLS12-381 curve already exist, and that BLS24-509 is not yet in a (draft) standard, in the short term BBS on the BLS12-381 curve could be used.
+If BBS is combined with an HSM‑backed ECDSA signature as described in [R26], the unforgeability of the resulting attestation is reduced to the unforgeability of ECDSA: any forgery of the combined construction implies an ECDSA forgery. Hence, this would meet the hardware requirements necessary to reach LoA High (as explained in [Section 2.3](#23-eid-means-at-loa-high-and-zkps)).
 - Migrate to the BLS24-509 curve as soon as possible.
-- Investigate combinations of BBS with ECDSA and circuit-based zero knowledge proofs to achieve unlinkability with LoA high.
 
 #### 4.2.2 PS
 
 The PS signature scheme was introduced in [PS16], but should be understood as a specific instantiation of a broader framework that is implicit in the Camenisch's and Lysyanskaya's signature construction [CL04]. The CL signature scheme is a re-randomizable signature scheme, meaning that one can publicly derive, from a valid signature on a set of messages, a new signature on the same set of messages. This property is particularly useful in the context of privacy-preserving authentication as one can merely re-randomise a certificate instead of hiding it in a ZK proof. The main downside of CL signature is its size, which grows with the number of attributes to sign. This problem was solved by the PS construction [PS16] that retains the key features of CL signatures (re-randomizability, sequential aggregation, etc) while achieving a constant size for the signature, namely two elements in $\mathbb{G_1}$, regardless of the amount of attributes in the attestation.
 
-Structurally, CL and PS signatures differ from BBS signatures to such a degree that the [CT2025] attack does not apply. In other words, there are no known concrete attacks against CL and PS signatures that would perform better than standard discrete logarithm computation, which means that BLS12_381 remains, as of today, a valid option for implementing these mechanisms at a 128-bit security level.
+Structurally, CL and PS signatures differ from BBS signatures to such a degree that the [CT2025] attack does not apply. In other words, there are no known concrete attacks against CL and PS signatures that would perform better than standard discrete logarithm computation, which means that BLS12-381 remains, as of today, a valid option for implementing these mechanisms at a 128-bit security level.
 More generally, security of PS signatures was initially proven in the generic group model, and later demonstrated using automated tools [ABS16]. Another paper [PS18] showed that variants of CL and PS signatures can also be proven under q-type assumptions, but the latter result does not seem optimal in light of Cheon's attack.
 
 Overall, one must note that PS and BBS should not be opposed. They have different features, suiting different needs, and they rely on different security arguments, providing the cryptographic diversity that is promoted by most standardization bodies.
 
 ### 4.3 Pairing-Free MMSs
 
-Bilinear pairings are widely used in MMS design to let the User prove to the Relying Parties that it is presenting an attestation issued by the issuer. With bilinear pairings any Relying Party can verify it only using the issuer public key. An exception are the strong RSA-based CL signatures [CL01]. While pairing-free, they are less efficient than elliptic curve based schemes, due to their reliance on RSA groups. Additionally, they are not naturally compatible with generic sigma protocol techniques which complicates the required ZKPs.
+Bilinear pairings are widely used in MMS design to let the User prove to the Relying Parties that it is presenting an attestation issued by the Issuer. With bilinear pairings any Relying Party can verify it only using the Issuer public key. An exception are the strong RSA-based CL signatures [CL01]. While pairing-free, they are less efficient than elliptic curve based schemes, due to their reliance on RSA groups. Additionally, they are not naturally compatible with generic sigma protocol techniques which complicates the required ZKPs.
 
-However, as explained in the previous section, requiring a pairing-friendly elliptic curve might delay deployment of MMS schemes that can reach LoA High because currently available certified hardware does not support pairing-friendly curves.
+However, as explained in the previous section, requiring a pairing-friendly elliptic curve may delay deployment of MMS schemes that can reach LoA High because currently available certified hardware does not support pairing-friendly curves.
 For that reason, various ways have been suggested recently to adapt MMS schemes such that they can operate on ordinary, widely supported elliptic curves.
 
 In the elliptic curve based setting, pairing-free variants all require some trade-off in terms of deployment. For instance, one-time use anonymous attestations such as U-Prove [UProve] or Anonymous Credentials Light [BL13] are based on blind signatures extended to include attributes. Blind signatures are inherently single-show credentials, and thus require batch issuance of credentials for multi-show unlinkability.
 
-Another way to remove the need of bilinear groups is by instructing Relying Parties to interact with the issuers of attestations during each disclosure in order to help them verify the presentations they receive. This of course brings complexity to the system design since it requires issuers to be available to support Relying Parties in each verification.
+Another way to remove the need of bilinear groups is by instructing Relying Parties to interact with the Issuers of attestations during each disclosure in order to help them verify the presentations they receive. This of course brings complexity to the system design since it requires Issuers to be available to support Relying Parties in each verification.
 
 An alternative to this approach instructs the Users to receive batches of helper information from a Helper Server, after which the User can use the Helper information at some later time to generate unlinkable presentations that Relying Parties can verify on their own. The Helper Server issues helper information in batches because each instance must be used only once to preserve the unlinkability of presentations. This approach, referred to as Server-aided Anonymous Credentials (SAAC), was first introduced along with an instantiation called BBS# [DDKT25] (implemented for instance in [DockNetwork](https://github.com/docknetwork/crypto/tree/main/kvac/src/bbs_sharp)), and later formalized in [CFLT2025].
 
 **Disadvantages**
 
-- If the User generates presentations using helper information, then the protocol flow inherits the scalability issues for issuers existing for the batch issuance of single-use ECDSA attestations
-- If Relying Parties verify presentations with the support of the Issuer, the Issuer must guarantee high availability
-- Pairing-Free MMS schemes rely on additional communication between the Wallet and Issuer before a presentation can be made. Because this communication is necessary before the presentation flow, care must be taken to ensure that it does not enable user tracking, which would be incompatible with ZK_07. The solutions presented in [DDKT25] and [CHLT2025] ensure that the data communicated itself does not require the Issuer to identify the User, but the concern extends beyond the content of the communication to include associated metadata. However, the severity of this drawback should be assessed in light of the fact that similar IP-based tracking vectors already exist in current issuance and presentation flows.
+- If the User generates presentations using helper information, then the protocol flow inherits the scalability issues for Issuers existing for the batch issuance of single-use ECDSA attestations.
+- If Relying Parties verify presentations with the support of the Issuer, the Issuer must guarantee high availability.
+- Pairing-Free MMS schemes rely on additional communication between the Wallet and Issuer before a presentation can be made. Because this communication is necessary before the presentation flow, care must be taken to ensure that it does not enable User tracking, which would be incompatible with ZK_07. The solutions presented in [DDKT25] and [CHLT2025] ensure that the data communicated itself does not require the Issuer to identify the User, but the concern extends beyond the content of the communication to include associated metadata. The severity of this drawback should be assessed in light of the fact that similar IP-based tracking vectors already exist in current issuance and presentation flows.
 
 **Advantages**
 
 - Being defined over standard elliptic curves, support in HSM for protecting the issuance private key can probably be achieved faster and easier.
-- Binding a credential to a holder's secure hardware (i.e., ZKP\_1(iv)) is simpler because the secure hardware and the MMS can be defined over the same elliptic curve; for instance, BBS# proposes a solution for device-binding from ECDSA-signatures, relying on re-randomization of ECDSA signatures and public keys. 
+- Binding a credential to a Holder's secure hardware (i.e., ZKP\_1(iv)) is simpler because the secure hardware and the MMS can be defined over the same elliptic curve; for instance, BBS# proposes a solution for device-binding from ECDSA-signatures, relying on re-randomization of ECDSA signatures and public keys. 
 - Compared to the case where Relying Parties verify presentations with the support of the Issuer, both Users and Relying Parties can be offline while generating and verifying presentations of attestations.
 - Compared to batch issuance of single-use ECDSA attestations:
-  - The protocol to obtain helper information is more efficient compared to a protocol that enables the (possibly blind) issuance of attestations: the helper information is not related to the attributes of the User, but is related only to the issuer key pair.
+  - The protocol to obtain helper information is more efficient compared to a protocol that enables the (possibly blind) issuance of attestations: the helper information is not related to the attributes of the User, but is related only to the Issuer key pair.
   - The User is protected against traceability (Issuer and Helper Server colluding with Relying Parties).
   - The Helper Server does not learn which User is asking for a batch of helper information: this implies that the Helper Server does not even learn how long it took the same User to use the previous batch of helper information.
 
 ### 4.4 Comparison and Recommendations
 
-MMS schemes smoothly interact with ZK proofs and have been scrutinized for a long time. In their pairing-based versions, regardless of the concrete instantiation, they offer performance that can hardly be matched by their competitors. They perfectly address the security and privacy requirements of the EUDI wallet and were actually designed to this end. They however face some deployment challenges due to the lack of support by current secure hardware (HSM, secure element, etc). When considering MMS deployments, we will thus make recommendations for two main phases.
+MMS schemes smoothly interact with ZK proofs and have been scrutinized for a long time. Their pairing-based versions, regardless of the concrete instantiation, offer performance that can hardly be matched by their competitors. They perfectly address the security and privacy requirements of the EUDI wallet and were actually designed to this end. They however face some deployment challenges due to the lack of support by current secure hardware (HSM, secure element, etc). When considering MMS deployments, we will thus make recommendations for two main phases.
 
-- **Phase 1 (short/medium term)**: In this phase, it is assumed that the hardware support for pairing-based MMS is very low.
+- **Phase 1 (short/medium term)**: In this phase, it is assumed that the hardware support for pairing-based MMS does not exist.
 
-- **Phase 2 (medium/long term)**: In this phase, it is assumed that pairing-based MMS schemes are now broadly supported by hardware, which allows to use them even for LoA High.
+- **Phase 2 (medium/long term)**: In this phase, it is assumed that pairing-based MMS schemes are now supported by hardware, which allows to use them even for LoA High.
 
 For Phase 1, for PID at LoA High, one would either: 
 - Use one of the pairing-free MMS schemes presented in [Section 4.3](#43-pairing-free-mmss). 
@@ -385,13 +401,13 @@ Looking at BBS and PS, the two MMSs compare as follows.
 
 **Ecosystem and Adoption**
 
-Generally, BBS is more well known and there are more (open source) implementations of it than of PS.
+BBS is more well known and there are more (open source) implementations of it than of PS.
 
 **Efficiency**
 
 - **BBS**: Due to the considerations in [Section 4.2.1.1](#4211-security-level), BBS will eventually require an elliptic curve offering 192 bits of security.
 - **PS**: Can be deployed on an elliptic curve such as BLS12-381 offering 128 bits of security, which should be more efficient.
-  However, the size of a PS issuer public key depends linearly on the number of attributes that can be issued with it.
+  However, the size of a PS Issuer public key depends linearly on the number of attributes that can be issued with it.
   By contrast, the size of a BBS public key is constant.
 
 It should be noted, however, that in practice both MMSs are efficient to such a degree that it is unlikely that any performance difference would exceed 100ms.
@@ -404,13 +420,13 @@ All in all, the most promising MMS candidate for now seems to be BBS which seems
 #### 4.4.2 Pairing-based vs Pairing-free
 
 Several approaches enabling the use of ordinary elliptic curves, instead of pairing-based ones, have been discussed in [Section 4.3](#43-pairing-free-mmss).
-By itself, this is not sufficient to enable the issuer to secure its private key in an HSM, since in order to be useful in an MMS deployment the HSM will additionally need to support the MMS signature scheme itself.
-Not having to additionally support newer elliptic curves might speed up the process of obtaining suitable certified HSMs, not only because it would involve fewer changes when compared to currently available HSMs, but also because (at least in the case of BBS) the HSM will need to support elliptic curve operations in both $\mathbb{G}_1$ and $\mathbb{G}_2$.
+By itself, this is not sufficient to enable the Issuer to secure its private key in an HSM, since in order to be useful in an MMS deployment the HSM will additionally need to support the MMS signature scheme itself.
+Not having to additionally support newer elliptic curves might speed up the process of obtaining suitable certified HSMs, not only because it would involve fewer changes when compared to currently available HSMs, but also because (at least in the case of BBS) the HSM will need to support elliptic curve operations in both $`\mathbb{G}_1`$ and $`\mathbb{G}_2`$.
 
 On the other hand, as discussed earlier, each of the pairing-free approaches brings its own disadvantages in particular in terms of more interaction.
 In addition, the ECDSA/MMS hybrid approach as discussed in [Section 4.1.1](#411-issuer-considerations) might be an alternative that can achieve LoA High for MMS schemes based on pairing-friendly curves.
 
-**Recommendation 3:** For Phase 1, combining the ECDSA/MMS issuer hybrid approach with ZKPs of ECDSA signatures to obtain device binding should be further developed for BBS. Certified hardware supporting pairing-friendly curves should be used instead of additional ZKPs as soon it  becomes available. 
+**Recommendation 3:** For Phase 1, combining the ECDSA/MMS Issuer hybrid approach as in [R26] with ZKPs of ECDSA signatures to obtain device binding should be further developed for BBS. Certified hardware supporting pairing-friendly curves should be used instead of additional ZKPs as soon it becomes available.
 
 ## 5 Additional Modules
 
@@ -418,7 +434,7 @@ This section presents the techniques that can be used to build predicate proofs 
 
 For the MMSs we consider in this document, the commitment schemes that can be used to efficiently perform committed disclosure are Pedersen commitments. 
 
-**Recommendation 4:** The commitments used in the modular approach should be the Pedersen Commitments.
+**Recommendation 4:** The commitments used in the modular approach should be the Pedersen Commitments and the core proof should be as described in Appendix B of [LSZ2025]. 
 
 In the following we briefly describe how to implement the following predicates for these commitments:
 
@@ -433,7 +449,7 @@ Device binding aims at non-transferability of attestations. It binds the User's 
 
 #### 5.1.1 Explicit Device Binding
 
-The idea of explicit device binding is to rely on the classic approach of including a device public key $dpk$ as an attribute in the user's attestation. Then, every presentation must be accompanied with a fresh PoP of the corresponding $dsk$ which is simply a valid signature $\sigma$ under $dsk$ on a challenge $nonce$ sent by the Relying Party.  To do this in a privacy preserving way, neither the public key nor the signature should be revealed. Instead, the user commits to both and proves their correctness via ZKPs. That the public key is the one attested in the User's attestation is proven via the MMS and core proof. Both proofs are combined through the committed public key. The corresponding device binding predicate captures the following:
+The idea of explicit device binding is to rely on the classic approach of including a device public key $dpk$ as an attribute in the User's attestation. Then, every presentation must be accompanied with a fresh PoP of the corresponding $dsk$ which is simply a valid signature $\sigma$ under $dsk$ on a challenge $nonce$ sent by the Relying Party.  To do this in a privacy preserving way, neither the public key nor the signature should be revealed. Instead, the User commits to both and proves their correctness via ZKPs. That the public key is the one attested in the User's attestation is proven via the MMS and core proof. Both proofs are combined through the committed public key. The corresponding device binding predicate captures the following:
 
 1. $dpk$ is committed in $C_{dpk}$
 2. $\sigma$ is committed in $C_{\sigma}$
@@ -443,11 +459,11 @@ For efficiency reasons, some constructions may reveal parts of the signature, bu
 
 A common candidate for the signature scheme is ECDSA over the P256 elliptic curve, as this is supported by common WSCDs.
 Thus, when using such ECDSA-based device binding with a pairing-based MMS, such as BBS, one needs to additionally bridge the ECDSA public key and signature in the P256 curve with the pairing-curve of BBS (e.g., BLS12-381). This bridging across groups, and proving knowledge of an ECDSA signature,
-are relatively difficult to construct. Two main approaches exist: either an optimized circuit-based ZKP (for example some adaptation of [Fs24]) or techniques similar to [CDLS] and [ZkAttest], which rely entirely on classical Schnorr proofs. The Schnorr-based approach has been implemented by [Ubique](https://github.com/UbiqueInnovation/zkattest-rs) and [DockNetworks](https://github.com/docknetwork/crypto/tree/main/equality_across_groups), whilst [Sigpop](https://github.com/pag-crypto/sigpop) implements the circuit-based approach. In the [pairing free variant](#43-pairing-free-mmss) ECDSA device binding is compatible with existing WSCDs through a standard ECDSA interface.
+are relatively difficult to construct. Two main approaches exist: either an optimized circuit-based ZKP (for example some adaptation of [Fs24]) or techniques similar to [CDLS] and [ZkAttest], which rely entirely on classical Schnorr proofs. The Schnorr-based approach has been described in detail for ECDSA device binding for BBS in Section 4 of [LSZ2025] and implemented by [Ubique](https://github.com/UbiqueInnovation/zkattest-rs) and [DockNetworks](https://github.com/docknetwork/crypto/tree/main/equality_across_groups), whilst [Sigpop](https://github.com/pag-crypto/sigpop) implements the circuit-based approach. In the [pairing free variant](#43-pairing-free-mmss) ECDSA device binding is compatible with existing WSCDs through a standard ECDSA interface.
 
 **Comparison of circuit-based and Schnorr-based approaches.** As for efficiency, circuit-based approaches tend to be faster for proving/verifying. Schnorr-based constructions tend to be simpler than circuit-based ones, which could make implementation and standardization easier, and are also compatible with the MMS schemes we consider in this document. They require, however, an additional elliptic curve, specifically the T256 curve proposed in [ZkAttest] (this is also the case for some circuit-based solutions which use this curve for optimizations). This T256 curve, however, has not been standardized yet.
 
-**Comparison with attestation system based on ECDSA and circuit based ZKPs.** A solution relying on an MMS and a separate module for ECDSA device binding is much simpler than attestations directly built with ECDSA (i.e., ECDSA is used also for attribute signing). Indeed, when using ECDSA only for device binding, a simpler statement needs to be proven since (1) the nonce is a public message that does not identify the user and (2) revealing part of the ECDSA signature is possible without compromising privacy (as the PoP signature is only used once, and only known to the User).
+**Comparison with attestation system based on ECDSA and circuit based ZKPs.** A solution relying on an MMS and a separate module for ECDSA device binding is much simpler than attestations directly built with ECDSA (i.e., ECDSA is used also for attribute signing). Indeed, when using ECDSA only for device binding, a simpler statement needs to be proven since (1) the nonce is a public message that does not identify the User and (2) revealing part of the ECDSA signature is possible without compromising privacy (as the PoP signature is only used once, and only known to the User).
 In particular, no statement over a hash function must be proven, which is often the most complex part when using a circuit-based ZKP. Therefore, solutions using a dedicated MMS for proofs over attributes and ECDSA only for the device binding part are inherently simpler and lighter than a construction using ECDSA for both. Separating the signature scheme used for signing the attributes and for device binding allows flexibility and enables making optimal choices for both (an efficient scheme for handling attributes and a legacy one that is widely deployed).
 
 #### 5.1.2 Native Device Binding
@@ -459,7 +475,7 @@ The DAA protocol was ISO standardized (for BBS and CL signatures) in 2013 [ISODA
 
 DAA requires two calls to the WSCD per presentation and requires the WSCD to keep state among both calls. This has recently been improved in [FHLL25] which only needs access to a standard BLS-signature interface on the WSCD, i.e., requires only a single API call and no state. It is also the first protocol for BBS signatures that does not require trusting the WSCD for unlinkability and comes with a privacy-preserving variant for remote HSM settings as currently considered in several member states.
 
-Such native device binding will be significantly more efficient than any ECDSA-based solution, and suitable for offline scenarios where bandwidth is very limited. However, it requires WSCDs to add new interfaces, e.g., for Schnorr or BLS signatures over a pairing-friendly curve. BLS signatures are an interesting stand-alone signature that provides easy mechanisms for key splitting and blind signing. Using BLS signatures for device binding immediately provides several advanced capabilities for the user/device key management.
+Such native device binding will be significantly more efficient than any ECDSA-based solution, and suitable for offline scenarios where bandwidth is very limited. However, it requires WSCDs to add new interfaces, e.g., for Schnorr or BLS signatures over a pairing-friendly curve. BLS signatures are an interesting stand-alone signature that provides easy mechanisms for key splitting and blind signing. Using BLS signatures for device binding immediately provides several advanced capabilities for the User/device key management.
 
 #### 5.1.3 Proposition for Explicit Device Binding Implementation 
 
@@ -471,7 +487,7 @@ The concurrent work that is done in TS13 can in principle be adapted and simplif
 
 ### 5.2 Range Proofs
 
-A range proof allows showing that an attribute lies in some range without revealing anything more about it. They can be used for implementing various features (revocation, non-expiration, pseudonyms amongst others). To prove that an attribute $m$ lies in some range $[l, h)$, the user produces a commitment $C$ to it during presentation and then uses a ZKP to prove that $l\leq m < h$. Concretely, the User computes a fresh commitment $C$ to the attribute $m_i$ that needs to be range-checked and a ZKP is used to prove a predicate that captures that
+A range proof allows showing that an attribute lies in some range without revealing anything more about it. They can be used for implementing various features (revocation, non-expiration, pseudonyms amongst others). To prove that an attribute $m$ lies in some range $[l, h)$, the User produces a commitment $C$ to it during presentation and then uses a ZKP to prove that $l\leq m < h$. Concretely, the User computes a fresh commitment $C$ to the attribute $m_i$ that needs to be range-checked and a ZKP is used to prove a predicate that captures that
 
 1. $m_i$ is committed in $C$
 2. $l\leq m_i < h$
@@ -487,7 +503,7 @@ x_i n^i$ and each $x_i\in [0, n)$.
 The state of the art approach for n-ary decomposition is Bulletproof [BBB+18] that builds on top of Pedersen commitments and would be compatible with the data encoded in the multi-message signatures considered in this document.
 Regarding square decomposition, until recently, the only integer commitment schemes were defined over hidden-order groups (like RSA groups), making their performance and proof size not comparable to those achieved by using Bulletproofs. Integer commitments defined over known-order groups was firstly introduced in [CKLR21], and later improved in [CGKR22] where the authors present $\mathsf{Sharp_{SO}^{Po}}$ (working on elliptic curve groups of prime order $p$ of 256 bits), a construction also adopted in [KRS25]. 
 
-Both $\mathsf{Sharp_{SO}^{Po}}$ and Bulletproofs benefit from a transparent setup and, if run on a laptop, they have prover and verifier time within a dozen of milliseconds for a single proof, ranges less than 32 bits and soundness of 128 bits. The size of the proof is in both cases within a KByte (see [CGKR22], Section 1.1.1 for more details about the comparison). The performances of $\mathsf{Sharp_{SO}^{Po}}$ are slightly better than those of Bulletproofs for a single proof, but if we consider proof batching (even for small batches like 8 proofs) Bulletproofs outperforms $\mathsf{Sharp_{SO}^{Po}}$. Also it is worth mentioning that Bulletproofs is a more established technique, therefore it is surely appropriate as a short-term solution for the generation of range proofs. However, given its performance $\mathsf{Sharp_{SO}^{Po}}$ may also qualify for mid-term adoption.
+Both $\mathsf{Sharp_{SO}^{Po}}$ and Bulletproofs benefit from a transparent setup and, if run on a laptop, they have prover and Verifier time within a dozen of milliseconds for a single proof, ranges less than 32 bits and soundness of 128 bits. The size of the proof is in both cases within a KByte (see [CGKR22], Section 1.1.1 for more details about the comparison). The performances of $\mathsf{Sharp_{SO}^{Po}}$ are slightly better than those of Bulletproofs for a single proof, but if we consider proof batching (even for small batches like 8 proofs) Bulletproofs outperforms $\mathsf{Sharp_{SO}^{Po}}$. Also it is worth mentioning that Bulletproofs is a more established technique, therefore it is surely appropriate as a short-term solution for the generation of range proofs. However, given its performance $\mathsf{Sharp_{SO}^{Po}}$ may also qualify for mid-term adoption.
 
 **Recommendation 6:** For Phase 1, range proofs should be achieved using Bulletproofs. 
 
@@ -495,9 +511,9 @@ A survey of zero knowledge range proofs can be found in [CBCM+24], however, we r
 
 ### 5.3 Equality
 
-Equality proofs allow a User to prove that a committed attribute equals a message committed in an external commitment $C_{ext}$. This module can be useful to link presentations of different attestations by proving that they share a same random attribute, realizing [Combined Presentation of Attestations](https://eudi.dev/2.7.3/discussion-topics/k-combined-presentation-of-attestations/) as specified in the ARF in a natural and simple way. Concretely, to realize ZKP\_03, a PID Provider could include a message containing a large random number. To bind an attestation to this, the other issuer would also include this random number in the message. Upon presentation, the User would make a committed disclosure to both numbers together with an equality proof of these commitments. 
+Equality proofs allow a User to prove that a committed attribute equals a message committed in an external commitment $C_{ext}$. This module can be useful to link presentations of different attestations by proving that they share a same random attribute, realizing [Combined Presentation of Attestations](https://eudi.dev/2.7.3/discussion-topics/k-combined-presentation-of-attestations/) as specified in the ARF in a natural and simple way. Concretely, to realize ZKP\_03, a PID Provider could include a message containing a large random number. To bind an attestation to this, the other Issuer would also include this random number in the message. Upon presentation, the User would make a committed disclosure to both numbers together with an equality proof of these commitments. 
 
-Assuming an external commitment $C_{ext}$ (which in practice is derived from a presentation of a different attestation), the user computes a fresh commitment $C$ to the attribute $s$ and uses a ZKP to prove a predicate capturing that:
+Assuming an external commitment $C_{ext}$ (which in practice is derived from a presentation of a different attestation), the User computes a fresh commitment $C$ to the attribute $s$ and uses a ZKP to prove a predicate capturing that:
 
 1. $s$ is committed in $C$
 2. $s$ is committed in $C_{ext}$
@@ -528,7 +544,7 @@ A relevant implementation can be found in [Sigma Proofs](https://github.com/sigm
 
 To enable ZKPs based on MMSs, the data being issued must contain
 
-- An issuer signed header containing information that is always disclosed. This header contains
+- An Issuer signed header containing information that is always disclosed. This header contains
   - An algorithm (signature scheme + curve) identifier (either explicit or implicit since that format is only used with one algorithm)
   - Other possible metadata entries that are always disclosed (e.g., policies embedded in the credential that must presented)
 - The list of messages / attributes that the signature is constructed over with their respective indices (either explicit or implicit via an ordered list)
@@ -555,8 +571,8 @@ The most important extension point in OpenID4VCI are **Credential Format profile
 A credential Format profile defines:
 
 - **A credential Identifier**: A string representing the credential format in the scope of OpenID4VCI / issuance
-- **Credential issuer metadata**: Credential format specific metadata used to identify supported algorithms (for both, credential signature scheme and device binding) and specify any format specific properties (e.g., information representing the type of credentials being offered, dependant on the chosen data model - for example doctype for mdoc, or vct for sd-jwt vc)
-- **Authorization details**: How `authorization_details` is specified if instead of scopes, a Rich Authorization Request (RAR) is used by the issuer.
+- **Credential Issuer metadata**: Credential format specific metadata used to identify supported algorithms (for both, credential signature scheme and device binding) and specify any format specific properties (e.g., information representing the type of credentials being offered, dependant on the chosen data model - for example doctype for mdoc, or vct for sd-jwt vc)
+- **Authorization details**: How `authorization_details` is specified if instead of scopes, a Rich Authorization Request (RAR) is used by the Issuer.
 - **Credential response**: The definition how an issued credential is transmitted in the JSON object returned by the credential endpoint (e.g., base64 encoding if the native serialization of the format is binary)
 
 An MMS would need to define those components, but construction is straightforward if a choice on the used container format is made (see discussion below).
@@ -655,7 +671,7 @@ A valid credential of this type in its core JSON form would be very similar to t
 
 To use this in combination with a MMS scheme, a transformation algorithm has to be defined that maps the keys in this map to the indices of the MMS attributes. It is important to note that this transformation algorithm SHOULD preserve the ability to create sub-proofs over attribute values, hence a simple transformation into a construction encompassing JSON path and value information into singular messages is likely not a good idea.
 
-The simplest form of such a transformation is to extract structural information into an issuer provided header that is always presented. Note that this leaks some information and it depends on the concrete use-case and credential type if always exposing structural information creates privacy problems. Additionally, decoy values can be added to mask array entries or optional fields - decoy values could guarantee a static header that is shared among all issued credentials of a specific type.
+The simplest form of such a transformation is to extract structural information into an Issuer provided header that is always presented. Note that this leaks some information and it depends on the concrete use-case and credential type if always exposing structural information creates privacy problems. Additionally, decoy values can be added to mask array entries or optional fields - decoy values could guarantee a static header that is shared among all issued credentials of a specific type.
 
 Example header for the JSON payload provided above:
 
@@ -747,9 +763,9 @@ This operation utilizes the issuer's public key as PK, the proof as signature, t
 
 Presentation:
 
-Derivation of the core proof is done by the holder using the NIZKCD.P operation from Appendix B of [LSZ2025]. Note that this diverges from proofGen as defined in [IETF-draft-BBS] to allow for commited disclosures.
+Derivation of the core proof is done by the Holder using the NIZKCD.P operation from Appendix B of [LSZ2025]. Note that this diverges from proofGen as defined in [IETF-draft-BBS] to allow for commited disclosures.
 
-The operation also takes a vector of indexes into messages, describing which payloads the holder wishes to disclose. All payloads are required for proof generation, but only these indicated payloads will be required to be disclosed for later proof verification. Additionally, it utilizes a vector commited disclosures.
+The operation also takes a vector of indexes into messages, describing which payloads the Holder wishes to disclose. All payloads are required for proof generation, but only these indicated payloads will be required to be disclosed for later proof verification. Additionally, it utilizes a vector commited disclosures.
 
 It also uses the adjusted cipher suite described above that allows to switch between hash-to-curve or using the input scalar directly is applied.
 
@@ -782,7 +798,7 @@ The `Proof` parameter in the JWP serialization contains an array of proofs with 
 
 Presentation Verification:
 
-The verifier decodes the Presented Form of the JWP and resolves the core proof and sub-proofs from the `Proof` array. The verifier uses the list of disclosed messages, the list of commitments, and the encoded proof as input to its verification logic.
+The Verifier decodes the Presented Form of the JWP and resolves the core proof and sub-proofs from the `Proof` array. The Verifier uses the list of disclosed messages, the list of commitments, and the encoded proof as input to its verification logic.
 
 ## 9 Revocation
 
@@ -791,55 +807,58 @@ In an MMS deployment, it is additionally desirable that revocation can be done w
 Several technologies exist that can satisfy some of these desired features.
 This section describes several of these technologies, and characterizes based on the following criteria: 
 - *Unlinkability*:  the revocation mechanism prevents multiple presentations from the same attestation from being linked based only on (1) the presentations sent to relying parties, (2) public information and (3) information known by issuers and revocation managers.
-- *Additional privacy threats*: the revocation mechanism forces or may induce users to leak private information (e.g. when they are online, if they are going to generate presentations) 
-- *Availability*: the availability required by wallets and verifiers who might need to update the information needed to prove and verify the non-revocation of the attestations, 
-- *Efficiency and scalability*: the efficiency of revocation managers (who must set up the revocation mechanism), holders (who must generate proofs of non-revocation) and verifiers (who must verify non-revocation proofs).
+- *Additional privacy threats*: the revocation mechanism forces or may induce Users to leak private information (e.g. when they are online, if they are going to generate presentations) 
+- *Availability*: the availability required by wallets and Verifiers who might need to update the information needed to prove and verify the non-revocation of the attestations, 
+- *Efficiency and scalability*: the efficiency of revocation managers (who must set up the revocation mechanism), Holders (who must generate proofs of non-revocation) and Verifiers (who must verify non-revocation proofs).
+- *Revocation latency*: the time from when a revocation is initiated until a Verifier will no longer accept a presentation of the credential. It depends on how quickly revocation data (updates, lists, tokens) are published, how often Verifiers/wallets fetch or receive them, and any remaining token lifetime (e.g., short-lived tokens). These parameters can be tuned to reduce latency (for example, by pushing updates more frequently or shortening token validity), but doing so typically increases operational cost and, in some designs, can expose more User metadata and reduce privacy. Below when presenting the different revocation mechanism the relevant latency trade-offs will also be presented.
+
+The following subsections describe candidate revocation mechanisms and assess each against the criteria defined above (unlinkability, additional privacy threats, availability, efficiency/scalability, and revocation latency). We conclude with a recommendation for the approach that best balances these criteria for the EUDI ecosystem.
 
 ### 9.1 Accumulators
 
 *Accumulators* are sophisticated cryptographic primitives that offer both scalability and unlinkability, through the use of zero knowledge proofs.
 They are, however, cryptographically relatively complex, and they put more demands on the wallet than other revocation solutions do.
 
-Briefly, accumulators are a cryptographic primitive that allows a user to prove in zero knowledge that they know a value that is an element of some set $S$.
+Briefly, accumulators are a cryptographic primitive that allows a User to prove in zero knowledge that they know a value that is an element of some set $S$.
 In our case, $S$ would correspond to the set of issued and unrevoked attestations.
 The accumulator itself is some value $A$ whose size is constant: it does not grow in size as the amount of accumulated values grows.
 In terms of scalability, this makes it very suitable to prove nonrevocation in an MMS deployment.
 
 The accumulator and the set $S$ are generally managed and updated by an *Accumulator Manager*.
-Since in EUDI wallets the issuer of an attestation must be the one that revokes it, we assume here that the issuer is also the Accumulator Manager.
+Since in EUDI wallets the Issuer of an attestation must be the one that revokes it, we assume here that the Issuer is also the Accumulator Manager.
 
 In EUDI wallets, accumulators that are *dynamic*, *positive*, and have *optimal communication complexity* would be most suitable.
 Rather than defining these terms in detail, this section describes how such an accumulator could be deployed alongside an MMS in an EUDI wallet.
 
-* **Key generation**: The issuer generates the initial accumulator value and makes it available to wallets and RPs.
-  This accumulator changes value whenever the issuer revokes an attestation (see below).
+* **Key generation**: The Issuer generates the initial accumulator value and makes it available to wallets and RPs.
+  This accumulator changes value whenever the Issuer revokes an attestation (see below).
   The latest accumulator value must always be available for wallets and RPs.
 
-* **Issuance**: Alongside the attestation signature, the issuer generates:
+* **Issuance**: Alongside the attestation signature, the Issuer generates:
   - A special-purpose *revocation attribute* that is included in the attestation,
   - A so-called *nonrevocation witness*.
   
   This witness is valid over the revocation attribute against the issuer's current accumulator, like a signature over a message can be valid against a public key.
-  During issuance, the issuer stores the revocation attribute for this attestation in a database for later revocation. The wallet stores the witness alongside the attestation.
+  During issuance, the Issuer stores the revocation attribute for this attestation in a database for later revocation. The wallet stores the witness alongside the attestation.
 
 * **Disclosure**: During disclosure, along with the disclosed attributes the wallet sends to the RP a *nonrevocation proof*, which proves in zero knowledge to the RP that the witness of the attestation is valid against the issuer's current accumulator, without revealing either the witness or the revocation attribute.
 From this the RP infers that the attestation is not revoked.
 Due to the zero knowledge property of the nonrevocation proof it learns nothing else besides that fact.
 
-* **Revocation**: When the issuer wants to revoke an attestation, it first looks up in its database the revocation attribute for that attestation that it stored after issuance.
+* **Revocation**: When the Issuer wants to revoke an attestation, it first looks up in its database the revocation attribute for that attestation that it stored after issuance.
   Using this, it (1) updates its accumulator to a new value, and (2) makes available to all wallets a *witness update message*.
   Wallets containing (non-revoked) attestations use these update messages to update their witness, so that it becomes valid against the new accumulator, allowing them to prove nonrevocation against it.
   This update algorithm is such that it does not work for the witness of the revoked attestation, so that the containing app can no longer prove nonrevocation.
 
-An important property of accumulators as described above is that whenever an attestation is revoked, wallets need to receive a witness update message created by the issuer in order to update their witness.
+An important property of accumulators as described above is that whenever an attestation is revoked, wallets need to receive a witness update message created by the Issuer in order to update their witness.
 If a wallet misses one of these update messages, then it cannot update its witness to be valid against the latest value of the accumulator.
 That results in the wallet being unable to prove to the RP that its attestation is unrevoked, which likely leads to the RP rejecting the entire disclosure.
 
-This therefore necessitates reliable software and protocols to distribute these update messages from the issuer to all wallets, to prevent that from happening.
+This therefore necessitates reliable software and protocols to distribute these update messages from the Issuer to all wallets, to prevent that from happening.
 It also means that the number of update messages that a wallet has to process to update its witness grows with the number of revoked attestations since the last time the wallet performed this process.
-We note that if either situation becomes a problem, then a lightweight protocol for reissuing an outdated witness could be used, in which the wallet first discloses the revocation attribute to the issuer out of its attestation, and if that corresponds to a nonrevoked attestation, then the issuer replies with a fresh witness.
+We note that if either situation becomes a problem, then a lightweight protocol for reissuing an outdated witness could be used, in which the wallet first discloses the revocation attribute to the Issuer out of its attestation, and if that corresponds to a nonrevoked attestation, then the Issuer replies with a fresh witness.
 Such a protocol will need to be developed and standardized, however. In the meantime, the entire attestation could simply be reissued.
-Since either process would identify the user to the issuer, a balance will need to be struck between the privacy impact of this protocol versus the performance of the wallet needing to process a lot of update messages.
+Since either process would identify the User to the Issuer, a balance will need to be struck between the privacy impact of this protocol versus the performance of the wallet needing to process a lot of update messages.
 
 The following accumulators have the required properties.
 
@@ -851,33 +870,41 @@ The following accumulators have the required properties.
   This additionally opens the possibility for using a single pairing-friendly elliptic curve for both BBS and the accumulator, which should increase efficiency.
   Further study to validate that this does not impact security or privacy is required, however.
 
-  To summarize, we can state that:
+To summarize, we can state that:
 - *Unlinkability*: the unlinkability of presentations is not compromised 
--*Additional privacy threats*: users might fetch the witness updates before generating a presentation which may allow the user to be traced because of the communication metadata. However, if the witness updates are public and non-specific for user this may limit the leakage to the manager. This information is always leaked to the manager if the manager reissues the user's witnesses instead of publishing witness updates.
-- *Availability*: both the wallets and the verifiers must be avaliable to receive the update messages at the end of every epoch, when the manager updates the accumulator value (removing the revocation attribute of the attestations revoked during the epoch) and broadcasts the witness update messages.  
+- *Additional privacy threats*: Users might fetch the witness updates before generating a presentation which may allow the User to be traced because of the communication metadata. However, if the witness updates are public and non-specific for User this may limit the leakage to the manager. This information is always leaked to the manager if the manager reissues the User's witnesses instead of publishing witness updates.
+- *Availability*: both the wallets and the Verifiers must be avaliable to receive the update messages at the end of every epoch, when the manager updates the accumulator value (removing the revocation attribute of the attestations revoked during the epoch) and broadcasts the witness update messages.
 - *Efficiency and scalability*: the manager computational and communication cost is linear in the number of revoked attestations as it must update the accumulator and broadcast the witness update messages. The computational and communication complexity increases linearly with the number of un-revoked attestations if the manager must compute the update witnesses for the unrevoked attestations. Holders generate proofs in constant time, and update their witnesses in time linear in the number of revoked attestations during an epoch (if they update it, and don't receive a fresh one from the manager). Verifiers verify proofs in constant time.
+- *Revocation latency*: revocation becomes effective for a given wallet once the Issuer publishes the accumulator update and the Verifier fetches this updated accumulator. In an ideal push-based design where the Issuer immediately publishes updates and wallets promptly receive them, latency can be near real-time. In practical deployments where updates are batched into epochs or wallets poll periodically, latency equals the epoch length or the poll interval (minutes to hours, potentially longer). Thus, accumulator-based latency ranges from near-instant (with robust push and coverage) to epoch-length. 
+
+Finally, some accumulator constructions require the manager to hold a secret “trapdoor” or private key in order to add or remove elements (e.g., classic RSA-style accumulators or many dynamic constructions), while other designs allow certain public updates. Any secret that may be used to circumvent the soundness of the accumulator cryptographic material must be protected accordingly. Concretely, to meet the key protection requirements for LoA Substantial and High discussed in [Section 2.3](#23-eid-means-at-loa-high-and-zkps), issuers/accumulator managers must be able store these secrets in certified hardware. 
+
 ### 9.2 Short-lived attestations
 Another revocation mechanism that can be used relies on the use of short-lived attestations and is inspired by [BCDE+14]. 
-In this case, the wallet is given a main long-lived attestation containing all the user attributes and a special attribute called revocation handle $RH$. 
-In addition to the main attestation, the user is issued a short-lived *revocation attestation* that contains as attributes only $RH$ and the expiration date, which might be 24-72 hours after its generation.
-Every time the user generates a presentation, it must prove to know both a valid main attestation and an unexpired revocation attestation whose revocation handle $RH$ match. Whenever the revocation manager wants to revoke the main attestation of a user, it stops issuing the revocation attestation for that specific main attestation.
-The advantage of this approach, relying on the short-lived revocation attestation, compared to an approach where the main attestation is short-lived, is that the manager does not have to store the attributes of every user whenever it renews the user's main attestation.
+In this case, the wallet is given a main long-lived attestation containing all the User attributes and a special attribute called revocation handle $RH$. 
+In addition to the main attestation, the User is issued a short-lived *revocation attestation* that contains as attributes only $RH$ and the expiration date, which might be 24-72 hours after its generation.
+Every time the User generates a presentation, it must prove to know both a valid main attestation and an unexpired revocation attestation whose revocation handle $RH$ match. Whenever the revocation manager wants to revoke the main attestation of a User, it stops issuing the revocation attestation for that specific main attestation.
+The advantage of this approach, relying on the short-lived revocation attestation, compared to an approach where the main attestation is short-lived, is that the manager does not have to store the attributes of every User whenever it renews the User's main attestation.
+Further, this approach stays compatible with existing Issuer infrastructure as only re-issuance of revocations are required from the Issuer. 
 
 This technique requires to generate a proof that two attributes in two distinct attestations are equal. Even though this kind of operation is not described this document, we observe that this can be easily done by performing the committed disclosure of the attribute $RH$ in both attestations generating the commitments $C_l$ (in the core proof of the long-lived attestation) and $`C_s`$ (in the core proof of the short-lived revocation attestation), then by generating an equality proof of the message committed in $`C_l`$ and $`C_s`$.
 
- To summarize, we can state that:
+To summarize, we can state that:
 - *Unlinkability*: the unlinkability of presentations is not compromised.
-- *Additional privacy threats*: users will have to query the manager for a new short-lived credential before generating a presentation. This communication metadata leaks to the revocation manager if (and when) the user is online.
-- *Availability*: the wallets must be avaliable to receive the new short-lived attestation, verifiers do not need to be available (unless the public key of the short-lived attestation rotates). 
-- *Efficiency*: the manager computational and communication cost is linear in the number of unrevoked attestations as it must reissue short-lived attestation. Holders and verifier generate and verify proofs in constant time.
+- *Additional privacy threats*: Users will have to query the manager for a new short-lived credential before generating a presentation. This communication metadata leaks to the revocation manager if (and when) the User is online.
+- *Availability*: the wallets must be avaliable to receive the new short-lived attestation, Verifiers do not need to be available (unless the public key of the short-lived attestation rotates). 
+- *Efficiency*: the manager computational and communication cost is for each epoch linear in the number of unrevoked attestations as it must reissue short-lived attestation. Holders and Verifier generate and verify proofs in constant time.
+- *Revocation latency*: revocation latency in this design is bounded by the remaining lifetime of the current short-lived attestation. If the revocation manager stops issuing new short-lived attestations, a compromised credential can still be used until the present short-lived attestation expires. Hence, latency is equal to the short attestation lifetime; shorter lifetimes yield faster revocation at the cost of greater issuance overhead and increased availability demands on wallets to obtain fresh tokens.
 
-### 9.3 Using signed pairs of attestation indices
+Note, if BBS is used for these attestations and it is necessary to protect the signing keys in secure hardware, then, as described previously in the document, an option would be to amend each BBS signature with an ECDSA signature and let the wallet do a proof of this signature upon presentation. 
+
+### 9.3 Using Signed Pairs of Attestation Indices
 
 The revocation mechanism from [NFHF2009], also suggested in [TS13](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts13-zksnarks.md#6-revocation), may also be an option.
 This mechanism works as follows.
 
-- In the attestation, the issuer includes an attribute containing an identifier for this attestation, consisting of a number that is incremented for each issued attestation.
-- Given the list $L = \{\text{id}_1, \text{id}_2, ..., \text{id}_n\}$ of identifiers corresponding to revoked attestations, the issuer signs each tuple $`(\text{id}_i, \text{id}_{i+1})`$ and publishes those signed tuples.
+- In the attestation, the Issuer includes an attribute containing an identifier for this attestation, consisting of a number that is incremented for each issued attestation.
+- Given the list $L = \{\text{id}_1, \text{id}_2, ..., \text{id}_n\}$ of identifiers corresponding to revoked attestations, the Issuer signs each tuple $`(\text{id}_i, \text{id}_{i+1})`$ and publishes those signed tuples.
 - During disclosure, the wallet uses a zero knowledge proof to convince the RP that (1) it knows a signed tuple $`(\text{id}_i, \text{id}_{i+1})`$ and (2) that the identifier $I$ in its attestation satisfies $`\text{id}_i < I < \text{id}_{i+1}`$.
 
 This mechanism requires that the signature scheme that is used allows proving knowledge of a signature in zero knowledge.
@@ -885,47 +912,61 @@ Note that BBS itself satisfies this property.
 If circuit-based zero knowledge proofs are available, then signature schemes such as ECDSA that by themselves don't have this property can also be used.
 
 In this mechanism, the amount of information that the wallet and RP need, as well as the computations that they both perform, does not depend on the amount of issued or revoked attestations.
-The amount of information that the issuer needs to host is linear in the amount of revoked attestations, but no party needs to download all of this information at once.
+The amount of information that the Issuer needs to host is linear in the amount of revoked attestations, but no party needs to download all of this information at once.
 
 It does, however, suffer from the following.
-If a wallet has an attestation with identifier $I$ such that $`\text{id}_i < I < \text{id}_{i+1}`$, and the issuer now revokes attestation $\text{id}_j$ with $`I < \text{id}_j < \text{id}_{i+1}`$, then the issuer will compute new signed tuples $`(\text{id}_i, \text{id}_{j})`$ and $`(\text{id}_j, \text{id}_{i+1})`$.
+If a wallet has an attestation with identifier $I$ such that $`\text{id}_i < I < \text{id}_{i+1}`$, and the Issuer now revokes attestation $\text{id}_j$ with $`I < \text{id}_j < \text{id}_{i+1}`$, then the Issuer will compute new signed tuples $`(\text{id}_i, \text{id}_{j})`$ and $`(\text{id}_j, \text{id}_{i+1})`$.
 Now, in order to prove nonrevocation the wallet will need to download the new signed tuple $`(\text{id}_i, \text{id}_{j})`$.
-When it does, then the issuer can infer that the index of the attestation of the wallet that is retrieving this tuple must be between $`\text{id}_i`$ and $`\text{id}_j`$.
-Since it created and issued these identifiers itself, it knows with some precision who the user must be, and it can track when the wallet downloads those tuples, i.e., when the user is online and using the wallet.
+When it does, then the Issuer can infer that the index of the attestation of the wallet that is retrieving this tuple must be between $`\text{id}_i`$ and $`\text{id}_j`$.
+Since it created and issued these identifiers itself, it knows with some precision who the User must be, and it can track when the wallet downloads those tuples, i.e., when the User is online and using the wallet.
 As this happens more and more often, the indices $`\text{id}_i`$ and $`\text{id}_j`$ will get progressively closer to each other, increasing the privacy impact of this issue.
 
 We see the following potential mechanisms for dealing with this:
 
-- The server could serve buckets of signed ranges, instead of just a single one in each HTTP request. This give the user some amount of privacy at the cost of some scalability.
+- The server could serve buckets of signed ranges, instead of just a single one in each HTTP request. This give the User some amount of privacy at the cost of some scalability.
 - Oblivious HTTP or Private Information Retrieval (PIR) could be used to hide which wallet is retrieving the information, or what information is being retrieved, respectively.
 
- To summarize, we can state that:
+To summarize, we can state that:
 - *Unlinkability*: the unlinkability of presentations is not compromised.
-- *Additional privacy threats*: users will have to fetch the new signed pair of indices before generating a presentation and thus leak if (and when) the user fetches this information. However, as the signed pairs are public and non-specific for user, this may limit the amount of information obtained by the manager.
-- *Availability*: the wallets must be avaliable to receive the new relevant signed pair of revoked indices at the end of every epoch, verifiers do not need to be available (unless the public key of the short-lived attestation rotates). 
-- *Efficiency and scalability*: the manager computational and communication cost is linear in the number of revoked attestations because it must sign the pairs of revoked indices at the end of every epoch. Holders and verifiers generate and verify proofs in constant time.
+- *Additional privacy threats*: Users will have to fetch the new signed pair of indices before generating a presentation and thus leak if (and when) the User fetches this information. However, as the signed pairs are public and non-specific for User, this may limit the amount of information obtained by the manager.
+- *Availability*: the wallets must be avaliable to receive the new relevant signed pair of revoked indices at the end of every epoch, Verifiers do not need to be available (unless the public key of the short-lived attestation rotates). 
+- *Efficiency and scalability*: the manager computational and communication cost is linear in the number of revoked attestations because it must sign the pairs of revoked indices at the end of every epoch. Holders and Verifiers generate and verify proofs in constant time.
+- *Revocation latency*: latency depends on when the Issuer publishes new signed pairs. If the Issuer publishes updates immediately and wallets fetch/poll frequently, latency can be short (minutes). If the Issuer batches updates into epochs and wallets poll infrequently (effectively making signed pairs have an expiration time also), latency will equal the epoch length, because a wallet can continue to use an older signed pair until it expires.
+
+#### 9.3.1 Combining Signed Pair of Indices with Short-Lived Attestations
+
+Instead of publishing signed index pairs publicly, the Issuer can issue a short‑lived revocation attestation signed with BBS containing three messages: (1) lower index, (2) upper index, and (3) expiration time. 
+To prove non‑revocation, the wallet would perform committed disclosure of its revocation handle together with the two indices from the revocation attestation, and proves (in zero knowledge) that the handle lies between the signed endpoints. 
+This check can be implemented with two ordinary range proofs as described in [Section 5.2](#52-range-proofs) and a few arithmetic operations on the Pedersen commitments. 
+The expiration time may be revealed directly when epochs are uniform for all Users' revocation attestations; otherwise the wallet can prove non‑expiry with an additional range proof.
+
+As the attestations with the same pair of indices can be distributed to multiple wallets with their revocation handle within the range, the number of signatures the Issuer must perform is the same as just publishing the signed list of pairs of indices (i.e., linear in the number of non-revoked credentials). 
+This approach, however, allows to reuse existing (re-)issuance and presentation concepts to minimize changes to existing infrastructure.
+
+The same considerations using hardware bound Issuer keys for short-lived attestations also apply to this approach. 
 
 ### 9.4 Token Status List
 
 A simpler solution is to use the same technology already used by EUDI wallets for proving nonrevocation of mdocs and SD-JWT, namely Token Status Lists.
 In this mechanism, each attestation gains a unique index that is disclosed to the RP during disclosure, which then consults a list of statuses at that index.
 The status at that index in the list indicates whether or not the attestation has been revoked.
-This mechanism therefore makes the user fully linkable, since each index uniquely identifies the attestation.
+This mechanism therefore makes the User fully linkable, since each index uniquely identifies the attestation.
 In practice, therefore, this solution is not as privacy friendly as a revocation mechanism suitable for an MMS should be.
 
 In the short term this is probably the easiest solution to deploy, providing an interim solution until one of the mechanisms from the previous three subsections can be deployed.
 
-
- To summarize, we can state that:
+To summarize, we can state that:
 - *Unlinkability*: the unlinkability of presentations is fully compromised becuase presentations of the same attestation reveal always the same identifier.
-
-- *Availability*: the verifier needs to download the more recent list of revoked identifers to check against the identifier disclosed in the presentation. Holders do not need to be available. 
-
+- *Availability*: the Verifier needs to download the more recent list of revoked identifers to check against the identifier disclosed in the presentation. Holders do not need to be available. 
 - *Efficiency and scalability*: the manager communication cost is linear in the number of revoked attestations because it must broadcast the updated listo of revoked identifiers. The verification time is logarithmic in the number of revoked attestations in the list.
+- *Revocation latency*: revocation latency is driven by how quickly Verifiers obtain the updated Token Status List. If Verifiers check the list in real-time (online lookup) latency can be effectively instantaneous from the Verifier's perspective. If Verifiers rely on periodic polling or cached lists, latency equals the polling interval or cache freshness (minutes to hours). Because the mechanism requires disclosing the index to the RP, the moment of Verifier check is the effective enforcement point.
 
 #### 9.4.1 Combining Token Status List with Privacy Preserving Revocation Mechanisms
-An observation that holds also for the revocation mechanism based on the use of accumulators, short-lived attestations, and signed pairs of attestation indices, for use cases where the wallet discloses attributes that by themselves already uniquely identify the user, the use of token status lists poses no additional privacy problem, so the holder can reveal its revocation handle (or its index).
-Moreover, by putting the index in a selectively disclosable attribute the user can prevent linkability in usecases where proving nonrevocation is not required by simply not disclosing the attribute.
+
+An observation that holds also for the revocation mechanism based on the use of accumulators, short-lived attestations, and signed pairs of attestation indices, for use cases where the wallet discloses attributes that by themselves already uniquely identify the User, the use of token status lists poses no additional privacy problem, so the Holder can reveal its revocation handle (or its index).
+By putting the index in a selectively disclosable attribute the User can prevent linkability in usecases where proving nonrevocation is not required by simply not disclosing the attribute.
+Alternatively, two different revocation handles can be included in the main attestation: 1) a public index/handle intended for Token Status List style checks (linkable) when hardware bound revocation keys are necessary and 2) a privacy-preserving revocation handle used with accumulator / short‑lived‑attestation / signed‑pairs of indices that can then be used in a more simple fashion without additional measures to protect cryptographic keys in secure hardware. The latter revocation handle can then be used when the high level of assurances are not needed for revocation. 
+
 ### 9.5 Verifier-Local Revocation
 
 Another approach, known as Verifier-Local Revocation (VLR), was introduced by Boneh and Shacham [BS04].
@@ -952,11 +993,25 @@ It does, however, have the following drawbacks.
   While techniques to share this power between several entities can be easily implemented, they do not fully address the problem.
   Before implementing this approach, one should check whether some entities are both trusted and willing to take on this role.
 
- To summarize, we can state that:
-- *Unlinkability*: the unlinkability of presentations is fully compromised with respect to the RA, who knows all the revocation elements of the holders and can then check if a presentation matches a given revocation element. Once published, revocation elements allow anyone to trace a revoked holder within an epoch. One must then set the epoch duration carefully, taking into account the following tradeoff: short epochs improve privacy but decreases efficiency, and vice versa.
-- *Additional privacy threats*: if revocation elements are updated to reduce the privacy damage given by the second drawback described above, the user reveal to the manager when it is online. 
-- *Availability*: The verifiers need to be available to download the list of revocation elements.
-- *Efficiency and scalability*: the manager communication cost is linear in the number of revoked attestations because it must broadcast the updated list of revocation elements. The verifier computational cost is linear in the number of revoked attestations. 
+To summarize, we can state that:
+- *Unlinkability*: the unlinkability of presentations is fully compromised with respect to the RA, who knows all the revocation elements of the Holders and can then check if a presentation matches a given revocation element. Once published, revocation elements allow anyone to trace a revoked Holder within an epoch. One must then set the epoch duration carefully, taking into account the following tradeoff: short epochs improve privacy but decreases efficiency, and vice versa.
+- *Additional privacy threats*: if revocation elements are updated to reduce the privacy damage given by the second drawback described above, the User reveal to the manager when it is online. 
+- *Availability*: The Verifiers need to be available to download the list of revocation elements.
+- *Efficiency and scalability*: the manager communication cost is linear in the number of revoked attestations because it must broadcast the updated list of revocation elements. The Verifier computational cost is linear in the number of revoked attestations. 
+- *Revocation latency*: revocation becomes effective once the RA publishes the revocation element and a given Verifier has fetched the updated revocation element list. Thus latency is similar to Token Status Lists: effectively instantaneous for an online Verifier performing a fresh lookup; equal to the Verifier's polling/caching interval if not. Note that any delay in publication or Verifier refresh directly increases the latency.
+
+### 9.6 Comparison and Recommendation 
+
+While accumulators offer strong cryptographic guarantees for unlinkable revocation, their practical deployment depends on reliable, timely distribution and processing of witness updates by Holders. That requirement raises non-trivial scalability and robustness concerns in large-scale deployments. 
+Further, it is currently unclear how to obtain hardware protection for cryptographic material guaranteeing the soundness of the accumulators so this must be investigated further. 
+Short‑lived revocation attestations represent a pragmatic middle ground: they preserve unlinkability, are compatible with current issuance infrastructure and the modular MMS/ZKP architecture, and can be deployed immediately. 
+Their principal downside for wallets is operational, as they must obtain and manage short‑lived non‑revocation attestations more frequently; for managers it is computational, as it must generate fresh credentials for every non-revoked credential at the end of every epoch. 
+For large scale deployments this may prove to be difficult. 
+The signed pairs of indices combined with short‑lived revocation attestations provide a pragmatic short‑term approach that balances privacy and operational effort. However, the performance of doing an additional ZKP over ECDSA has not been demonstrated. 
+Token Status Lists are simple and operationally mature, but they do not meet the unlinkability requirement (ZKP_07). 
+Verifier-Local Revocation does not provide the full unlinkability guarantees as required by ZKP\_07. Further, they also require Verifiers to do work that is linear in the number of revoked credentials. 
+
+**Recommendation 9:** For Phase 1 deployment of MMS‑based attestations in the EUDI wallet ecosystem signed pairs of attestation indices combined with short‑lived revocation attestations should be adopted. Simultaneously, further develop and evaluate accumulator‑based revocation as it offers strong cryptographic guarantees and excellent asymptotic scalability for unlinkable revocation. If neither of the approaches prove to scale in practice, then these can be combined with Token Status Lists for use cases where hardware protection of Issuer keys at the cost of linkable presentations are acceptable.
 
 ## References
 
@@ -973,7 +1028,7 @@ It does, however, have the following drawbacks.
 | [CHLT2025] | Chairattana-Apirom, R., Harding, F., Lysyanskaya, A., and Tessaro, S., "Server-Aided Anonymous Credentials". Available at <https://eprint.iacr.org/2025/513.pdf> |
 | [FHLL2025] | Friedrichs, K., Harding, F., Lehmann, A., and Lysyanskaya, A., "Device-Bound Anonymous Credentials With(out) Trusted Hardware". Available at <https://eprint.iacr.org/2025/1995.pdf> |
 | [CT2025] | Chairattana-Apirom, R., Tessaro, S. On the Concrete Security of BBS/BBS+ Signatures. In: ASIACRYPT 2025. Available at: <https://eprint.iacr.org/2025/1093.pdf> |
-| [DDKT25] | Desmoulins, N., Dumanois, A., Kane, S., and Traoré, J., "Making BBS anonymous credentials eIDAS 2.0 compliant", Cryptology ePrint Archive, Paper 2025/619, 2025, available at <https://eprint.iacr.org/2025/1995.pdf>
+| [DDKT25] | Desmoulins, N., Dumanois, A., Kane, S., and Traoré, J., "Making BBS anonymous credentials eIDAS 2.0 compliant", Cryptology ePrint Archive, Paper 2025/619, 2025, available at <https://eprint.iacr.org/2025/619.pdf>
 | [C06] | Cheon, J.H., "Security analysis of the strong Diffie-Hellman problem". In: EUROCRYPT 2006, available at <https://www.iacr.org/archive/eurocrypt2006/40040001/40040001.pdf> |
 | [PS16] | Pointcheval, D., Sanders, O., "Short Randomizable Signatures". In: CT-RSA 2016, available at <https://eprint.iacr.org/2015/525.pdf> |
 | [AFG2024] | Aranha, D. F., Fotiadis, G., Guillevic, A., "A short-list of pairing-friendly curves resistant to the Special TNFS algorithm at the 192-bit security level", available at <https://eprint.iacr.org/2024/1223> |
@@ -999,38 +1054,5 @@ It does, however, have the following drawbacks.
 |[CKLR21]|Geoffroy Couteau, Michael Klooß, Huang Lin, and Michael Reichle “Efficient Range Proofs with Transparent Setup from Bounded Integer Commitments”, EUROCRYPT 2021, avaliable at https://hal.science/hal-03374179/file/2021-540.pdf|
 |[CGKR22]|G. Couteau, D. Goudarzi, M. Klooß, and M. Reichle. Sharp: Short Relaxed Range Proofs. ACM CCS 2022. Available at https://ia.cr/2022/1153.|
 |[KRS25]|Jonathan Katz, Mariana Raykova, Samuel Schlesinger, "Anonymous Credentials with Range Proofs and Rate Limiting" available at https://docs.rs/crate/authenticated-pseudonyms/latest/source/design/Range.pdf|
-
-## Appendix A
-
-To get a BBS-based attestation that can serve as an eID means at LoA High, a BBS attestation can be augmented with an HSM-backed issuer ECDSA signature as follows.
-
-The attestation issuer generates a hardware protected ECDSA private key, $k$, as part of the private key generation.
-When issuing a BBS attestation, the issuer proceeds by first using the BBS issuance process normally to create a signature $(A, e)$.
-Second, the issuer creates an ECDSA signature $\sigma = \text{ECDSA}(k, A)$.
-The issuer sends $(\sigma, A, e)$ to the wallet.
-
-This approach allows the following three ways to use these augmented BBS attestations.
-
-1. When it is necessary to disclose the eID means at LoA High in an unlinkable fashion, the disclosure process is augmented with the issuer's ECDSA signature as follows.
-   - The wallet performs the BBS disclosure process.
-   - As part of the BBS disclosure process, the wallet generates random scalars $r_1, r_2$, sets $\bar{A} = A^{r_1/r_2}$, and sends $\bar{A}$ over to the RP (see [TZ23, Appendix B]).
-   Next it sets $r = r_1/r_2$, and then uses a circuit-based zero knowledge proof to prove that it knows an elliptic curve element $A$, an ECDSA signature $\sigma$, and a number $r$ such that
-	 1. $\sigma$ is an ECDSA signature over $A$ that verifies against the issuer's public key,
-	 2. $\bar{A} = A^r$.
-
-   In other words, the wallet proves that if the randomized BBS signature that it proved knowledge of would be "un-randomized" back into the original BBS signature that it had before randomization, then it knows a valid ECDSA signature over the $A$ of that BBS signature.
-   This means that effectively, this ECDSA signature also signs the attributes.
-2. For usecases where it is required to identify the user at LoA High, the disclosed attributes will uniquely identify the users. In these cases unlinkability is impossible to achieve, so that the issuer's ECDSA signature can just be sent as is without hiding it behind a circuit-based proof as above.
-  This can already be done in the short term when circuit proofs might not yet be available.
-  (Note that to allow the RP to verify the issuer's ECDSA signature over $A$ the wallet will need to send it as is, i.e., skip randomizing the BBS signature that is normally done as part of a BBS disclosure.
-  Since the disclosure is already linkable as mentioned, this is not an issue.
-  The number $e$ which is also part of the BBS signature $(A, e)$ is still hidden behind the zero knowledge proof, so that sending $A$ unblinded does not endow adversaries wanting to perform Cheon's algorithm as discussed in [Section 4.2.1.1](#4211-security-level) with an extra BBS signature.)
-3. For usecases where is sufficient to disclose attributes and prove statement based on an eID means at LoA Substantial, the holder can simply ignore the issuer's ECDSA signature and just perform an ordinary BBS disclosure towards the RP to improve efficiency.
-
-This setup has the following benefits.
-
-- Augmenting BBS with ECDSA in this fashion is very flexible, in the sense that a single ECDSA-augmented BBS attestation can be used in the three distinct ways described above, depending on what the use case requires.
-- The first variant uses BBS for most of the zero knowledge proofs, which in turn uses very efficient Schnorr zero knowledge proofs. This leaves only a small remaining part has to be done using circuit-based zero knowledge proofs. This allows for simplified circuits with a fixed set of values with known offsets, lengths, and types, which should keep the complexity and efficiency of these proofs under control, as well as ease the process of standardization and certification.
-- The first variant requires a circuit to prove knowledge of the issuer's ECDSA signature. In deployments where a devicebound ECDSA public key is used to prove device binding, that same circuit could then also be reused for the holder to prove knowledge of a valid PoP over the RP's nonce, since that too is an ECDSA signature, over the attestation's public key.
-- Once there exists hardware support in HSMs for BBS private keys, the migration path from this setup to ordinary BBS is obvious: just discard the ECDSA signature from the issuance process.
-- Since this proposal only stacks an ECDSA signature on top of a BBS attestation without any modifications to the BBS part, it remains compatible with other augmentations of BBS that for example escrow part of the BBS attestation to a remote server for additional security [FHLL2025], or embed a hardware-backed ECDSA public key of the mobile device into the BBS attributes [LSZ2025].
+|[CDLS] | Sofia Celi, Shai Levin, Joe Rowell, Royal Holloway, "CDLS: Proving Knowledge of Committed Discrete Logarithms with Soundness". Available at <https://eprint.iacr.org/2023/1595>. |
+| [R26] | Ringers, S., "Augmenting BBS with Conventional Signatures". Available at <https://eprint.iacr.org/2026/087.pdf> |
