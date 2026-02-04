@@ -21,22 +21,26 @@ The present document specifies the common format and data set for the transactio
 | `0.97`   | 14.08.2025  | Release candidate - adding a general migration process description, basing on the commenting table proposal       |
 | `0.99`   | 15.08.2025  | Final draft for review      |
 | `1.0`   | 15.08.2025  | Final version for release      |
+| `1.1`   | 2.02.2026  | Alignment with [TS12], adding non-device bound attestations handling, rework of pseudonym related aspects       |
+
 
 
 ## 1 Introduction
 
 ### 1.1 Overview
 
-According to [Regulation (EU) No 910/2014] with the amending [Regulation (EU) 2024/1183] (hereinafter together referred as the [European Digital Identity Regulation]) and [CIR on Integrity and Core Functionalities], the Wallet Units shall keep a transaction log, as well as a "migration object" that can be used to export User's data from a Wallet Unit and to import it to another Wallet Unit, in backup, recovery and migration processes.
+According to [Regulation (EU) No 910/2014] with the amending [Regulation (EU) 2024/1183] (hereinafter together referred as the [European Digital Identity Regulation]) and [CIR on Integrity and Core Functionalities], the Wallet Units SHALL keep a transaction log, as well as a "migration object" that can be used to export User's data from a Wallet Unit and to import it to another Wallet Unit, in backup, recovery and migration processes.
 The relevant requirements are set out in Article 5a(4)(f) and (g) of the [European Digital Identity Regulation] and Article 9 and 13 of the [CIR on Integrity and Core Functionalities].
 
 The migration process has the following steps:
 
-- creation of the migration object (which is a password-protected and encrypted file) in the existing Wallet Unit, which contains the list of credentials and the transaction log,
+- creation of the migration object (which is a password-protected and encrypted file) in the existing Wallet Unit, which contains the list of all credentials (PIDs and Attestations), all non-device bound credentials and the transaction log,
 - exporting and storing the migration object in a User preferred location, such as an external disk or a cloud storage (from locations supported by the Wallet Solution),
 - importing the migration object to a new Wallet Unit,
 - initiating the process of migration i.a. with use of the password to decrypt the file,  
-- (automatic) issuance of the PID and/or other Attestations that were present in the old Wallet Unit (as listed in the migration object's list of credentials), as well as restoring the transaction log (from the migration object's transaction log).
+- (automatic) issuance to the new Wallet Unit of PID and all device-bound Attestations that were present in the old Wallet Unit (as listed in the migration object's list of credentials),
+- copying to the new Wallet Unit all non-device bound attestation,
+- restoring in the new Wallet Unit the transaction log (from the migration object's transaction log).
 
 Further details and requirements related to the migration process are presented in the ARF Annex 2 Topic 34.
 
@@ -50,7 +54,8 @@ The present document specifies:
 
 The migration object contains:
 
-- a file containing the list of credentials (PIDs and attestations) present in a Wallet Unit,
+- a file containing the list of credentials (PIDs and Attestations) present in a Wallet Unit,
+- all non-device bound attestations,
 - a transaction log file.
 
 ### 1.3 Requirements Notation
@@ -67,13 +72,13 @@ As outlined in the above figure, it contains the following **main classes**:
 
 - **Transaction**
 - **Presentation**
-- **PseudonymPresentation**
 - **W2WPresentationRequest**
 - **W2WPresentation**
 - **CredentialIssuance**
 - **CredentialDeletion**
 - **PseudonymGeneration**
 - **PseudonymDeletion**
+- **PseudonymousAuthentication**
 - **CertificateIssuance**
 - **CertificateDeletion**
 - **SigningSealing**
@@ -112,27 +117,27 @@ The `Transaction` class is the central class of the transaction log data model a
 | Attribute          | Multiplicity | Type  | Description  |
 |--------------------|--------------|-------|--------------|
 | `presentation`      | [0..1]       | [*Presentation*](#32-presentation)      | specifies the specific attributes of a **presentation** transaction. This attribute is present, if and only if the transaction is a presentation transaction.        |
-| `pseudonymPresentation`      | [0..1]       | [*PseudonymPresentation*](#33-pseudonympresentation)      | specifies the specific attributes of a **pseudonym presentation** transaction. This attribute is present, if and only if the transaction is a presentation performed with use of the User's pseudonym.        |
-| `w2wPresentationRequest`      | [0..1]       | [*W2WPresentationRequest*](#34-w2wpresentationrequest)      | specifies the specific attributes of a **presentation request** sending (in-bound) transaction.  This attribute is present, if and only if the transaction is sending a presentation request and logged in the transaction log of the requestors Wallet Unit.        |
-| `w2wPresentation`      | [0..1]       | [*W2WPresentation*](#35-w2wpresentation)      | specifies the specific attributes of a **presentation** transaction performed by the Wallet Unit upon request received from another Wallet Unit, in the wallet-to-wallet interaction scenario.  This attribute is present, if and only if the transaction is a presentation transaction in wallet-to-wallet mode.        |
-| `credentialIssuance`      | [0..1]       | [*CredentialIssuance*](#36-credentialissuance)      | specifies the specific attributes of a **credential (attestation) issuance** transaction attribute is present, if and only if the transaction is credential issuance or re-issuance.        |
-| `credentialDeletion`      | [0..1]       | [*CredentialDeletion*](#37-credentialdeletion)      | specifies the specific attributes of a **credential deletion** transaction attribute is present, if and only if the transaction is deletion of a credential from the Wallet Unit.        |
-| `pseudonymGeneration`      | [0..1]       | [*PseudonymGeneration*](#38-pseudonymgeneration)      | specifies the specific attributes of a **pseudonym generation** transaction attribute is present, if and only if the User generates a pseudonym in the Wallet Unit.        |
-| `pseudonymDeletion`      | [0..1]       | [*PseudonymDeletion*](#39-pseudonymdeletion)      | specifies the specific attributes of a **pseudonym deletion** transaction. This attribute is present, if and only if the User deletes a previously generated pseudonym in the Wallet Unit.        |
+| `w2wPresentationRequest`      | [0..1]       | [*W2WPresentationRequest*](#33-w2wpresentationrequest)      | specifies the specific attributes of a **presentation request** sending (in-bound) transaction.  This attribute is present, if and only if the transaction is sending a presentation request and logged in the transaction log of the requestors Wallet Unit.        |
+| `w2wPresentation`      | [0..1]       | [*W2WPresentation*](#34-w2wpresentation)      | specifies the specific attributes of a **presentation** transaction performed by the Wallet Unit upon request received from another Wallet Unit, in the wallet-to-wallet interaction scenario.  This attribute is present, if and only if the transaction is a presentation transaction in wallet-to-wallet mode.        |
+| `credentialIssuance`      | [0..1]       | [*CredentialIssuance*](#35-credentialissuance)      | specifies the specific attributes of a **credential (attestation) issuance** transaction attribute is present, if and only if the transaction is credential issuance or re-issuance.        |
+| `credentialDeletion`      | [0..1]       | [*CredentialDeletion*](#36-credentialdeletion)      | specifies the specific attributes of a **credential deletion** transaction attribute is present, if and only if the transaction is deletion of a credential from the Wallet Unit.        |
+| `pseudonymGeneration`      | [0..1]       | [*PseudonymGeneration*](#37-pseudonymgeneration)      | specifies the specific attributes of a **pseudonym generation** transaction attribute is present, if and only if the User generates a pseudonym in the Wallet Unit.        |
+| `pseudonymDeletion`      | [0..1]       | [*PseudonymDeletion*](#38-pseudonymdeletion)      | specifies the specific attributes of a **pseudonym deletion** transaction. This attribute is present, if and only if the User deletes a previously generated pseudonym in the Wallet Unit.        |
+| `pseudonymousAuthentication`      | [0..1]       | [*PseudonymousAuthentication*](#39-pseudonymousauthentication)      | specifies the specific attributes of a **pseudonymous authentication** transaction. This attribute is present, if and only if the User performs authentication to a Relying Party with use of a  pseudonym previously generated in the Wallet Unit .        |
 | `certificateIssuance`      | [0..1]       | [*CertificateIssuance*](#310-certificateissuance)      | specifies the specific attributes of a **certificate issuance and/or key pair generation** transaction. The certificate and the associated key pair can be used for signing or sealing. This attribute is present, if and only if the transaction is about signing or sealing certificate issuance and/or associated key pair generation. This attribute is mandatory if the certificate and/or the key pair is generated, stored or processed (during the issuance/generation) inside the Wallet Unit.        |
 | `certificateDeletion`      | [0..1]       | [*CertificateDeletion*](#311-certificatedeletion)      | specifies the specific attributes of a **certificate and/or key pair deletion** transaction. This attribute is present, if and only if the transaction is about (for signing or sealing) certificate and/or key pair deletion .        |
 | `signingSealing`      | [0..1]       | [*SigningSealing*](#312-signingsealing)      | specifies the specific attributes of a **signing or sealing** transaction.  This attribute is present, if and only if the transaction is about signature or seal creation by the User with use of the Wallet Unit.        |
 | `dataDeletionRequest`      | [0..1]       | [*DataDeletionRequest*](#313-datadeletionrequest)      | specifies the specific attributes of a **data deletion request** transaction.  This attribute is present, if and only if the transaction is about sending a request to a wallet-Relying Party to delete User's data previously obtained from the User's Wallet Unit with a presentation transaction.        |
 | `dpaReport`      | [0..1]       | [*DPAReport*](#314-dpareport)      | specifies the specific attributes of a **data protection authority report** transaction.  This attribute is present, if and only if the transaction is about sending a report to a data protection authority by the User directly from the Wallet Unit.        |
-| `otherTransaction`      | [0..1]       | [*OtherTransaction*](#315-othertransaction)      | specifies the specific attributes of **other** types of transaction logged in the transaction log.  This attribute is present, if and only if the transaction is none of the above mentioned transaction types.        |
-| `transactionIdentifier`      | [1..1]       | *string*      | contains the **transaction identifier** of the transaction processed by the Wallet Unit.        |
-| `time`      | [1..1]       | *string*      |           contains the **date and time** of the transaction in ISO 8601 format (YYYY-MM-DDTHH:mm:ss).              |
+| `otherTransaction`      | [0..1]       | [*OtherTransaction*](#315-othertransaction)      | specifies the specific attributes of **other** types of transaction logged in the transaction log.  This attribute is present, if and only if the transaction is none of the above mentioned transaction types.      |
+| `transactionIdentifier`      | [1..1]       | *string*      | contains the **transaction identifier** of the transaction processed by the Wallet Unit.     |
+| `time`      | [1..1]       | *string*      |           contains the **date and time** of the transaction in ISO 8601 format (YYYY-MM-DDTHH:mm:ss).         |
 | `transactionType`      | [1..1]       | *string*     |           contains the **type** of the transaction, where the following values are defined  in the present document: <ul><li>`Presentation`</li><li>`PseudonymPresentation`</li><li>`W2WPresentation`</li><li>`W2WPresentationRequest`</li><li>`CredentialIssuance`</li><li>`CredentialReissuance`</li><li>`CredentialDeletion`</li><li>`PseudonymGeneration`</li><li>`PseudonymDeletion`</li><li>`CertificateIssuance`</li><li>`CertificateDeletion`</li><li>`SigningSealing`</li><li>`DataDeletionRequest`</li><li>`DPAReport`</li><li>`OtherTransaction`</li></ul>         |
 | `transactionResult`     | [1..1]       | *string*      |         specifies the **result** of the transaction, where the following values are defined in the present document: <li>`Completed`</li><li>`NotCompleted`</li>         |
 
 ### 3.2 Presentation
 
-The `Presentation` class is used within the definition of [`Transaction`](#31-transaction) and specifies the attributes related to the presentation requests received and processed by the Wallet Unit (including pseudonym transactions). It contains attributes specified in the following table:
+The `Presentation` class is used within the definition of [`Transaction`](#31-transaction) and specifies the attributes related to the presentation requests received and processed by the Wallet Unit. It contains attributes specified in the following table:
 
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
@@ -152,23 +157,12 @@ The `Presentation` class is used within the definition of [`Transaction`](#31-tr
 | `dpaContact`      | [1..1]  |  Array of *string* objects      | contains an array with at least one of the contact details to the competent data protection authority, where the following attributes are possible: <li>`LegalEntity.email`</li><li>`LegalEntity.phone`</li><li>`LegalEntity.infoURI`</li> as specified in [Provider information specification]. `LegalEntity.infoURI` refers here an URL to a  webform for sending the report.  If `isIntermediary` value is 'TRUE', this attribute refers to the intermediated Wallet-Relying Party.     |  
 | `listOfClaimsRequested`      | [1..*]       | Array of [*ClaimInfo*](#3202-claiminfo) objects      | contains an array with information about all the claims (Wallet Unit User-related attributes) requested from the User's Wallet Unit by an interacting party.  |
 | `listOfClaimsPresented`      | [1..*]       | Array of [*ClaimInfo*](#3202-claiminfo) objects      | contains an array with information about all the claims (User-related attributes) presented by the User's Wallet Unit to an interacting party. (_Note: the User may choose to release only some of the requested attributes._)     |
+| `transactionalData`    | [0..1]       | [*TransactionalData*](#32012-transactionaldata)      |       contains **transactional data** transported in the presentation request, as specified in the attestation-related technical specification or rulebook; included if and only if the attestation type supports transactional data and where the transactional data was contained in the presentation request.              |
 | `reasonOfNoncompletion`    | [0..1]       | *string*      |       specifies the **reason of non completion** of a transaction; included if and only if `TransactionResult` value is `NotCompleted`.              |
 
 
 
-### 3.3 PseudonymPresentation
-
-The `PseudonymPresentation` class is used within the definition of [`Transaction`](#31-transaction) and specifies the attributes related to the presentation requests received and processed by the Wallet Unit (including pseudonym transactions). It contains attributes specified in the following table:
-
-| Attribute          | Multiplicity | Type | Description |
-|--------------------|--------------|------|-------------|
-| `interactingPartyIdentifier`       | [1..1]       | *[Identifier](#3209-identifier-external)*       |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
-| `interactingPartyType`       | [1..1]       | *string*      |          specifies the **type** of the party interacting with a Wallet Unit in a transaction, where the following values are defined in the present document: <li>`ServiceProvider`</li><li>`NaturalPerson`</li>               |
-| `interactingPartyName`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     contains the **name** of the party interacting with a Wallet Unit in a transaction. The interacting party name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification].   |
-| `interactingPartyContact`      | [1..1]  |  Array of *string* objects      | contains an array with <li>`LegalEntity.country`</li> and at least one of the following attributes: <li>`LegalEntity.email`</li><li>`LegalEntity.phone`</li><li>`LegalEntity.infoURI`</li> as specified in [Provider information specification]. The contact details are primarily needed to enable the User to request deletion of the User's personal data obtained by the interacting party. |  
-| `reasonOfNoncompletion`    | [0..1]       | *string*      |       specifies the **reason of non completion** of a transaction; included if and only if `TransactionResult` value is `NotCompleted`.                            |
-
-### 3.4 W2WPresentationRequest
+### 3.3 W2WPresentationRequest
 
 The `W2WPresentationRequest` class is used within the definition of [`Transaction`](#31-transaction) for presentation requests sent out from the Wallet Unit directly to another one in a wallet-to-wallet scenario. It contains attributes specified in the following table:
 
@@ -177,7 +171,7 @@ The `W2WPresentationRequest` class is used within the definition of [`Transactio
 | `listOfClaimsRequested`      | [1..*]       | Array of [*ClaimInfo*](#3202-claiminfo) objects      | contains an array with information about all the **claims (attributes) requested** from another Wallet Unit in the wallet-to-wallet presentation request.     |
 | `listOfClaimsPresented`      | [1..*]       | Array of [*ClaimInfo*](#3202-claiminfo) objects      | contains an array with information about all the **claims (attributes) presented** to the Wallet Unit following the wallet-to-wallet presentation request.|
 
-### 3.5 W2WPresentation
+### 3.4 W2WPresentation
 
 The `W2WPresentation` class is used within the definition of [`Transaction`](#31-transaction) for presentation requests processed by the Wallet Unit received directly from another Wallet Unit in a wallet-to-wallet scenario. It contains attributes specified in the following table:
 
@@ -187,7 +181,7 @@ The `W2WPresentation` class is used within the definition of [`Transaction`](#31
 | `listOfClaimsPresented`      | [1..*]       | Array of [*ClaimInfo*](#3202-claiminfo) objects      | contains an array with information about all the **claims (attributes) presented** to another Wallet Unit following the wallet-to-wallet presentation request.|
 | `reasonOfNoncompletion`    | [0..1]       | *string*      |       specifies the **reason of non completion** of a transaction; included if and only if `TransactionResult` value is `NotCompleted`.                            |
 
-### 3.6 CredentialIssuance
+### 3.5 CredentialIssuance
 
 The `CredentialIssuance` class is used within the definition of [`Transaction`](#31-transaction) and specifies the attributes related to credential (PID and attestation) issuance transactions. It contains attributes specified in the following table:
 
@@ -202,7 +196,7 @@ The `CredentialIssuance` class is used within the definition of [`Transaction`](
 | `credentialIdentifier`      | [1..*]       | Array of *string* objects       |    contains an array of **identifiers of the credentials** issued to a Wallet Unit in the transaction, where the identifiers values are equal to Verifiable Credential Type (`vct`) parameter value for [SD-JWT VC] format or Document Type (`docType`) parameter value for [ISO/IEC 18013-5] format.   |
 | `isUserTriggered`    | [1..1]       | *boolean*      |       indicates whether the issuance transaction is triggered by the Wallet Unit User ('TRUE') or by the credential issuer ('FALSE').                            |
 
-### 3.7 CredentialDeletion
+### 3.6 CredentialDeletion
 
 The `CredentialDeletion` class is used within the definition of [`Transaction`](#31-transaction) for credential (PID or Attestation) deletion transactions processed by the Wallet Unit. It contains attributes specified in the following table:
 
@@ -212,21 +206,36 @@ The `CredentialDeletion` class is used within the definition of [`Transaction`](
 | `credentialIssuerIdentifier`       | [1..1]       | *[Identifier](#3209-identifier-external)*     |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
 | `credentialIssuerName`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     contains the **name** of the deleted credential's issuer name. The issuer's name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification].   |
 
-### 3.8 PseudonymGeneration
+### 3.7 PseudonymGeneration
 
 The `PseudonymGeneration` class is used within the definition of [`Transaction`](#31-transaction) for (User's) pseudonym generation  transactions. It contains attributes specified in the following table:
 
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
-| `pseudonym`      | [1..1]       | *[Pseudonym](#3203-pseudonym)*       |    specifies the attributes of the pseudonym of the User.   |
+| `pseudonym`      | [1..1]       | *[Pseudonym](#3203-pseudonym)*       |    contains the **pseudonym** of the User.   |
 
-### 3.9 PseudonymDeletion
+### 3.8 PseudonymDeletion
 
 The `PseudonymDeletion` class is used within the definition of [`Transaction`](#31-transaction) for (User's) pseudonym deletion  transactions. It contains attributes specified in the following table:
 
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
-| `pseudonym`      | [1..1]       | *[Pseudonym](#3203-pseudonym)*       |    specifies the attributes of the pseudonym of the User.   |
+| `pseudonym`      | [1..1]       | *[Pseudonym](#3203-pseudonym)*       |    contains the **pseudonym** of the User.   |
+
+
+### 3.9 PseudonymousAuthentication
+
+The `PseudonymousAuthentication` class is used within the definition of [`Transaction`](#31-transaction) and specifies the attributes related to the User authentication to a Relaying Party, where the User's pseudonym is used, the User's identity is not revealed and no any other User attributes are presented. It contains attributes specified in the following table:
+
+| Attribute          | Multiplicity | Type | Description |
+|--------------------|--------------|------|-------------|
+| `interactingPartyIdentifier`       | [1..1]       | *[Identifier](#3209-identifier-external)*       |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
+| `interactingPartyType`       | [1..1]       | *string*      |          specifies the **type** of the party interacting with a Wallet Unit in a transaction, where the following values are defined in the present document: <li>`ServiceProvider`</li><li>`NaturalPerson`</li>               |
+| `interactingPartyName`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     contains the **name** of the party interacting with a Wallet Unit in a transaction. The interacting party name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification].   |
+| `pseudonym`      | [1..1]       | *[Pseudonym](#3203-pseudonym)*       |    contains the **pseudonym** of the User.   |
+| `reasonOfNoncompletion`    | [0..1]       | *string*      |       specifies the **reason of non completion** of a transaction; included if and only if `TransactionResult` value is `NotCompleted`.                            |
+
+
 
 ### 3.10 CertificateIssuance
 
@@ -297,26 +306,29 @@ The `OtherTransaction` class is used within the definition of the [`Transaction`
 
 ### 3.16 TransactionLog
 
-The `TransactionLog` object is an array containing `Transaction` objects.
+The `TransactionLog` object is an array containing zero or more `Transaction` objects. In some cases it may be empty (if no transactions have been done yet or the log was erased).
+
 
 ### 3.17 TransactionLogObject
 
-The `TransactionLogObject` object is file that contains the `TransactionLog` object. `TransactionLogObject` can be exported from the Wallet Unit and stored in an external location. The structure and coding of `TransactionLogObject` as the exportable file is specified in Section 4.1.
+The `TransactionLogObject` object is file that contains the `TransactionLog` object. The structure and coding of `TransactionLogObject` as the exportable file is specified in Section 4.1.
 
 
 ### 3.18 ListOfCredentials
 
-The `ListOfCredentials` object is a data file containing one or more `CredentialInfo` objects.
+The `ListOfCredentials` object is a file that contains zero or more `CredentialInfo` objects. In some cases it may be empty (if no attestations are present in the Wallet Unit).
 
 
 ### 3.19 MigrationObject
-The `MigrationObject` object is a "container", that contains two data elements: the transaction log and the list of credentials (attesatation). `MigrationObject` can be exported from the Wallet Unit and stored in an external location as a file. The structure and coding of `MigrationObject` as the  exportable file is specified in Section 4.2.
+
+The `MigrationObject` object is a file, that contains: the transaction log and the list of credentials (attesatation). The structure and coding of `MigrationObject` as the  exportable file is specified in Section 4.2.
+
 
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
 | `transactionLog`      | [1..1]       | [TransactionLog](#316-transactionlog)      |       contains the current transaction log of the Wallet Unit.    |
-| `listOfCredentials`      | [1..1]       | [ListOfCredentials](#318-listofcredentials)      |       contains the current list of credentials (attestations) present in the Wallet Unit.    |
-
+| `listOfCredentials`      | [1..1]       | [ListOfCredentials](#318-listofcredentials)      |       contains the current list of all device-bound credentials (attestations) present in the Wallet Unit.    |
+| 'nonDeviceBoundCredentials' | [1..1] | Array of attestation objects | Contains an array including all non-device-bound attestations currently present in the Wallet Unit; format of each entry in the array SHALL be identical to 'credential' object as received by the Wallet Unit from a Credential Issuer in a Credential Response according to section 8.3 of [OpenID4VCI]. The Wallet Unit SHALL NOT include any 'credential' objects representing device-bound credentials in the array. |
 
 
 ### 3.20 Auxiliary classes
@@ -328,11 +340,12 @@ The `CredentialInfo` class represents the set of data related to a credential, t
 | Attribute                 | Multiplicity | Type | Description |
 |---------------------------|--------------|------|-------------|
 | `credentialIdentifier`    | [1..1]       | *string*     | contains  an **identifier of the credential** (attestation), where its value equals to Verifiable Credential Type (`vct`) parameter value for [SD-JWT VC] format or Document Type (`docType`) parameter value for [ISO/IEC 18013-5] format.  |
-| `format`                  | [1..1]       | *string*               | Specifies the format of the attestation, where the following values are defined in the present document:  <li>`jwt_vc_json` for the format conformant to W3C VCDM 1.1, signed as a JWT, not using JSON-LD 							(according to Appendix B.1.3.1 of [OpenID4VP])</li><li>`ldp_vc` for the format conformant to W3C VCDM 1.1, that is secured using Data Integrity, using JSON-LD (according to Appendix B.1.3.2 of [OpenID4VP])</li><li>`mso_mdoc`for the format conformant to mdoc format i.e. complying with [ISO/IEC 18013-5]												(according to Appendix B.2 of [OpenID4VP]) </li><li>`dc+sd-jwt` for the format conformant to [SD-JWT VC]	(according to Appendix B.3.1 of [OpenID4VP])</li> |
+| `format`                  | [1..1]       | *string*               | specifies the format of the attestation, where the following values are defined in the present document:  <li>`jwt_vc_json` for the format conformant to W3C VCDM 1.1, signed as a JWT, not using JSON-LD 							(according to Appendix B.1.3.1 of [OpenID4VP])</li><li>`ldp_vc` for the format conformant to W3C VCDM 1.1, that is secured using Data Integrity, using JSON-LD (according to Appendix B.1.3.2 of [OpenID4VP])</li><li>`mso_mdoc`for the format conformant to mdoc format i.e. complying with [ISO/IEC 18013-5]												(according to Appendix B.2 of [OpenID4VP]) </li><li>`dc+sd-jwt` for the format conformant to [SD-JWT VC]	(according to Appendix B.3.1 of [OpenID4VP])</li> |
 | `issuerIdentifier`       | [1..*]       | *[Identifier](#3209-identifier-external)*      |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
 | `issuerType`       | [1..1]       | *string*      |          specifies the **type** of the issuer, where the following values are defined in the present document (following [CIR for Relying Party Registration] Annex I point 12, plus additional ones): <li>`QEAAProvider`</li><li>`NonQEAAProvider`</li><li>`PubEEAProvider`</li><li>`PIDProvider`</li>             |
 | `issuerName`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     contains the **name** of the issuer. The issuer name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification].    |
 | `supplyPointURL`      | [1..1]       | *string*      |     specifies a Unique Resource Locator (URL) with a **link to the issuer's on-line service**, at which a Wallet Unit can start the process of requesting and obtaining a PID or Attestation.    |
+
 
 #### 3.20.2 ClaimInfo
 
@@ -345,10 +358,12 @@ The `ClaimInfo` class represents the set of data related to a claim (a User-rela
 
 #### 3.20.3 Pseudonym
 
+The `Pseudonym` class represents the set of data related to User's pseudonym. It contains the attributes specified in the following table:
+
 | Attribute                 | Multiplicity | Type | Description |
 |---------------------------|--------------|------|-------------|
-| `value`      | [1..1]       | *string*       |    contains the **value** of the pseudonym, which is a public key of the asymmetric key pair generated by the Wallet Unit for this purpose.    |
-| `alias`      | [0..1]       | *string*       |    may contain the User-friendly **alias**  of the pseudonym, set by the User. This attribute is optional.    |
+| `value`      | [1..1]       | *string*       |    contains the **value** of the pseudonym, which may be a public key of the asymmetric key pair generated by the Wallet Unit for this purpose.    |
+| `alias`      | [0..1]       | *string*       |    may contain the User-friendly **alias**  of the pseudonym, set by the User. This attribute is optional.  |
 
 #### 3.20.4 Credential (external)
 
@@ -382,13 +397,20 @@ The `MultiLangString` class contains the attributes specified in the [Relying Pa
 
 The `Policy` class contains the attributes specified in the [Provider information specification].
 
+#### 3.20.12 TransactionalData 
+
+The `TransactionalData` class represents data of an external transaction (such as payment authentication or signature activation), that is contained within a presentation request (for instance in `transaction_data` parameter as specified in  [OID4VP]). It contains one or more attributes specified in a technical specification or rulebook related to the attestation type at stake.
+
+_Note: For instance, for payment authentication `TransactionalData` content is specified in [TS12]._
+
+
 ### 4 Structures
 
 #### 4.1 Transaction Log Object Structure
 
-The `TransactionLogObject` exportable object is composed from the transaction log entries of various types. It contains an array with transaction log entries. A single transaction log entry is a JSON-encoded `Transaction` object with key/value elements of the corresponding data types for a given transaction type, as defined in Sections 3.2 to 3.15. 
+The `TransactionLogObject` exportable object is composed from the transaction log entries of various types. It can be exported from the Wallet Unit and stored in an external location. It contains an array with transaction log entries. A single transaction log entry is a JSON-encoded `Transaction` object with key/value elements of the corresponding data types for a given transaction type, as defined in Sections 3.2 to 3.15. 
 
-The `TransactionLogObject` object shall be in [JWE] format; the corresponding [JWE] ciphertext object shall be encoded as a [JSON] object. The encryption process and mandatory algorithms for [JWE] encryption are defined in Section 5.
+The `TransactionLogObject` object SHALL be in [JWE] format; the corresponding [JWE] ciphertext object SHALL be encoded as a [JSON] object. The encryption process and mandatory algorithms for [JWE] encryption are defined in Section 5.
   
 
 The following is a non-normative example of the `TransactionLogObject` object:
@@ -490,13 +512,18 @@ The following is a non-normative example of the `TransactionLogObject` object:
 
 #### 4.2 Migration Object Structure
 
-The `MigrationObject` exportable object contains two data elements: `TransactionLogObject` and `ListOfCredential`. The `TransactionLogObject` object's structure and coding are defined in Section 4.1.
+The `MigrationObject` exportable object contains:
+- `TransactionLogObject`
+- `ListOfCredentials`,
+- all non-device bound attestations files. 
 
-The `ListOfCredential` object is composed from the credential-related information entries. It contains an array with `CredentialInfo` objects, containing selected information on each credential (attestation) present in the Wallet Unit. A single credential entry is a JSON-encoded `CredentialInfo` object with key/value elements as defined in Section 3.20.1.  
+It can be exported from the Wallet Unit and stored in an external location. The `TransactionLogObject` object's structure and coding are defined in Section 4.1.
 
-The `MigrationObject` object shall be in [JWE] format; the corresponding [JWE] ciphertext is composed of the `TransactionLog` and `ListOfCredential` objects, both encoded as [JSON] objects. The encryption process and mandatory algorithms for [JWE] encryption are defined in Section 5.
+The `ListOfCredentials` object is composed from the credential-related information entries. It contains an array with `CredentialInfo` objects, containing selected information on each device-bound credential (attestation) present in the Wallet Unit. A single credential entry is a JSON-encoded `CredentialInfo` object with key/value elements as defined in Section 3.20.1.  
 
-The following is a non-normative example of the `ListOfCredential` object:
+The `MigrationObject` object SHALL be in [JWE] format; the corresponding [JWE] ciphertext is composed of the `TransactionLog` and `ListOfCredentials` objects, both encoded as [JSON] objects. The encryption process and mandatory algorithms for [JWE] encryption are defined in Section 5.
+
+The following is a non-normative example of the `ListOfCredentials` object:
 
 ```
 {
@@ -529,7 +556,7 @@ The following is a non-normative example of the `ListOfCredential` object:
 
 ### 5 Encryption
 
-The following algorithms are mandatory for [JWE] objects encryption:
+The Wallet Unit SHALL use the following algorithms for [JWE] objects encryption:
 
 * [PBES2-HS256+A128KW](https://www.rfc-editor.org/rfc/rfc7518.html#section-4.8), as specified in [JWA] and [PKCS#5] - to derive the key encryption key from the User's password/passphrase and encrypt the content encryption key,
 * [A128GCM](https://www.rfc-editor.org/rfc/rfc7518.html#section-5.3), as specified in [JWA] - for the content encryption with the content encryption key.
@@ -556,4 +583,7 @@ The encryption process is visualised in the diagram below:
 | [ECCG]      | [ECCG Agreed Cryptographic Mechanisms - version 2](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/416) |
 | [SD-JWT-VC]      | [SD-JWT-based Verifiable Credentials (SD-JWT VC)](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/9)|
 | [ISO/IEC 18013-5]  | [ISO/IEC 18013-5 - Mobile driving licence (mDL) application, First edition, 2021-09](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/84) |
+| [OID4VP] | [OpenID for Verifiable Presentations 1.0](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/2) |
+| [OID4VCI] | [OpenID for Verifiable Credential Issuance 1.0](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/3) |
 | [RFC 5280] | [RFC 5280 Internet X.509 Public Key Infrastructure Certificate and Certificate Revocation List (CRL) Profile](https://www.rfc-editor.org/info/rfc5280) |
+| [TS12] | [Technical Specification 12: Specification of Strong Customer Authentication (SCA) Implementation with the Wallet](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts12-electronic-payments-SCA-implementation-with-wallet.md) |
