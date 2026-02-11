@@ -8,14 +8,27 @@ The present document specifies the technical specification and requirements for 
 
 ### [GitHub discussion](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/discussions/485)
 
+
+## Licensing and Reuse
+
+© European Union, 2025-2026.
+
+This document is made available under the Creative Commons Attribution 4.0 International licence (CC BY 4.0), unless otherwise stated.
+
+You may reuse this document provided that appropriate credit is given and any changes are indicated.
+
+The full licence text is available at:
+https://creativecommons.org/licenses/by/4.0/
+
 ## Versioning
 
 | Version | Date | Description |
 |---------|------------|------------|
-| `0.1` | 03.04.2025 | Initial version for discussion |
-| `0.2` | 23.04.2025 | Updates based on first group meeting |
-| `0.3` | 02.05.2025 | Updates based on second group meeting |
-| `1.0` | 21.05.2025 | Final version |
+| `0.1` | 2025-04-03 | Initial version for discussion |
+| `0.2` | 2025-04-23 | Updates based on first group meeting |
+| `0.3` | 2025-05-02 | Updates based on second group meeting |
+| `1.0` | 2025-05-21 | Final version |
+| `1.0.1` | 2026-01-30 | Editorial update (licensing and reuse clarification) |
 
 
 ## 1 Introduction and Overview

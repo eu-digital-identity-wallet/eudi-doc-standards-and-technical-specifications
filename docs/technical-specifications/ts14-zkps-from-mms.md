@@ -8,13 +8,25 @@ This technical specification contains exploratory work aimed at clarifying the t
 
 ### [GitHub discussion](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/discussions/467)
 
+## Licensing and Reuse
+
+© European Union, 2025-2026.
+
+This document is made available under the Creative Commons Attribution 4.0 International licence (CC BY 4.0), unless otherwise stated.
+
+You may reuse this document provided that appropriate credit is given and any changes are indicated.
+
+The full licence text is available at:
+https://creativecommons.org/licenses/by/4.0/
+
 ## Version
 
-| Version | Date       | Description                                                                                |
-|---------|------------|--------------------------------------------------------------------------------------------|
-| `0.1`   | 19.12.2025 | Initial version                                                                            |
-| `0.2`   | 22.01.2026 | Updates based on first focus group meeting and additional details                          |
-| `0.3`   | 30.01.2026 | Updates based on second focus group meeting, editorial changes and additional explanations |
+| Version | Date       | Description                                                       |
+|---------|------------|-------------------------------------------------------------------|
+| `0.1`   | 2025-12-19 | Initial version                                                   |
+| `0.2`   | 2026-01-22 | Updates based on first focus group meeting and additional details |
+| `0.3`   | 2026-01-30 | Updates based on second focus group meeting, editorial changes and additional explanations |
+| `0.4`   | 2026-02-11 | Editorial update (licensing and reuse clarification) |
 
 ## 1 Introduction and Overview
 

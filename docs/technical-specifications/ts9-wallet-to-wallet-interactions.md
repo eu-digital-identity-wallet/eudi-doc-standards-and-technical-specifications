@@ -10,6 +10,17 @@ Wallet Unit.
 
 ### [GitHub Discussion](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/discussions/381)
 
+## Licensing and Reuse
+
+© European Union, 2025-2026.
+
+This document is made available under the Creative Commons Attribution 4.0 International licence (CC BY 4.0), unless otherwise stated.
+
+You may reuse this document provided that appropriate credit is given and any changes are indicated.
+
+The full licence text is available at:
+https://creativecommons.org/licenses/by/4.0/
+
 ## Versioning
 
 | Version | Date       | Description                               |
@@ -18,6 +29,7 @@ Wallet Unit.
 | `0.2`   | 2025-07-01 | Updated after first focus group meeting.  |
 | `0.3`   | 2025-07-11 | Updated after second focus group meeting. |
 | `1.0`   | 2025-07-28 | Final version after the Coordination Group review period. |
+| `1.0.1` | 2026-01-30 | Editorial update (licensing and reuse clarification) |
 
 ## 1. Introduction
 

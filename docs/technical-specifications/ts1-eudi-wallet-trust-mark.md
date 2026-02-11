@@ -8,17 +8,31 @@ The present document specifies the technical specification and requirements for 
 
 ### [GitHub discussion](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/discussions/425)
 
+
+## Licensing and Reuse
+
+© European Union, 2025-2026.
+
+This document is made available under the Creative Commons Attribution 4.0 International licence (CC BY 4.0), unless otherwise stated.
+
+You may reuse this document provided that appropriate credit is given and any changes are indicated.
+
+The full licence text is available at:
+https://creativecommons.org/licenses/by/4.0/
+
 ## Versioning
 
 | Version | Date       | Description                                                                |
 |---------|------------|----------------------------------------------------------------------------|
-| `0.1`   | 20.01.2025 | Initial version for discussion                                             |
-| `0.2`   | 18.02.2025 | Version with first internal feedback and improved scoping                  |
-| `0.3`   | 03.03.2025 | Version for public discussion with the Member States                       |
-| `0.4`   | 03.04.2025 | Updated version based on discussions in 1st and 2nd focus group meetings   |
-| `1.0`   | 25.04.2025 | Final version (v1.0)                                                       |
-| `1.1`   | 14.11.2025 | Updated version (v1.1) with JSON schemas for Trust Mark resources          |
-| `1.1.1` | 18.11.2025 | Editorial and typo fixes to version v1.1                                   |
+| `0.1`   | 2025-01-20 | Initial version for discussion                                             |
+| `0.2`   | 2025-02-18 | Version with first internal feedback and improved scoping                  |
+| `0.3`   | 2025-03-03 | Version for public discussion with the Member States                       |
+| `0.4`   | 2025-04-03 | Updated version based on discussions in 1st and 2nd focus group meetings   |
+| `1.0`   | 2025-04-25 | Final version (v1.0)                                                       |
+| `1.1`   | 2025-11-14 | Updated version (v1.1) with JSON schemas for Trust Mark resources          |
+| `1.1.1` | 2025-11-18 | Editorial and typo fixes to version v1.1                                   |
+| `1.1.2` | 2026-01-30 | Editorial update (licensing and reuse clarification) |
+
 
 ## 1 Introduction and Overview
 

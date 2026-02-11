@@ -12,14 +12,26 @@ at a Wallet-Relying Party for personal data, which was previously provided by a 
 
 ### [GitHub Discussion](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/discussions/378)
 
+## Licensing and Reuse
+
+© European Union, 2025-2026.
+
+This document is made available under the Creative Commons Attribution 4.0 International licence (CC BY 4.0), unless otherwise stated.
+
+You may reuse this document provided that appropriate credit is given and any changes are indicated.
+
+The full licence text is available at:
+https://creativecommons.org/licenses/by/4.0/
+
 ## Versioning
 
 | Version | Date       | Description                           |
 |--------|------------|----------------------------------------|
-| `0.1`  | 27.05.2025 | Initial version for first discussions. |
-| `0.2`  | 12.06.2025 | Update after first discussions.        |
-| `0.9`  | 22.06.2025 | Update after second focus meeting.     |
-| `0.95` | 16.07.2025 | Minor editorial update. |
+| `0.1`  | 2025-05-27 | Initial version for first discussions. |
+| `0.2`  | 2025-06-12 | Update after first discussions.        |
+| `0.9`  | 2025-06-22 | Update after second focus meeting.     |
+| `0.10` | 2025-07-16 | Minor editorial update. |
+| `0.11` | 2026-01-30 | Editorial update (licensing and reuse clarification) |
 
 ## Notational Conventions
 

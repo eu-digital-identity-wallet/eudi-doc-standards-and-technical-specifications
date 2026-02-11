@@ -8,19 +8,31 @@ The present document specifies how WUA is used in connection with PID Providers 
 
 ### [GitHub discussion](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/discussions/450)
 
+## Licensing and Reuse
+
+© European Union, 2025-2026.
+
+This document is made available under the Creative Commons Attribution 4.0 International licence (CC BY 4.0), unless otherwise stated.
+
+You may reuse this document provided that appropriate credit is given and any changes are indicated.
+
+The full licence text is available at:
+https://creativecommons.org/licenses/by/4.0/
+
 ## Versioning
 
-| Version | Date       | Description                                                                                                                                                  |
-|---------|------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `0.1`   | 28.03.2025 | Initial version for first discussions.                                                                                                                       |
-| `0.2`   | 14.04.2025 | Improvements after first round of feedback and improved scoping.                                                                                             |
-| `0.3`   | 28.04.2025 | Addition of Wallet App Attestation, improvements after second round of feedback.                                                                             |
-| `0.4`   | 16.05.2025 | Improvements after commenting.                                                                                                                               |
-| `1.0`   | 20.08.2025 | Changes to WUA Use Cases section (removed references to presentation WUA).                                                                                   |
-| `1.1`   | 05.11.2025 | Editorial changes, rename “Wallet App Attestation (WAA)” to “Wallet Instance Attestation (WIA)”, remove the "ephemeral WIA", and add attestation proof type. |
-| `1.2`   | 11.11.2025 | Editorial changes, included requirements for WUAs related to keystore(s).                                                                                    |
-| `1.3`   | 25.11.2025 | Added option to let PID and Attestation Providers communicate WUA expiration preferences to Wallet Unit.                                                     |
-| `1.4`   | 19.01.2026 | Removed requirements for non-device-bound attestations, added explicit way of communicating WUA requirements, update of examples, editorial changes, added information about exportability of private keys, specified signature algorithms.                             |
+| Version | Date       | Description                        |
+|---------|------------|------------------------------------|
+| `0.1`   | 2025-03-28 | Initial version for first discussions. |
+| `0.2`   | 2025-04-14 | Improvements after first round of feedback and improved scoping. |
+| `0.3`   | 2025-04-28 | Addition of Wallet App Attestation, improvements after second round of feedback. |
+| `0.4`   | 2025-05-16 | Improvements after commenting. |
+| `1.0`   | 2025-08-20 | Changes to WUA Use Cases section (removed references to presentation WUA). |
+| `1.1`   | 2025-11-05 | Editorial changes, rename “Wallet App Attestation (WAA)” to “Wallet Instance Attestation (WIA)”, remove the "ephemeral WIA", and add attestation proof type. |
+| `1.2`   | 2025-11-11 | Editorial changes, included requirements for WUAs related to keystore(s). |
+| `1.3`   | 2025-11-25 | Added option to let PID and Attestation Providers communicate WUA expiration preferences to Wallet Unit. |
+| `1.4`   | 2026-01-19 | Removed requirements for non-device-bound attestations, added explicit way of communicating WUA requirements, update of examples, editorial changes, added information about exportability of private keys, specified signature algorithms. |
+| `1.4.1` | 2026-01-30 | Editorial update (licensing and reuse clarification) |
 
 ## 1 Introduction and Overview
 
