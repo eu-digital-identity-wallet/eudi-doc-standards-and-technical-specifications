@@ -9,21 +9,31 @@ The present document specifies the common format and data set for the transactio
 
 ### [GitHub discussion](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/discussions/407)
 
+## Licensing and Reuse
+
+© European Union, 2025-2026.
+
+This document is made available under the Creative Commons Attribution 4.0 International licence (CC BY 4.0), unless otherwise stated.
+
+You may reuse this document provided that appropriate credit is given and any changes are indicated.
+
+The full licence text is available at:
+https://creativecommons.org/licenses/by/4.0/
+
 ## Versioning
 
 | Version | Date        | Description                              |
 |---------|-------------|------------------------------------------|
-| `0.1`   | 27.06.2025  | Initial version for the first discussion |
-| `0.2`   | 14.07.2025  | Update after the first focus meeting     |
-| `0.3`   | 24.07.2025  | Update after the second focus meeting    |
-| `0.4`   | 5.08.2025  | Update after the public release of the draft     |
-| `0.9`   | 7.08.2025  | Release candidate      |
-| `0.97`   | 14.08.2025  | Release candidate - adding a general migration process description, basing on the commenting table proposal       |
-| `0.99`   | 15.08.2025  | Final draft for review      |
-| `1.0`   | 15.08.2025  | Final version for release      |
-| `1.1`   | 2.02.2026  | Alignment with [TS12], adding non-device bound attestations handling, rework of pseudonym related aspects       |
-
-
+| `0.1`   | 2025-06-27  | Initial version for the first discussion |
+| `0.2`   | 2025-07-14  | Update after the first focus meeting     |
+| `0.3`   | 2025-07-24  | Update after the second focus meeting    |
+| `0.4`   | 2025-08-05  | Update after the public release of the draft     |
+| `0.9`   | 2025-08-07  | Release candidate      |
+| `0.10`  | 2025-08-14  | Release candidate - adding a general migration process description, basing on the commenting table proposal       |
+| `0.11`  | 2025-08-15  | Final draft for review      |
+| `1.0`   | 2025-08-15  | Final version for release      |
+| `1.1`   | 2026-02-02  | Alignment with [TS12], adding non-device bound attestations handling, rework of pseudonym related aspects       |
+| `1.1.1` | 2026-02-11  | Editorial update (licensing and reuse clarification) |
 
 ## 1 Introduction
 

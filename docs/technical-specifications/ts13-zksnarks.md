@@ -14,21 +14,33 @@ trusted setup, in the EUDI Wallet.
 
 ### [GitHub discussion](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/discussions/440)
 
+## Licensing and Reuse
+
+© European Union, 2025-2026.
+
+This document is made available under the Creative Commons Attribution 4.0 International licence (CC BY 4.0), unless otherwise stated.
+
+You may reuse this document provided that appropriate credit is given and any changes are indicated.
+
+The full licence text is available at:
+https://creativecommons.org/licenses/by/4.0/
+
 ## Versioning
 
 | Version | Date | Description |
 |---------|------------|------------|
-| `1.0` | 15.12.2025 | Editorial changes
-| `0.95` | 24.11.2025 | Improvements based on second focus meeting
-| `0.9` | 7.11.2025 | Improvements based on internal review
-| `0.8` | 24.10.2025 | Improvements based on first focus meeting
-| `0.7` | 14.10.2025 | Improvements based on internal review
-| `0.6` | 09.10.2025 | Detailed circuit description extended, initial description of presentation protocols |
-| `0.5` | 02.10.2025 | Initial description for section 4.2 Detailed circuit description |
-| `0.4` | 22.09.2025 | Scope update, information about revocation |
-| `0.3` | 15.09.2025 | Information about attestation and presentation formant, scope update |
-| `0.2` | 12.09.2025 | Scope and information about the longfellow-zk library|
-| `0.1` | 05.09.2025 | Initial version based on TS-4|
+| `1.0` | 2025-12-15 | Editorial changes
+| `0.95` | 2025-11-24 | Improvements based on second focus meeting
+| `0.9` | 2025-11-07 | Improvements based on internal review
+| `0.8` | 2025-10-24 | Improvements based on first focus meeting
+| `0.7` | 2025-10-14 | Improvements based on internal review
+| `0.6` | 2025-10-09 | Detailed circuit description extended, initial description of presentation protocols |
+| `0.5` | 2025-10-02 | Initial description for section 4.2 Detailed circuit description |
+| `0.4` | 2025-09-22 | Scope update, information about revocation |
+| `0.3` | 2025-09-15 | Information about attestation and presentation formant, scope update |
+| `0.2` | 2025-09-12 | Scope and information about the longfellow-zk library|
+| `1.0` | 2025-09-05 | Initial version based on TS-4|
+| `1.0.1` | 2026-01-30 | Editorial update (licensing and reuse clarification) |
 
 ## 1 Introduction and Overview
 

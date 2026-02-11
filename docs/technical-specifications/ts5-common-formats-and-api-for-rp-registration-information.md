@@ -8,17 +8,29 @@ The present document specifies the data formats and application programming inte
 
 ### [GitHub discussion](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/discussions/357)
 
+## Licensing and Reuse
+
+© European Union, 2025-2026.
+
+This document is made available under the Creative Commons Attribution 4.0 International licence (CC BY 4.0), unless otherwise stated.
+
+You may reuse this document provided that appropriate credit is given and any changes are indicated.
+
+The full licence text is available at:
+https://creativecommons.org/licenses/by/4.0/
+
 ## Versioning
 
 | Version | Date        | Description                                               |
 |---------|-------------|-----------------------------------------------------------|
-| `0.1`   | 25.04.2025  | Initial version for first discussion                      |
-| `0.2`   | 30.04.2025  | Initial version - fixed data model figure                 |
-| `0.3`   | 13.05.2025  | Updated version based on first feedback round             |
-| `0.4`   | 23.05.2025  | Updated version based on focus group meeting 2            |
-| `1.0`   | 13.06.2025  | Published version after Coordination Group review period  |
-| `1.1`   | 14.10.2025  | First maintenance release - JWS API fix, intendedUseIdentifier, registryURI, TS11-implied updates     |
-| `1.2`   | 27.11.2025  | Added Indended use identifier to /wrp GET query parameters list in main specification, reference updates.       |
+| `0.1`   | 2025-04-25  | Initial version for first discussion                      |
+| `0.2`   | 2025-04-30  | Initial version - fixed data model figure                 |
+| `0.3`   | 2025-05-13  | Updated version based on first feedback round             |
+| `0.4`   | 2025-05-23  | Updated version based on focus group meeting 2            |
+| `1.0`   | 2025-06-13  | Published version after Coordination Group review period  |
+| `1.1`   | 2025-10-14  | First maintenance release - JWS API fix, intendedUseIdentifier, registryURI, TS11-implied updates     |
+| `1.2`   | 2025-11-27  | Added Intended use identifier to /wrp GET query parameters list in main specification, reference updates.       |
+| `1.2.1` | 2026-01-30  | Editorial update (licensing and reuse clarification) |
 
 ## 1. Introduction and Overview
 

@@ -9,20 +9,32 @@ The present document specifies data structures and processing rules for conducti
 
 ### [GitHub discussion](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/discussions/439)
 
+## Licensing and Reuse
+
+© European Union, 2025-2026.
+
+This document is made available under the Creative Commons Attribution 4.0 International licence (CC BY 4.0), unless otherwise stated.
+
+You may reuse this document provided that appropriate credit is given and any changes are indicated.
+
+The full licence text is available at:
+https://creativecommons.org/licenses/by/4.0/
+
 ## Versioning
 
 | Version | Date        | Description                              |
 |---------|-------------|------------------------------------------|
-| `0.1`   | 10.10.2025  | Initial version for the first discussion |
-| `0.5`   | 26.10.2025  | Update after the Focus Meeting 1 and comments from GitHub |
-| `0.7`   | 3.11.2025  | Update after the Focus Meeting 2 |
-| `0.8`   | 4.11.2025  | Adding the minimum transactional data and attestation metadata specifications |
-| `0.9`   | 7.11.2025  | Pre-release version |
-| `0.95`   | 10.11.2025  | For review |
-| `0.96`   | 14.11.2025  | Further fine-tuning and error corrections |
-| `0.97`   | 17.11.2025  | Adding transaction logging requirements |
-| `0.98`   | 27.11.2025  | API files names update |
-| `1.0`   | 5.12.2025  | Final version  |
+| `0.1`   | 2025-10-10  | Initial version for the first discussion |
+| `0.5`   | 2025-10-26  | Update after the Focus Meeting 1 and comments from GitHub |
+| `0.7`   | 2025-11-03  | Update after the Focus Meeting 2 |
+| `0.8`   | 2025-11-04  | Adding the minimum transactional data and attestation metadata specifications |
+| `0.9`   | 2025-11-07  | Pre-release version |
+| `0.95`   | 2025-11-10  | For review |
+| `0.96`   | 2025-11-14  | Further fine-tuning and error corrections |
+| `0.97`   | 2025-11-17  | Adding transaction logging requirements |
+| `0.98`   | 2025-11-27  | API files names update |
+| `1.0`   | 2025-12-05  | Final version  |
+| `1.0.1` | 2026-01-30 | Editorial update (licensing and reuse clarification) |
 
 ## 1 Introduction
 

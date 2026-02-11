@@ -10,14 +10,26 @@ Management of attribute schemas for the core attributes listed in Appendix VI of
 
 ### [GitHub discussion](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/discussions/428)
 
+## Licensing and Reuse
+
+© European Union, 2025-2026.
+
+This document is made available under the Creative Commons Attribution 4.0 International licence (CC BY 4.0), unless otherwise stated.
+
+You may reuse this document provided that appropriate credit is given and any changes are indicated.
+
+The full licence text is available at:
+https://creativecommons.org/licenses/by/4.0/
+
 ## Versioning
 
 | Version | Date       | Description                                                          |
 |---------|------------|----------------------------------------------------------------------|
-| `0.1`   | 05.09.2025 | Initial version for discussion in sync with topic O discussion paper |
-| `0.2`   | 24.09.2025 | Updated version after first focus group meeting and feedback         |
-| `0.3`   | 03.10.2025 | Updated version for the 2-week commenting period                     |
-| `1.0`   | 10.11.2025 | Version 1.0 matched with stable draft of ETSI TS 119 478             |
+| `0.1`   | 2025-09-05 | Initial version for discussion in sync with topic O discussion paper |
+| `0.2`   | 2025-09-24 | Updated version after first focus group meeting and feedback         |
+| `0.3`   | 2025-10-03 | Updated version for the 2-week commenting period                     |
+| `1.0`   | 2025-11-10 | Version 1.0 matched with stable draft of ETSI TS 119 478             |
+| `1.0.1` | 2026-01-30 | Editorial update (licensing and reuse clarification) |
 
 ## 1. Introduction and Overview
 

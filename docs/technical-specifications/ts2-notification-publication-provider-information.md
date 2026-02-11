@@ -8,16 +8,28 @@ The present document specifies the data model and systems enabling the notificat
 
 ### [GitHub discussion](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/discussions/427)
 
+## Licensing and Reuse
+
+© European Union, 2025-2026.
+
+This document is made available under the Creative Commons Attribution 4.0 International licence (CC BY 4.0), unless otherwise stated.
+
+You may reuse this document provided that appropriate credit is given and any changes are indicated.
+
+The full licence text is available at:
+https://creativecommons.org/licenses/by/4.0/
+
 ## Versioning
 
-| Version | Date        | Description  |
-|---------|-------------|------------- |
-| `0.1`   | 16.01.2025  | Initial version for first discussions. |
-| `0.2`   | 10.02.2025  | Version with first feedback integrated. |
-| `0.3`   | 09.03.2025  | Version with more comments integrated. |
-| `0.4`   | 09.04.2025  | Version with more comments integrated and separation of ``LegalEntity`` and ``Provider``. ``IntendedUse`` has been introduced and specification text has been closely aligned with class diagram. |
-| `0.9`   | 25.04.2025  | Version with slightly updated data model and specification of notification system.  |
-| `1.0` | 25.01.2026 | Final Version. |
+| Version | Date       | Description                                          |
+|---------|------------|------------------------------------------------------|
+| `0.1`   | 2025-01-16 | Initial version for first discussions.               |
+| `0.2`   | 2025-02-10 | Version with first feedback integrated.              |
+| `0.3`   | 2025-03-09 | Version with more comments integrated.               |
+| `0.4`   | 2025-04-09 | Version with more comments integrated and separation of ``LegalEntity`` and ``Provider``. ``IntendedUse`` has been introduced and specification text has been closely aligned with class diagram.      |
+| `0.9`   | 2025-04-25 | Version with slightly updated data model and specification of notification system.  |
+| `1.0`   | 2026-01-25 | Final Version.                                       |
+| `1.0.1` | 2026-01-30 | Editorial update (licensing and reuse clarification) |
 
 
 ## 1. Introduction and Overview
