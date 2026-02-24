@@ -157,12 +157,34 @@ components:
           type: integer
         x5c:
           type: string
+    SupervisoryAuthority:
+      type: object
+      properties:
+        country:
+          type: string
+        email:
+          type: array
+          items:
+            type: string
+          minItems: 0
+        formURI:
+          type: array
+          items:
+            type: string
+          minItems: 0
+        name:
+          type: string
+        phone:
+          type: array
+          items:
+            type: string
+          minItems: 0
     WalletRelyingPartySchema:
       allOf:
         - $ref: '#/components/schemas/Provider'
         - type: object
           properties:
-            entitlement:
+            entitlements:
               type: array
               items:
                 type: string
@@ -185,7 +207,7 @@ components:
                 items:
                   $ref: '#/components/schemas/MultiLangString'
             supervisoryAuthority:
-              $ref: '#/components/schemas/LegalEntity'
+              $ref: '#/components/schemas/SupervisoryAuthority'
             supportURI:
               type: string
             tradeName:
