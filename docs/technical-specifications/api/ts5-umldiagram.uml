@@ -1,27 +1,27 @@
 @startuml
-skinparam classAttributeIconSize 0
-skinparam classStereotypeFontSize 8
 
-package "http://data.europa.eu/eudi/" {
+package "http://data.europa.eu/eudi/wrp/" {
   class WalletRelyingParty {
-    + entitlement: string[*]
-    + intendedUse: IntendedUse[*]
+    + tradeName: string [0..1]
+    + supportURI: string [1..*]
+    + srvDescription: MultiLangString [1..*]
+    + intendedUse: IntendedUse [1..*]
     + isPSB: boolean
-    + providesAttestations: Credential[*]
-    + srvDescription: MultiLangString[][*]
-    + supervisoryAuthority: LegalEntity
-    + supportURI: string
-    + tradeName: string
-    + usesIntermediary: WalletRelyingParty[*]
+    + entitlements: string [1..*]
+    + providesAttestations: ProvidedAttestation [0..*]
+    + supervisoryAuthority: SupervisoryAuthority
+    + registryURI: string
+    + usesIntermediary: WalletRelyingParty [0..*]
     + isIntermediary: boolean
   }
   WalletRelyingParty --|> Provider
 
   class Provider {
-    + policy: Policy[*]
-    + providerType: integer
-    + x5c: string
+    + policy: Policy [1..*]
+    + providerType: string
+    + x5c: string [0..*]
   }
+  Provider --|> LegalEntity
 
   class Policy {
     + policyURI: string
@@ -29,34 +29,38 @@ package "http://data.europa.eu/eudi/" {
   }
 
   class IntendedUse {
-    + purpose: MultiLangString[*]
-    + privacyPolicy: Policy[*]
+    + purpose: MultiLangString [1..*]
+    + privacyPolicy: Policy [1..*]
+    + intendedUseIdentifier : string
     + createdAt: string
     + revokedAt: string
-    + credential: Credential[*]
+    + credentials: Credential [1..*]
+  }
+
+  class ProvidedAttestation {
+    + format: string
+    + meta: string
   }
 
   class Credential {
     + format: string
     + meta: string
-    + claim: Claim[*]
+    + claims: Claim [1..*]
   }
 
   class Claim {
-    + path: string
-    + values: string
+    + path: non-empty array of strings, nulls and non-negative integers
   }
 
   class LegalEntity {
+    + identifier: Identifier [1..*]
+    + legalPerson: LegalPerson [0..1]
+    + naturalPerson: NaturalPerson [0..1]
+    + postalAddress: string [0..*]
     + country: string
-    + email: string[*]
-    + identifier: Identifier[*]
-    + infoURI: string[*]
-    + legalPerson: LegalEntity
-    + may_be: LegalPerson[*]
-    + naturalPerson: NaturalPerson
-    + phone: string[*]
-    + postalAddress: string[*]
+    + email: string [0..*]
+    + phone: string [0..*]
+    + infoURI: string [0..*]
   }
 
   class Identifier {
@@ -65,13 +69,13 @@ package "http://data.europa.eu/eudi/" {
   }
 
   class LegalPerson {
-    + establishedByLaw: Law[*]
-    + legalName: string[*]
+    + establishedByLaw: Law [0..*]
+    + legalName: string [1..*]
   }
 
   class Law {
-    + lang: string
-    + legalBasis: string
+    + legislativeIdentifier: string
+    + legalBasis: string [0..*]
   }
   
   class MultiLangString {
@@ -79,23 +83,34 @@ package "http://data.europa.eu/eudi/" {
     + content: string
   }
 
-  class NaturalPerson {
-    + dateOfBirth: string
-    + familyName: string
-    + givenName: string
-    + placeOfBirth: string
+   class SupervisoryAuthority {
+    + country: string
+    + name: string
+    + email: string [0..*]
+    + phone: string [0..*]
+    + formURI: string [0..*]
   }
 
-  WalletRelyingParty "0..*" -- "0..*" WalletRelyingParty : uses
-  intendedUse "1..*" -- "1..*" MultiLangString : purpose
-  IntendedUse "1..*" -- "1" Policy : privacyPolicy
-  IntendedUse "1..*" -- "1..*" Credential : credential
-  Credential "0..*" -- "0..*" Claim : claim
-  LegalEntity "0..1" -- "0..1" LegalEntity : legalPerson
-  LegalEntity "0..*" -- "0..*" Identifier : identifier
-  LegalEntity "0..*" -- "0..*" LegalPerson : may be
-  LegalEntity "0..1" -- "0..1" NaturalPerson : naturalPerson
-  LegalPerson "0..*" -- "0..*" Law : establishedByLaw
-  Provider "0..*" -- "0..*" Policy : policy
+  class NaturalPerson {
+    + familyName: string
+    + givenName: string
+    + dateOfBirth: string [0..1]
+    + placeOfBirth: string [0..1]
+  }
+
+  WalletRelyingParty -- SupervisoryAuthority : supervised by
+  WalletRelyingParty -- ProvidedAttestation : may provide
+  WalletRelyingParty -- WalletRelyingParty : may use intermediary
+  WalletRelyingParty -- IntendedUse : contains
+   WalletRelyingParty -- MultiLangString : srvDescription
+  IntendedUse -- MultiLangString : purpose
+  IntendedUse -- Policy : has 
+  IntendedUse -- Credential : contains
+  Credential  --  Claim : contains
+  LegalEntity --  Identifier : identified by
+  LegalEntity --  LegalPerson : may be
+  LegalEntity --  NaturalPerson : may be
+  LegalPerson -- Law : may be authentic source established by
+  Provider -- Policy : has
 }
 @enduml

@@ -4,10 +4,16 @@
             xmlns:tns="http://data.europa.eu/eudi/"
             elementFormDefault="qualified">
 
+    <xsd:complexType name="ProvidedAttestation">
+        <xsd:sequence>
+            <xsd:element name="format" type="xsd:string"/>
+            <xsd:element name="meta" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
     <xsd:complexType name="Claim">
         <xsd:sequence>
             <xsd:element name="path" type="xsd:string"/>
-            <xsd:element name="values" type="tns:ArrayOfString" minOccurs="0"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -15,7 +21,7 @@
         <xsd:sequence>
             <xsd:element name="format" type="xsd:string"/>
             <xsd:element name="meta" type="xsd:string"/>
-            <xsd:element name="claim" type="tns:ArrayOfClaim" minOccurs="0"/>
+            <xsd:element name="claims" type="tns:ArrayOfClaim" minOccurs="1"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -48,7 +54,7 @@
         <xsd:sequence>
             <xsd:element name="country" type="xsd:string"/>
             <xsd:element name="email" type="tns:ArrayOfString" minOccurs="0"/>
-            <xsd:element name="identifier" type="tns:ArrayOfIdentifier" minOccurs="0"/>
+            <xsd:element name="identifier" type="tns:ArrayOfIdentifier" minOccurs="1"/>
             <xsd:element name="infoURI" type="tns:ArrayOfString" minOccurs="0"/>
             <xsd:element name="legalPerson" type="tns:LegalEntity" minOccurs="0"/>
             <xsd:element name="may_be" type="tns:ArrayOfLegalPerson" minOccurs="0"/>
@@ -96,14 +102,24 @@
         </xsd:sequence>
     </xsd:complexType>
 
+    <xsd:complexType name="SupervisoryAuthority">
+        <xsd:sequence>
+            <xsd:element name="country" type="xsd:string"/>
+            <xsd:element name="email" type="tns:ArrayOfString" minOccurs="0"/>
+            <xsd:element name="formURI" type="tns:ArrayOfString" minOccurs="0"/>
+            <xsd:element name="name" type="xsd:string"/>
+            <xsd:element name="phone" type="tns:ArrayOfString" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
     <xsd:complexType name="WalletRelyingParty">
         <xsd:complexContent>
             <xsd:extension base="tns:Provider">
                 <xsd:sequence>
-                    <xsd:element name="entitlement" type="tns:ArrayOfString" minOccurs="1"/>
+                    <xsd:element name="entitlements" type="tns:ArrayOfString" minOccurs="1"/>
                     <xsd:element name="intendedUse" type="tns:ArrayOfIntendedUse" minOccurs="0"/>
                     <xsd:element name="isPSB" type="xsd:boolean" minOccurs="1"/>
-                    <xsd:element name="providesAttestations" type="tns:Credential" minOccurs="0"/>
+                    <xsd:element name="providesAttestations" type="tns:ArrayOfProvidedAttestation" minOccurs="0"/>
                     <xsd:element name="srvDescription" minOccurs="0">
                         <xsd:complexType>
                             <xsd:sequence>
@@ -117,7 +133,7 @@
                             </xsd:sequence>
                         </xsd:complexType>
                     </xsd:element>
-                    <xsd:element name="supervisoryAuthority" type="tns:LegalEntity" minOccurs="0"/>
+                    <xsd:element name="supervisoryAuthority" type="tns:SupervisoryAuthority" minOccurs="0"/>
                     <xsd:element name="supportURI" type="tns:ArrayOfString" minOccurs="1"/>
                     <xsd:element name="tradeName" type="xsd:string" minOccurs="0"/>
                     <xsd:element name="registryURI" type="xsd:string"/>
@@ -143,6 +159,12 @@
     <xsd:complexType name="ArrayOfClaim">
         <xsd:sequence>
             <xsd:element name="item" type="tns:Claim" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="ArrayOfProvidedAttestation">
+        <xsd:sequence>
+            <xsd:element name="item" type="tns:ProvidedAttestation" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
     </xsd:complexType>
 
