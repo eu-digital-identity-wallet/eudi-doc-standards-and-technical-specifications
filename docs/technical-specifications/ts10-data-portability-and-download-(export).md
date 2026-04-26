@@ -34,6 +34,8 @@ https://creativecommons.org/licenses/by/4.0/
 | `1.0`   | 2025-08-15  | Final version for release      |
 | `1.1`   | 2026-02-02  | Alignment with [TS12], adding non-device bound attestations handling, rework of pseudonym related aspects       |
 | `1.1.1` | 2026-02-11  | Editorial update (licensing and reuse clarification) |
+| `1.2`   | 2026-02-04  | Non-device bound attestations aspect fine tuning, data model and Migration Object minor updates,  editorial corrections       |
+
 
 ## 1 Introduction
 
@@ -48,8 +50,8 @@ The migration process has the following steps:
 - exporting and storing the migration object in a User preferred location, such as an external disk or a cloud storage (from locations supported by the Wallet Solution),
 - importing the migration object to a new Wallet Unit,
 - initiating the process of migration i.a. with use of the password to decrypt the file,  
-- (automatic) issuance to the new Wallet Unit of PID and all device-bound Attestations that were present in the old Wallet Unit (as listed in the migration object's list of credentials),
-- copying to the new Wallet Unit all non-device bound attestation,
+- (automatic) issuance to the new Wallet Unit of PID and all device-bound attestations that were present in the old Wallet Unit (as listed in the migration object's list of credentials),
+- copying to the new Wallet Unit all non-device-bound attestations,
 - restoring in the new Wallet Unit the transaction log (from the migration object's transaction log).
 
 Further details and requirements related to the migration process are presented in the ARF Annex 2 Topic 34.
@@ -96,9 +98,7 @@ As outlined in the above figure, it contains the following **main classes**:
 - **DPAReport**
 - **OtherTransaction**
 - **TransactionLog**
-- **TransactionLogObject**
 - **ListOfCredentials**
-- **MigrationObject**
 
 These classes are defined using the following **auxiliary classes**:
 
@@ -151,26 +151,24 @@ The `Presentation` class is used within the definition of [`Transaction`](#31-tr
 
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
-| `interactingPartyIdentifier`       | [1..1]       | *[Identifier](#3209-identifier-external)*       |   may be present in order to specify one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
+| `interactingPartyIdentifier`       | [1..1]       | *[Identifier](#3199-identifier-external)*       |   may be present in order to specify one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
 | `interactingPartyType`       | [1..1]       | *string*      |          specifies the **type** of the party interacting with a Wallet Unit in a transaction, where the following values are defined in the present document: <li>`ServiceProvider`</li> (*Note: despite in the general terms the interacting parties can be of various types such as PID Providers, QEAA Providers, Signature Service Providers etc, as specified in the [CIR for Relying Party Registration] Annex I point 12, to request a presentation all of them will act (and will have to be previously registered) as "service providers" (additionally), and will always request the presentation in this role.*)              |
-| `interactingPartyName`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     contains the **name** of the party interacting with a Wallet Unit in a transaction. The interacting party name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification].   |
+| `interactingPartyName`      | [1..1]       | *[MultiLangString](#31910-multilangstring-external)*      |     contains the **name** of the party interacting with a Wallet Unit in a transaction. The interacting party name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification].   |
 | `interactingPartyContact`      | [1..1]  |  Array of *string* objects      | contains an array with <li>`LegalEntity.country`</li> and at least one of the following attributes: <li>`LegalEntity.email`</li><li>`LegalEntity.phone`</li><li>`LegalEntity.infoURI`</li> as specified in [Provider information specification]. The contact details are primarily needed to enable the User to request deletion of the User's personal data obtained by the interacting party.      |  
 | `isIntermediary`    | [1..1]       | *boolean*      |       indicates whether the interacting party is an **intermediary** ('TRUE') or not ('FALSE').                            |
-| `intermediaryIdentifier`       | [0..1]       | *[Identifier](#3209-identifier-external)*       |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.  Not present if `isIntermediary` value is 'FALSE'.      |
-| `intermediaryName`      | [0..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     contains the **name** of the party interacting with a Wallet Unit in a transaction. The interacting party name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity </li> as specified in [Provider information specification]. Not present if `isIntermediary` value is 'FALSE'.   |
+| `intermediaryIdentifier`       | [0..1]       | *[Identifier](#3199-identifier-external)*       |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.  Not present if `isIntermediary` value is 'FALSE'.      |
+| `intermediaryName`      | [0..1]       | *[MultiLangString](#31910-multilangstring-external)*      |     contains the **name** of the party interacting with a Wallet Unit in a transaction. The interacting party name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity </li> as specified in [Provider information specification]. Not present if `isIntermediary` value is 'FALSE'.   |
 | `intermediaryContact`      | [0..1]  |  Array of *string* objects      | may contain an array with the following attributes: <li>`LegalEntity.country`</li><li>`LegalEntity.email`</li><li>`LegalEntity.phone`</li><li>`LegalEntity.infoURI`</li> as specified in [Provider information specification]. This attribute is present if such contact details are available. Not present if `isIntermediary` value is 'FALSE'.      |  
 | `registrarURL`    | [1..1]       | *string*      |       specifies a Unique Resource Locator (URL) with a **link to the registrar's on-line service**, where the registration information about the interacting party can be retrieved from.  If `isIntermediary` value is 'TRUE', this attribute refers to the intermediated Wallet-Relying Party.                           |
-| `purpose`       | [1..*]       |   [*MultiLangString*](#32010-multilangstring-external)    |        contains an array with one or more purposes of the intended data processing according to Article 5 1. (b) of (EU) 2016/679 as `IntendedUse.purpose` attribute specified in [Relying Party registration specification]. If `isIntermediary` value is 'TRUE', this attribute refers to the intermediated Wallet-Relying Party.                   |
-| `privacyPolicy`    | [1..*]       | *[Policy](#32011-policy-external)* |     specifies one or more purposes of the intended data processing according to Article 5 1. (b) of (EU) 2016/679, and equals to `IntendedUse.privacyPolicy` attribute specified in [Provider information specification], where `Policy.type` SHALL be of type Privacy Statement. If `isIntermediary` value is 'TRUE', this attribute refers to the intermediated Wallet-Relying Party.            |
-| `dpaName`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     specifies **name** of the competent data protection authority. If `isIntermediary` value is 'TRUE', this attribute refers to the intermediated Wallet-Relying Party.  |
-| `dpaCountry`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     specifies **country** of the competent data protection authority. If `isIntermediary` value is 'TRUE', this attribute refers to the intermediated Wallet-Relying Party.|
+| `purpose`       | [1..*]       |   [*MultiLangString*](#31910-multilangstring-external)    |        contains an array with one or more purposes of the intended data processing according to Article 5 1. (b) of (EU) 2016/679 as `IntendedUse.purpose` attribute specified in [Relying Party registration specification]. If `isIntermediary` value is 'TRUE', this attribute refers to the intermediated Wallet-Relying Party.                   |
+| `privacyPolicy`    | [1..*]       | *[Policy](#31911-policy-external)* |     specifies one or more purposes of the intended data processing according to Article 5 1. (b) of (EU) 2016/679, and equals to `IntendedUse.privacyPolicy` attribute specified in [Provider information specification], where `Policy.type` SHALL be of type Privacy Statement. If `isIntermediary` value is 'TRUE', this attribute refers to the intermediated Wallet-Relying Party.            |
+| `dpaName`      | [1..1]       | *[MultiLangString](#31910-multilangstring-external)*      |     specifies **name** of the competent data protection authority. If `isIntermediary` value is 'TRUE', this attribute refers to the intermediated Wallet-Relying Party.  |
+| `dpaCountry`      | [1..1]       | [*MultiLangString*](#31910-multilangstring-external)      |     specifies **country** of the competent data protection authority. If `isIntermediary` value is 'TRUE', this attribute refers to the intermediated Wallet-Relying Party.|
 | `dpaContact`      | [1..1]  |  Array of *string* objects      | contains an array with at least one of the contact details to the competent data protection authority, where the following attributes are possible: <li>`LegalEntity.email`</li><li>`LegalEntity.phone`</li><li>`LegalEntity.infoURI`</li> as specified in [Provider information specification]. `LegalEntity.infoURI` refers here an URL to a  webform for sending the report.  If `isIntermediary` value is 'TRUE', this attribute refers to the intermediated Wallet-Relying Party.     |  
-| `listOfClaimsRequested`      | [1..*]       | Array of [*ClaimInfo*](#3202-claiminfo) objects      | contains an array with information about all the claims (Wallet Unit User-related attributes) requested from the User's Wallet Unit by an interacting party.  |
-| `listOfClaimsPresented`      | [1..*]       | Array of [*ClaimInfo*](#3202-claiminfo) objects      | contains an array with information about all the claims (User-related attributes) presented by the User's Wallet Unit to an interacting party. (_Note: the User may choose to release only some of the requested attributes._)     |
-| `transactionalData`    | [0..1]       | [*TransactionalData*](#32012-transactionaldata)      |       contains **transactional data** transported in the presentation request, as specified in the attestation-related technical specification or rulebook; included if and only if the attestation type supports transactional data and where the transactional data was contained in the presentation request.              |
+| `listOfClaimsRequested`      | [1..*]       | Array of [*ClaimInfo*](#3192-claiminfo) objects      | contains an array with information about all the claims (Wallet Unit User-related attributes) requested from the User's Wallet Unit by an interacting party.  |
+| `listOfClaimsPresented`      | [1..*]       | Array of [*ClaimInfo*](#3192-claiminfo) objects      | contains an array with information about all the claims (User-related attributes) presented by the User's Wallet Unit to an interacting party. (*Note: the User may choose to release only some of the requested attributes.*)     |
+| `transactionalData`    | [0..1]       | [*TransactionalData*](#31912-transactionaldata)      |       contains **transactional data** transported in the presentation request, as specified in the attestation-related technical specification or rulebook; included if and only if the attestation type supports transactional data and where the transactional data was contained in the presentation request.              |
 | `reasonOfNoncompletion`    | [0..1]       | *string*      |       specifies the **reason of non completion** of a transaction; included if and only if `TransactionResult` value is `NotCompleted`.              |
-
-
 
 ### 3.3 W2WPresentationRequest
 
@@ -178,8 +176,8 @@ The `W2WPresentationRequest` class is used within the definition of [`Transactio
 
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
-| `listOfClaimsRequested`      | [1..*]       | Array of [*ClaimInfo*](#3202-claiminfo) objects      | contains an array with information about all the **claims (attributes) requested** from another Wallet Unit in the wallet-to-wallet presentation request.     |
-| `listOfClaimsPresented`      | [1..*]       | Array of [*ClaimInfo*](#3202-claiminfo) objects      | contains an array with information about all the **claims (attributes) presented** to the Wallet Unit following the wallet-to-wallet presentation request.|
+| `listOfClaimsRequested`      | [1..*]       | Array of [*ClaimInfo*](#3192-claiminfo) objects      | contains an array with information about all the **claims (attributes) requested** from another Wallet Unit in the wallet-to-wallet presentation request.     |
+| `listOfClaimsPresented`      | [1..*]       | Array of [*ClaimInfo*](#3192-claiminfo) objects      | contains an array with information about all the **claims (attributes) presented** to the Wallet Unit following the wallet-to-wallet presentation request.|
 
 ### 3.4 W2WPresentation
 
@@ -187,8 +185,8 @@ The `W2WPresentation` class is used within the definition of [`Transaction`](#31
 
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
-| `listOfClaimsRequested`      | [1..*]       | Array of [*ClaimInfo*](#3202-claiminfo) objects      | contains an array with information about all the **claims (attributes) requested** by requested by another Wallet Unit in the wallet-to-wallet presentation request.     |
-| `listOfClaimsPresented`      | [1..*]       | Array of [*ClaimInfo*](#3202-claiminfo) objects      | contains an array with information about all the **claims (attributes) presented** to another Wallet Unit following the wallet-to-wallet presentation request.|
+| `listOfClaimsRequested`      | [1..*]       | Array of [*ClaimInfo*](#3192-claiminfo) objects      | contains an array with information about all the **claims (attributes) requested** by requested by another Wallet Unit in the wallet-to-wallet presentation request.     |
+| `listOfClaimsPresented`      | [1..*]       | Array of [*ClaimInfo*](#3192-claiminfo) objects      | contains an array with information about all the **claims (attributes) presented** to another Wallet Unit following the wallet-to-wallet presentation request.|
 | `reasonOfNoncompletion`    | [0..1]       | *string*      |       specifies the **reason of non completion** of a transaction; included if and only if `TransactionResult` value is `NotCompleted`.                            |
 
 ### 3.5 CredentialIssuance
@@ -197,9 +195,9 @@ The `CredentialIssuance` class is used within the definition of [`Transaction`](
 
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
-| `interactingPartyIdentifier`       | [1..1]       | *[Identifier](#3209-identifier-external)*       |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
+| `interactingPartyIdentifier`       | [1..1]       | *[Identifier](#3199-identifier-external)*       |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
 | `interactingPartyType`       | [1..1]       | *string*      |          specifies the **type** of the party interacting with a Wallet Unit in the credential issuance transaction, where the following values are defined in the present document (following [CIR for Relying Party Registration] Annex I point 12): <li>`QEAAProvider`</li><li>`NonQEAAProvider`</li><li>`PubEEAProvider`</li><li>`PIDProvider`</li>             |
-| `interactingPartyName`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     contains the **name** of the issuer of the credentials in the issuance transaction. The issuer's name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification]. (*Note: In some Member States the name of the legal person may be given in more than one language, which necessitates use of *[MultiLangString](#32010-multilangstring-external)*  type of the class*).   |
+| `interactingPartyName`      | [1..1]       | *[MultiLangString](#31910-multilangstring-external)*      |     contains the **name** of the issuer of the credentials in the issuance transaction. The issuer's name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification]. (*Note: In some Member States the name of the legal person may be given in more than one language, which necessitates use of *[MultiLangString](#31910-multilangstring-external)*  type of the class*).   |
 | `interactingPartyContact`      | [1..1]  |  Array of *string* objects      | contains an array with <li>`LegalEntity.country`</li> and at least one of the following attributes: <li>`LegalEntity.email`</li><li>`LegalEntity.phone`</li><li>`LegalEntity.infoURI`</li> as specified in [Provider information specification].     |  
 | `credentialNumberRequested`      | [1..1]       | *integer*      |      contains the total number of the credentials requested for issuance.   |
 | `credentialNumberIssued`      | [1..1]       | *integer*      |      contains the total number of the credentials issued in the transaction.   |
@@ -213,8 +211,8 @@ The `CredentialDeletion` class is used within the definition of [`Transaction`](
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
 | `credentialIdentifier`      | [1..1]       | *string*       |    contains the **identifier of the credential** deleted by the User from the Wallet Unit in the deletion transaction, where the identifier values is equal to Verifiable Credential Type (`vct`) parameter value for [SD-JWT VC] format or Document Type (`docType`) parameter value for [ISO/IEC 18013-5] format.  |
-| `credentialIssuerIdentifier`       | [1..1]       | *[Identifier](#3209-identifier-external)*     |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
-| `credentialIssuerName`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     contains the **name** of the deleted credential's issuer name. The issuer's name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification].   |
+| `credentialIssuerIdentifier`       | [1..1]       | *[Identifier](#3199-identifier-external)*     |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
+| `credentialIssuerName`      | [1..1]       | *[MultiLangString](#31910-multilangstring-external)*      |     contains the **name** of the deleted credential's issuer name. The issuer's name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification].   |
 
 ### 3.7 PseudonymGeneration
 
@@ -222,7 +220,7 @@ The `PseudonymGeneration` class is used within the definition of [`Transaction`]
 
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
-| `pseudonym`      | [1..1]       | *[Pseudonym](#3203-pseudonym)*       |    contains the **pseudonym** of the User.   |
+| `pseudonym`      | [1..1]       | *[Pseudonym](#3193-pseudonym)*       |    contains the **pseudonym** of the User.   |
 
 ### 3.8 PseudonymDeletion
 
@@ -230,8 +228,7 @@ The `PseudonymDeletion` class is used within the definition of [`Transaction`](#
 
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
-| `pseudonym`      | [1..1]       | *[Pseudonym](#3203-pseudonym)*       |    contains the **pseudonym** of the User.   |
-
+| `pseudonym`      | [1..1]       | *[Pseudonym](#3193-pseudonym)*       |    contains the **pseudonym** of the User.   |
 
 ### 3.9 PseudonymousAuthentication
 
@@ -239,13 +236,11 @@ The `PseudonymousAuthentication` class is used within the definition of [`Transa
 
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
-| `interactingPartyIdentifier`       | [1..1]       | *[Identifier](#3209-identifier-external)*       |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
+| `interactingPartyIdentifier`       | [1..1]       | *[Identifier](#3199-identifier-external)*       |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
 | `interactingPartyType`       | [1..1]       | *string*      |          specifies the **type** of the party interacting with a Wallet Unit in a transaction, where the following values are defined in the present document: <li>`ServiceProvider`</li><li>`NaturalPerson`</li>               |
-| `interactingPartyName`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     contains the **name** of the party interacting with a Wallet Unit in a transaction. The interacting party name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification].   |
-| `pseudonym`      | [1..1]       | *[Pseudonym](#3203-pseudonym)*       |    contains the **pseudonym** of the User.   |
+| `interactingPartyName`      | [1..1]       | *[MultiLangString](#31910-multilangstring-external)*      |     contains the **name** of the party interacting with a Wallet Unit in a transaction. The interacting party name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification].   |
+| `pseudonym`      | [1..1]       | *[Pseudonym](#3193-pseudonym)*       |    contains the **pseudonym** of the User.   |
 | `reasonOfNoncompletion`    | [0..1]       | *string*      |       specifies the **reason of non completion** of a transaction; included if and only if `TransactionResult` value is `NotCompleted`.                            |
-
-
 
 ### 3.10 CertificateIssuance
 
@@ -253,9 +248,9 @@ The `CertificateIssuance` class is used within the definition of [`Transaction`]
 
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
-| `interactingPartyIdentifier`       | [1..1]       | *[Identifier](#3209-identifier-external)*     |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
+| `interactingPartyIdentifier`       | [1..1]       | *[Identifier](#3199-identifier-external)*     |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
 | `interactingPartyType`       | [1..1]       | *string*      |          specifies the **type** of the party interacting with a Wallet Unit in the certificate issuance transaction, where the following values are defined in the present document (following [CIR for Relying Party Registration] Annex I point 12): <li>`QCertForESealProvider`</li><li>`QCertForESigProvider`</li>             |
-| `interactingPartyName`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     contains the **name** of the party interacting with a Wallet Unit in a transaction. The interacting party name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification].   |
+| `interactingPartyName`      | [1..1]       | *[MultiLangString](#31910-multilangstring-external)*      |     contains the **name** of the party interacting with a Wallet Unit in a transaction. The interacting party name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification].   |
 | `interactingPartyContact`      | [1..1]  |  Array of *string* objects      | contains an array with <li>`LegalEntity.country`</li> and at least one of the following attributes: <li>`LegalEntity.email`</li><li>`LegalEntity.phone`</li><li>`LegalEntity.infoURI`</li>, as specified in [Provider information specification].     |  
 | `certificateIdentifier`      | [1..1]       | *string*      |     contains **identifier of the certificate** issued to the Wallet Unit in the issuance transaction, where its value is equal to `serialNumber` field value of the certificate as specified in [RFC 5280].   |
 
@@ -266,8 +261,8 @@ The `CertificateDeletion` class is used within the definition of [`Transaction`]
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
 | `certificateIdentifier`      | [1..1]       | *string*      |     contains **identifier of the certificate** that was deleted in the transaction, where its value is equal to `serialNumber` field value of the certificate as specified in [RFC 5280].    |
-| `certificateIssuerIdentifier`       | [1..1]       | *[Identifier](#3209-identifier-external)*     |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
-| `certificateIssuerName`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     contains the **name** of the party interacting with a Wallet Unit in a transaction. The interacting party name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification].   |
+| `certificateIssuerIdentifier`       | [1..1]       | *[Identifier](#3199-identifier-external)*     |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
+| `certificateIssuerName`      | [1..1]       | *[MultiLangString](#31910-multilangstring-external)*      |     contains the **name** of the party interacting with a Wallet Unit in a transaction. The interacting party name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification].   |
 
 ### 3.12 SigningSealing
 
@@ -275,10 +270,10 @@ The `SigningSealing` class is used within the definition of the [`Transaction`](
 
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
-| `interactingPartyIdentifier`       | [1..1]       | *[Identifier](#3209-identifier-external)*      |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.      |
+| `interactingPartyIdentifier`       | [1..1]       | *[Identifier](#3199-identifier-external)*      |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.      |
 | `interactingPartyType`       | [1..1]       | *string*      |          specifies the **type** of the party interacting with a Wallet Unit in a signing or sealing transaction, where the following values are defined in the present document (following [CIR for Relying Party Registration]): <li>`ESigESealCreationProvider`</li>              |
-| `interactingPartyName`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     contains the **name** of the party interacting with a Wallet Unit in a transaction. The interacting party name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity </li> as specified in [Provider information specification].   |
-| `interactingPartyContact`      | [1..1]  |  Array of *string* objects      | contains an array with <li>`LegalEntity.country`</li> and at least one of the following attributes: <li>`LegalEntity.email`</li><li>`LegalEntity.phone`</li><li>`LegalEntity.infoURI`</li>, as specified in [Provider information specification].     |   
+| `interactingPartyName`      | [1..1]       | *[MultiLangString](#31910-multilangstring-external)*      |     contains the **name** of the party interacting with a Wallet Unit in a transaction. The interacting party name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity </li> as specified in [Provider information specification].   |
+| `interactingPartyContact`      | [1..1]  |  Array of *string* objects      | contains an array with <li>`LegalEntity.country`</li> and at least one of the following attributes: <li>`LegalEntity.email`</li><li>`LegalEntity.phone`</li><li>`LegalEntity.infoURI`</li>, as specified in [Provider information specification].     |
 | `signingTransactionIdentifier`      | [1..1]       | *string*      |     specifies the **identifier of the signing or sealing** transaction processed by the Wallet Unit.   |
 | `certificateIdentifier`      | [1..1]       | *string*      |     contains **identifier of the certificate** used in the signing or sealing transaction processed by the Wallet Unit, where its value is equal to `serialNumber` field value of the certificate as specified in [RFC 5280].    |
 | `dtbsr`      | [1..1]       | *string*      |     contains **data to be signed representation** (DTBS/R) used in the signing or sealing transaction processed by the Wallet Unit.    |
@@ -292,9 +287,9 @@ The `DataDeletionRequest` class is used within the definition of the [`Transacti
 
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
-| `interactingPartyIdentifier`       | [1..1]       | *[Identifier](#3209-identifier-external)*      |   specifies one or more identifiers of the legal entity (being a Wallet-Relying Party), as stated in an official record together with the identification data of that official record, if applicable.      |
-| `interactingPartyName`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     contains the **name** of the interacting party, being a Wallet-Relying Party and a subject of the data deletion request. The interacting party name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity </li> as specified in [Provider information specification].   |
-| `listOfClaims`      | [1..*]       | Array of [*ClaimInfo*](#3202-claiminfo) objects      | contains an array with information about all the claims (User-related attributes) in possession of an interacting party (a Wallet-Relying Party) and to be deleted by this party.    |
+| `interactingPartyIdentifier`       | [1..1]       | *[Identifier](#3199-identifier-external)*      |   specifies one or more identifiers of the legal entity (being a Wallet-Relying Party), as stated in an official record together with the identification data of that official record, if applicable.      |
+| `interactingPartyName`      | [1..1]       | *[MultiLangString](#31910-multilangstring-external)*      |     contains the **name** of the interacting party, being a Wallet-Relying Party and a subject of the data deletion request. The interacting party name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity </li> as specified in [Provider information specification].   |
+| `listOfClaims`      | [1..*]       | Array of [*ClaimInfo*](#3192-claiminfo) objects      | contains an array with information about all the claims (User-related attributes) in possession of an interacting party (a Wallet-Relying Party) and to be deleted by this party.    |
 
 ### 3.14 DPAReport
 
@@ -302,9 +297,8 @@ The `DPAReport` class is used within the definition of the [`Transaction`](#31-t
 
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
-| `dpaName`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     specifies **name** of the data protection authority to which the report was sent.   |
-| `dpaCountry`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     specifies **country** of the data protection authority to which the report was sent. |
-
+| `dpaName`      | [1..1]       | *[MultiLangString](#31910-multilangstring-external)*      |     specifies **name** of the data protection authority to which the report was sent.   |
+| `dpaCountry`      | [1..1]       | *[MultiLangString](#31910-multilangstring-external)*      |     specifies **country** of the data protection authority to which the report was sent. |
 
 ### 3.15 OtherTransaction
 
@@ -316,48 +310,43 @@ The `OtherTransaction` class is used within the definition of the [`Transaction`
 
 ### 3.16 TransactionLog
 
-The `TransactionLog` object is an array containing zero or more `Transaction` objects. In some cases it may be empty (if no transactions have been done yet or the log was erased).
+The `TransactionLog` class is an array containing zero or more `Transaction` objects. In some cases it may be empty (if no transactions have been done yet or the log was erased).
+
+A Wallet Unit can export the `TransactionLog` in JSON Web Encryption format as a Transaction Log Object, as specified in [Section 4.1](#41-transaction-log-object-structure).
 
 
-### 3.17 TransactionLogObject
+### 3.17 ListOfCredentials
 
-The `TransactionLogObject` object is file that contains the `TransactionLog` object. The structure and coding of `TransactionLogObject` as the exportable file is specified in Section 4.1.
+The `ListOfCredentials` class contains zero or more `CredentialInfo` objects. In some cases it may be empty (if no attestations are present in the Wallet Unit).
 
+### 3.18 MigrationData
 
-### 3.18 ListOfCredentials
-
-The `ListOfCredentials` object is a file that contains zero or more `CredentialInfo` objects. In some cases it may be empty (if no attestations are present in the Wallet Unit).
-
-
-### 3.19 MigrationObject
-
-The `MigrationObject` object is a file, that contains: the transaction log and the list of credentials (attesatation). The structure and coding of `MigrationObject` as the  exportable file is specified in Section 4.2.
-
+The `MigrationData` class contains the following objects:
 
 | Attribute          | Multiplicity | Type | Description |
 |--------------------|--------------|------|-------------|
-| `transactionLog`      | [1..1]       | [TransactionLog](#316-transactionlog)      |       contains the current transaction log of the Wallet Unit.    |
+| `transactionLog`   | [1..1]       | [TransactionLog](#316-transactionlog)      |       contains the current transaction log of the Wallet Unit.    |
 | `listOfCredentials`      | [1..1]       | [ListOfCredentials](#318-listofcredentials)      |       contains the current list of all device-bound credentials (attestations) present in the Wallet Unit.    |
-| 'nonDeviceBoundCredentials' | [1..1] | Array of attestation objects | Contains an array including all non-device-bound attestations currently present in the Wallet Unit; format of each entry in the array SHALL be identical to 'credential' object as received by the Wallet Unit from a Credential Issuer in a Credential Response according to section 8.3 of [OpenID4VCI]. The Wallet Unit SHALL NOT include any 'credential' objects representing device-bound credentials in the array. |
+| `nonDeviceBoundCredentials` | [1..1] | Array of [NonDeviceBoundCredential](#31913-nondeviceboundcredential) | Contains all the non-device-bound credentials (attestations) currently present in the Wallet Unit. |
 
+A Wallet Unit can export the `MigrationData` in JSON Web Encryption format as a Migration Object, as specified in [Section 4.2](#42-migration-object-structure).
 
-### 3.20 Auxiliary classes
+### 3.19 Auxiliary classes
 
-#### 3.20.1 CredentialInfo
+#### 3.19.1 CredentialInfo
 
-The `CredentialInfo` class represents the set of data related to a credential, that is necessary to create `ListOfCredentials` in the `MigrationObject` object. It inherits all attributes from the (external) `Credential` class. In addition it contains the attributes specified in the following table:
+The `CredentialInfo` class represents the set of data related to a credential, that is necessary to create `ListOfCredentials` for the `MigrationData` class. It inherits all attributes from the (external) `Credential` class. In addition it contains the attributes specified in the following table:
 
 | Attribute                 | Multiplicity | Type | Description |
 |---------------------------|--------------|------|-------------|
 | `credentialIdentifier`    | [1..1]       | *string*     | contains  an **identifier of the credential** (attestation), where its value equals to Verifiable Credential Type (`vct`) parameter value for [SD-JWT VC] format or Document Type (`docType`) parameter value for [ISO/IEC 18013-5] format.  |
 | `format`                  | [1..1]       | *string*               | specifies the format of the attestation, where the following values are defined in the present document:  <li>`jwt_vc_json` for the format conformant to W3C VCDM 1.1, signed as a JWT, not using JSON-LD 							(according to Appendix B.1.3.1 of [OpenID4VP])</li><li>`ldp_vc` for the format conformant to W3C VCDM 1.1, that is secured using Data Integrity, using JSON-LD (according to Appendix B.1.3.2 of [OpenID4VP])</li><li>`mso_mdoc`for the format conformant to mdoc format i.e. complying with [ISO/IEC 18013-5]												(according to Appendix B.2 of [OpenID4VP]) </li><li>`dc+sd-jwt` for the format conformant to [SD-JWT VC]	(according to Appendix B.3.1 of [OpenID4VP])</li> |
-| `issuerIdentifier`       | [1..*]       | *[Identifier](#3209-identifier-external)*      |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
+| `issuerIdentifier`       | [1..*]       | *[Identifier](#3199-identifier-external)*      |   specifies one or more identifiers of the legal entity, as stated in an official record together with the identification data of that official record, if applicable.       |
 | `issuerType`       | [1..1]       | *string*      |          specifies the **type** of the issuer, where the following values are defined in the present document (following [CIR for Relying Party Registration] Annex I point 12, plus additional ones): <li>`QEAAProvider`</li><li>`NonQEAAProvider`</li><li>`PubEEAProvider`</li><li>`PIDProvider`</li>             |
-| `issuerName`      | [1..1]       | *[MultiLangString](#32010-multilangstring-external)*      |     contains the **name** of the issuer. The issuer name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification].    |
+| `issuerName`      | [1..1]       | *[MultiLangString](#31910-multilangstring-external)*      |     contains the **name** of the issuer. The issuer name may be: <li>`LegalPerson.legalName` for the legal person type of the legal entity, or </li><li>`NaturalPerson.givenName` + `NaturalPerson.familyName` for the natural person type of the legal entity</li> as specified in [Provider information specification].    |
 | `supplyPointURL`      | [1..1]       | *string*      |     specifies a Unique Resource Locator (URL) with a **link to the issuer's on-line service**, at which a Wallet Unit can start the process of requesting and obtaining a PID or Attestation.    |
 
-
-#### 3.20.2 ClaimInfo
+#### 3.19.2 ClaimInfo
 
 The `ClaimInfo` class represents the set of data related to a claim (a User-related attribute). It contains the attributes specified in the following table:
 
@@ -366,7 +355,7 @@ The `ClaimInfo` class represents the set of data related to a claim (a User-rela
 | `credentialIdentifier`    | [1..1]       | *string*     | contains  an **identifier of the credential** (attestation),  where its value equals to Verifiable Credential Type (`vct`) value for [SD-JWT VC] format or Document Type (`docType`) value for [ISO/IEC 18013-5] format.  |
 | `claims`    | [1..*]       | Array of *string* objects     | contains an array of path pointers that specifies the paths to the claims within the credential (see [OpenID4VP] Sections 7). |
 
-#### 3.20.3 Pseudonym
+#### 3.19.3 Pseudonym
 
 The `Pseudonym` class represents the set of data related to User's pseudonym. It contains the attributes specified in the following table:
 
@@ -375,60 +364,65 @@ The `Pseudonym` class represents the set of data related to User's pseudonym. It
 | `value`      | [1..1]       | *string*       |    contains the **value** of the pseudonym, which may be a public key of the asymmetric key pair generated by the Wallet Unit for this purpose.    |
 | `alias`      | [0..1]       | *string*       |    may contain the User-friendly **alias**  of the pseudonym, set by the User. This attribute is optional.  |
 
-#### 3.20.4 Credential (external)
+#### 3.19.4 Credential (external)
 
 The `Credential` class contains the attributes specified in [Relying Party registration specification].
 
-#### 3.20.5 LegalEntity (external)
+#### 3.19.5 LegalEntity (external)
 
 The `LegalEntity` class contains the attributes specified in [Provider information specification].
 
-#### 3.20.6 LegalPerson (external)
+#### 3.19.6 LegalPerson (external)
 
 The `LegalPerson` class is used within the definition of the LegalEntity class and allows to specify the attributes of a legal person. It contains the attributes specified in the [Provider information specification].
 
-#### 3.20.7 NaturalPerson (external)
+#### 3.19.7 NaturalPerson (external)
 
 The `NaturalPerson` class is used within the definition of the LegalEntity class and allows to specify the attributes of a natural person (acting as a legal entity). It contains the attributes specified in the [Provider information specification].
 
-#### 3.20.8 IntendedUse (external)
+#### 3.19.8 IntendedUse (external)
 
 The `IntendedUse` class contains the attributes specified in the [Relying Party registration specification].
 
-#### 3.20.9 Identifier (external)
+#### 3.19.9 Identifier (external)
 
 The `Identifier` class contains the attributes specified in [Provider information specification].
 
-#### 3.20.10 MultiLangString (external)
+#### 3.19.10 MultiLangString (external)
 
 The `MultiLangString` class contains the attributes specified in the [Relying Party registration specification].
 
-#### 3.20.11 Policy (external)
+#### 3.19.11 Policy (external)
 
 The `Policy` class contains the attributes specified in the [Provider information specification].
 
-#### 3.20.12 TransactionalData 
+#### 3.19.12 TransactionalData
 
 The `TransactionalData` class represents data of an external transaction (such as payment authentication or signature activation), that is contained within a presentation request (for instance in `transaction_data` parameter as specified in  [OID4VP]). It contains one or more attributes specified in a technical specification or rulebook related to the attestation type at stake.
+(*Note: For instance, for payment authentication the content of `TransactionalData` is specified in [TS12].*)
 
-_Note: For instance, for payment authentication `TransactionalData` content is specified in [TS12]._
+#### 3.19.13 NonDeviceBoundCredential
 
+The `NonDeviceBoundCredential` class represents a non-device-bound attestation.  It contains the attributes specified in the following table:
 
-### 4 Structures
+| Attribute                 | Multiplicity | Type | Description |
+|---------------------------|--------------|------|-------------|
+| `format`    | [1..1]       | *string*     | contains a **format of the credential** (attestation),  where the value is as `CredentialInfo.format`, see [Section 3.19.1](#3191-credentialinfo).  |
+| `credential`    | [1..1]       | *string*     | contains a full value of a credential, identical to the `credential` object as defined in [OpenID4VCI], as received by the Wallet Unit from a Credential Issuer in a Credential Response according to section 8.3 of [OpenID4VCI].  |
 
-#### 4.1 Transaction Log Object Structure
+## 4 Structures
 
-The `TransactionLogObject` exportable object is composed from the transaction log entries of various types. It can be exported from the Wallet Unit and stored in an external location. It contains an array with transaction log entries. A single transaction log entry is a JSON-encoded `Transaction` object with key/value elements of the corresponding data types for a given transaction type, as defined in Sections 3.2 to 3.15. 
+### 4.1 Transaction Log Object Structure
 
-The `TransactionLogObject` object SHALL be in [JWE] format; the corresponding [JWE] ciphertext object SHALL be encoded as a [JSON] object. The encryption process and mandatory algorithms for [JWE] encryption are defined in Section 5.
+The Transaction Log Object is an exportable object in JSON Web Encryption format, containing a `TransactionLog` array. It can be exported from the Wallet Unit and stored in an external location. It contains an array with transaction log entries. A single transaction log entry is a JSON-encoded `Transaction` object with key/value elements of the corresponding data types for a given transaction type, as defined in Sections 3.2 to 3.15.
+
+The Wallet Unit SHALL export the Transaction Log Object in [JWE] format. The encryption process and mandatory algorithms for [JWE] encryption are defined in Section 5.
   
-
-The following is a non-normative example of the `TransactionLogObject` object:
+The following is a non-normative example of the `TransactionLog` array before encryption:
 
 ```
-{
-  "transactionLogObject": [  
-    {
+"TransactionLog": [  
+   {
       "interactingPartyIdentifier": {
           "type": "http://data.europa.eu/eudi/id/EUID",
           "identifier": "PLKRS.0000123456"
@@ -517,27 +511,23 @@ The following is a non-normative example of the `TransactionLogObject` object:
       "reasonOfNoncompletion": "session interrupted"
     }
   ]
-}
-```
-
-#### 4.2 Migration Object Structure
-
-The `MigrationObject` exportable object contains:
-- `TransactionLogObject`
-- `ListOfCredentials`,
-- all non-device bound attestations files. 
-
-It can be exported from the Wallet Unit and stored in an external location. The `TransactionLogObject` object's structure and coding are defined in Section 4.1.
-
-The `ListOfCredentials` object is composed from the credential-related information entries. It contains an array with `CredentialInfo` objects, containing selected information on each device-bound credential (attestation) present in the Wallet Unit. A single credential entry is a JSON-encoded `CredentialInfo` object with key/value elements as defined in Section 3.20.1.  
-
-The `MigrationObject` object SHALL be in [JWE] format; the corresponding [JWE] ciphertext is composed of the `TransactionLog` and `ListOfCredentials` objects, both encoded as [JSON] objects. The encryption process and mandatory algorithms for [JWE] encryption are defined in Section 5.
-
-The following is a non-normative example of the `ListOfCredentials` object:
 
 ```
+
+### 4.2 Migration Object Structure
+
+The Migration Object is a file containing `MigrationData` object. It can be exported from the Wallet Unit and stored in an external location.
+
+The Wallet Unit SHALL export the Migration Object object in [JWE] format. The encryption process and mandatory algorithms for [JWE] encryption are defined in [Section 5](#5-encryption).
+
+The following is a non-normative example of the `MigrationData` object before encryption: 
+(_Note: In this example, the value of "transactionLog" is identical to the example in [Section 4.1](#41-transaction-log-object-structure)_)
+
+```
+MigrationData:
 {
-  "listOfCredentials":[
+  "transactionLog" : [...],
+  "listOfCredentials": [
     {
       "credentialIdentifier": "urn:eudi:pid:de:1",
       "format": "jwt_vc_json",
@@ -560,16 +550,26 @@ The following is a non-normative example of the `ListOfCredentials` object:
       "issuerType": "EAAProvider",
       "supplyPointURL": "https://www.superbank.com/supplypoint/"
     }
+  ],
+  "nonDeviceBoundCredentials":[
+    {
+      "format": "mso_mdoc",
+      "credential": "omppc3N1ZXJBdXRohEOhASahG...ArQwggKwMIICVqADAgEC"
+    },
+    {
+      "format": "dc+sd-jwt",
+      "credential": "eyJhbGciOiAiRVMyNTYiLCAi...92ZXJfNjUiLCB0cnVlXQ~"
+    }
   ]
 }
 ```
 
-### 5 Encryption
+## 5 Encryption
 
 The Wallet Unit SHALL use the following algorithms for [JWE] objects encryption:
 
-* [PBES2-HS256+A128KW](https://www.rfc-editor.org/rfc/rfc7518.html#section-4.8), as specified in [JWA] and [PKCS#5] - to derive the key encryption key from the User's password/passphrase and encrypt the content encryption key,
-* [A128GCM](https://www.rfc-editor.org/rfc/rfc7518.html#section-5.3), as specified in [JWA] - for the content encryption with the content encryption key.
+- [PBES2-HS256+A128KW](https://www.rfc-editor.org/rfc/rfc7518.html#section-4.8), as specified in [JWA] and [PKCS#5] - to derive the key encryption key from the User's password/passphrase and encrypt the content encryption key,
+- [A128GCM](https://www.rfc-editor.org/rfc/rfc7518.html#section-5.3), as specified in [JWA] - for the content encryption with the content encryption key.
 
 The encryption process is visualised in the diagram below:
 
