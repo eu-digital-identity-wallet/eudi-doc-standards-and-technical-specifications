@@ -1,0 +1,137 @@
+classDiagram
+    subgraph http://data.europa.eu/eudi/wrp/
+        class WalletRelyingParty {
+            +string tradeName [0..1]
+            +boolean isPSB
+            +SupervisoryAuthority supervisoryAuthority
+            +string registryURI
+            +WalletRelyingPartyService walletRelyingPartyService
+        }
+
+        class WalletRelyingPartyService {
+            +string serviceTradeName [1..1]
+            +string serviceIdentifier [1..1]
+            +string supportURI [1..*]
+            +MultiLangString srvDescription [1..*]
+            +IntendedUse intendedUse [0..*]
+            +string entitlements [0..*]
+            +ProvidedAttestation providesAttestations [0..*]
+            +WalletRelyingPartyService usesIntermediary [0..*]
+            +boolean isIntermediary
+        }
+
+        class Provider {
+            +Policy policy [1..*]
+            +string providerType
+            +string x5c [0..*]
+        }
+
+        class Policy {
+            +string policyURI
+            +string type
+        }
+
+        class IntendedUse {
+            +MultiLangString purpose [1..*]
+            +Policy privacyPolicy [1..*]
+            +string intendedUseIdentifier
+            +string createdAt
+            +string revokedAt
+            +Credential credentials [1..*]
+        }
+
+        class ProvidedAttestation {
+            +string format
+            +MetaType meta
+        }
+
+        class Credential {
+            +string format
+            +MetaType meta
+            +Claim claims [1..*]
+        }
+
+        class Claim {
+            +string path_description
+        }
+
+        class LegalEntity {
+            +Identifier identifier [1..*]
+            +LegalPerson legalPerson [0..1]
+            +NaturalPerson naturalPerson [0..1]
+            +string postalAddress [0..*]
+            +string country
+            +string email [0..*]
+            +string phone [0..*]
+            +string infoURI [0..*]
+        }
+
+        class Identifier {
+            +string identifier
+            +string type
+        }
+
+        class LegalPerson {
+            +Law establishedByLaw [0..*]
+            +string legalName [1..*]
+        }
+
+        class Law {
+            +string legislativeIdentifier
+            +string legalBasis [0..*]
+        }
+
+        class MultiLangString {
+            +string lang
+            +string content
+        }
+
+        class MetaType {
+            <<abstract>>
+        }
+
+        class DcSdJwtMeta {
+            +List~String~ vct_values
+        }
+
+        class MsoMdocMeta {
+            +String doctype_value
+        }
+
+        class SupervisoryAuthority {
+            +string country
+            +string name
+            +string email [0..*]
+            +string phone [0..*]
+            +string formURI [0..*]
+        }
+
+        class NaturalPerson {
+            +string familyName
+            +string givenName
+            +string dateOfBirth [0..1]
+            +string placeOfBirth [0..1]
+        }
+    end
+
+    WalletRelyingParty --|> Provider : inherits
+    Provider --|> LegalEntity : inherits
+    WalletRelyingParty -- SupervisoryAuthority : supervised by
+    WalletRelyingParty -- WalletRelyingPartyService : has at least one
+    WalletRelyingPartyService -- ProvidedAttestation : may provide
+    WalletRelyingPartyService -- WalletRelyingPartyService : may use intermediary
+    WalletRelyingPartyService -- IntendedUse : contains
+    WalletRelyingPartyService -- MultiLangString : srvDescription
+    IntendedUse -- MultiLangString : purpose
+    IntendedUse -- Policy : has
+    IntendedUse -- Credential : contains
+    Credential -- Claim : contains
+    Credential -- MetaType : contains
+    LegalEntity -- Identifier : identified by
+    LegalEntity -- LegalPerson : may be
+    LegalEntity -- NaturalPerson : may be
+    LegalPerson -- Law : established by
+    ProvidedAttestation -- MetaType : contains
+    Provider -- Policy : has
+    MetaType <|-- DcSdJwtMeta : inheritance
+    MetaType <|-- MsoMdocMeta : inheritance

@@ -6,8 +6,7 @@
 
     <xsd:complexType name="ProvidedAttestation">
         <xsd:sequence>
-            <xsd:element name="format" type="xsd:string"/>
-            <xsd:element name="meta" type="xsd:string"/>
+            <xsd:element name="meta" type="tns:MetaType" minOccurs="1"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -19,8 +18,7 @@
 
     <xsd:complexType name="Credential">
         <xsd:sequence>
-            <xsd:element name="format" type="xsd:string"/>
-            <xsd:element name="meta" type="xsd:string"/>
+            <xsd:element name="meta" type="tns:MetaType" minOccurs="1"/>
             <xsd:element name="claims" type="tns:ArrayOfClaim" minOccurs="1"/>
         </xsd:sequence>
     </xsd:complexType>
@@ -71,6 +69,25 @@
         </xsd:sequence>
     </xsd:complexType>
     
+    <xsd:complexType name="MetaType">
+      <xsd:choice>
+         <xsd:element name="mso_mdoc">
+            <xsd:complexType>
+               <xsd:sequence>
+                  <xsd:element name="doctype_value" type="xs:string"/>
+               </xsd:sequence>
+            </xsd:complexType>
+         </xsd:element>
+         <xsd:element name="dc_sd_jwt">
+            <xsd:complexType>
+               <xsd:sequence>
+                  <xsd:element name="vct_value" type="xs:string" maxOccurs="unbounded"/>
+               </xsd:sequence>
+            </xsd:complexType>
+         </xsd:element> 
+      </xsd:choice>
+</xs:complexType>
+
     <xsd:complexType name="MultiLangString">
         <xsd:sequence>
             <xsd:element name="lang" type="xsd:string"/>
@@ -112,33 +129,41 @@
         </xsd:sequence>
     </xsd:complexType>
 
+    <xsd:complexType name="WalletRelyingPartyService">
+        <xsd:sequence>
+            <xsd:element name="entitlements" type="tns:ArrayOfString" minOccurs="0"/>
+            <xsd:element name="intendedUse" type="tns:ArrayOfIntendedUse" minOccurs="0"/>
+            <xsd:element name="providesAttestations" type="tns:ArrayOfProvidedAttestation" minOccurs="0"/>
+            <xsd:element name="srvDescription" minOccurs="1">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="descriptionSet" minOccurs="0" maxOccurs="unbounded">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="localizedString" type="tns:MultiLangString" minOccurs="1" maxOccurs="unbounded"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="supportURI" type="tns:ArrayOfString" minOccurs="1"/>
+            <xsd:element name="serviceIdentifier" type="xsd:string" minOccurs="1"/>
+            <xsd:element name="serviceTradeName" type="xsd:string" minOccurs="1"/>
+            <xsd:element name="usesIntermediary" type="tns:ArrayOfWalletRelyingPartyService" minOccurs="0"/>
+            <xsd:element name="isIntermediary" type="xsd:boolean" minOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
     <xsd:complexType name="WalletRelyingParty">
         <xsd:complexContent>
             <xsd:extension base="tns:Provider">
                 <xsd:sequence>
-                    <xsd:element name="entitlements" type="tns:ArrayOfString" minOccurs="1"/>
-                    <xsd:element name="intendedUse" type="tns:ArrayOfIntendedUse" minOccurs="0"/>
                     <xsd:element name="isPSB" type="xsd:boolean" minOccurs="1"/>
-                    <xsd:element name="providesAttestations" type="tns:ArrayOfProvidedAttestation" minOccurs="0"/>
-                    <xsd:element name="srvDescription" minOccurs="0">
-                        <xsd:complexType>
-                            <xsd:sequence>
-                                <xsd:element name="descriptionSet" minOccurs="0" maxOccurs="unbounded">
-                                    <xsd:complexType>
-                                        <xsd:sequence>
-                                            <xsd:element name="localizedString" type="tns:MultiLangString" minOccurs="1" maxOccurs="unbounded"/>
-                                        </xsd:sequence>
-                                    </xsd:complexType>
-                                </xsd:element>
-                            </xsd:sequence>
-                        </xsd:complexType>
-                    </xsd:element>
                     <xsd:element name="supervisoryAuthority" type="tns:SupervisoryAuthority" minOccurs="0"/>
-                    <xsd:element name="supportURI" type="tns:ArrayOfString" minOccurs="1"/>
                     <xsd:element name="tradeName" type="xsd:string" minOccurs="0"/>
                     <xsd:element name="registryURI" type="xsd:string"/>
-                    <xsd:element name="usesIntermediary" type="tns:ArrayOfWalletRelyingParty" minOccurs="0"/>
-                    <xsd:element name="isIntermediary" type="xsd:boolean" minOccurs="1"/>
+                    <xsd:element name="walletRelyingPartyService" type="tns:ArrayOfWalletRelyingPartyService" minOccurs="1"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
@@ -207,6 +232,12 @@
     <xsd:complexType name="ArrayOfWalletRelyingParty">
         <xsd:sequence>
             <xsd:element name="item" type="tns:WalletRelyingParty" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="ArrayOfWalletRelyingPartyService">
+        <xsd:sequence>
+            <xsd:element name="item" type="tns:WalletRelyingPartyService" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
     </xsd:complexType>
 

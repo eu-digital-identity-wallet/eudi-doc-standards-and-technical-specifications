@@ -3,19 +3,24 @@
 package "http://data.europa.eu/eudi/wrp/" {
   class WalletRelyingParty {
     + tradeName: string [0..1]
-    + supportURI: string [1..*]
-    + srvDescription: MultiLangString [1..*]
-    + intendedUse: IntendedUse [1..*]
     + isPSB: boolean
-    + entitlements: string [1..*]
-    + providesAttestations: ProvidedAttestation [0..*]
     + supervisoryAuthority: SupervisoryAuthority
     + registryURI: string
-    + usesIntermediary: WalletRelyingParty [0..*]
-    + isIntermediary: boolean
+    + walletRelyingPartyService: WalletRelyingPartyService [1..*]
   }
   WalletRelyingParty --|> Provider
 
+class WalletRelyingPartyService {
+    + serviceTradeName: string [1..1]
+    + serviceIdentifier: string [1..1]
+    + supportURI: string [1..*]
+    + srvDescription: MultiLangString [1..*]
+    + intendedUse: IntendedUse [0..*]
+    + entitlements: string [0..*]
+    + providesAttestations: ProvidedAttestation [0..*]
+    + usesIntermediary: WalletRelyingPartyService [0..*]
+    + isIntermediary: boolean
+  }
   class Provider {
     + policy: Policy [1..*]
     + providerType: string
@@ -49,7 +54,7 @@ package "http://data.europa.eu/eudi/wrp/" {
   }
 
   class Claim {
-    + path: non-empty array of strings, nulls and non-negative integers
+    + path: "non-empty array of strings, nulls and non-negative integers"
   }
 
   class LegalEntity {
@@ -83,7 +88,7 @@ package "http://data.europa.eu/eudi/wrp/" {
     + content: string
   }
 
-   class SupervisoryAuthority {
+  class SupervisoryAuthority {
     + country: string
     + name: string
     + email: string [0..*]
@@ -99,17 +104,18 @@ package "http://data.europa.eu/eudi/wrp/" {
   }
 
   WalletRelyingParty -- SupervisoryAuthority : supervised by
-  WalletRelyingParty -- ProvidedAttestation : may provide
-  WalletRelyingParty -- WalletRelyingParty : may use intermediary
-  WalletRelyingParty -- IntendedUse : contains
-   WalletRelyingParty -- MultiLangString : srvDescription
+  WalletRelyingParty -- walletRelyingPartyService : has at least one
+  WalletRelyingPartyService -- ProvidedAttestation : may provide
+  WalletRelyingPartyService -- WalletRelyingPartyService : may use intermediary
+  WalletRelyingPartyService -- IntendedUse : contains
+  WalletRelyingPartyService -- MultiLangString : srvDescription
   IntendedUse -- MultiLangString : purpose
-  IntendedUse -- Policy : has 
+  IntendedUse -- Policy : has
   IntendedUse -- Credential : contains
-  Credential  --  Claim : contains
-  LegalEntity --  Identifier : identified by
-  LegalEntity --  LegalPerson : may be
-  LegalEntity --  NaturalPerson : may be
+  Credential -- Claim : contains
+  LegalEntity -- Identifier : identified by
+  LegalEntity -- LegalPerson : may be
+  LegalEntity -- NaturalPerson : may be
   LegalPerson -- Law : may be authentic source established by
   Provider -- Policy : has
 }
