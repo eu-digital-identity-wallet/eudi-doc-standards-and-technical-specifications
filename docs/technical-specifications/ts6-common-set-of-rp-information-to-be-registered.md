@@ -24,15 +24,16 @@ https://creativecommons.org/licenses/by/4.0/
 
 ## Versioning
 
-| Version | Date       | Description |
-|---------|------------|------------------------|
-| `0.1`   | 2025-04-25 | Initial version for first discussion  |
-| `0.2`   | 2025-05-12 | Updated version from first commenting round |
-| `0.3`   | 2025-05-23 | Updated version from second focus group meeting |
-| `1.0`   | 2025-06-13 | Final version after the Coordination Group review period |
-| `1.0.1` | 2026-01-30 | Editorial update (licensing and reuse clarification) |
-| `1.1`   | 2026-06-10 | Updated version as outcome of topic refinement round |
-| `1.2`  | 2026-08-02 | Update to align with changes introduced by CIR (EU) 2026/1730 |
+| Version | Date        | Description |
+|---------|-------------|------------------------|
+| `0.1`   | 2025-04-25  | Initial version for first discussion  |
+| `0.2`   | 2025-05-12  | Updated version from first commenting round |
+| `0.3`   | 2025-05-23  | Updated version from second focus group meeting |
+| `1.0`   | 2025-06-13  | Final version after the Coordination Group review period |
+| `1.0.1` | 2026-01-30  | Editorial update (licensing and reuse clarification) |
+| `1.1`   | 2026-06-10  | Updated version as outcome of topic refinement round |
+| `1.2`   | 2026-08-04 | Update to align with changes introduced by CIR (EU) 2026/1730 |
+| `1.2.1` | 2026-08-05 | Fix to new attribute naming and reverting removal of providedAttestation attribute |
 
 ## Notational Conventions
 
@@ -104,8 +105,9 @@ For guidance on the data format of each information attribute, the table rows co
 | 13. | Sub Entitlements | With regard to paragraph 12, point (c), Member States may provide additional sub-entitlements to state which attestations a specific non-qualified issuer of electronic attestation of attributes shall issue. | `WalletRelyingPartyService.subEntitlement` |
 | 14. | Use of Intermediary | Where applicable, an indication that the wallet-relying party relies upon an intermediary acting on behalf of the relying party who intends to rely upon the wallet. | *See paragraph 15.* | Note, that the indication that the wallet-relying party relies upon an intermediary is implied by the presence of one or more `WalletRelyingPartyService.usesIntermediary` attributes. |
 | 15. | Used Intermediary  | Where applicable, an association to the intermediary that the wallet-relying party is relying upon that is acting on behalf of the relying party who intends to rely upon the wallet. | `WalletRelyingPartyService.usesIntermediary` | Note, that this attribute may only be present in case of a regular wallet-relying party, not in case of an intermediary. |
-| 16. | Served Wallet-Relying Party   | Where applicable, an association to the wallet-relying party that is relying upon the intermediary to whom the wallet-relying party access certificate has been issued and that is acting on behalf of the relying party who intends to rely upon the wallet. | `WalletRelyingPartyService.servedWRP` | 1) Note, that this attribute may only be present in case of an intermediary, not in case of a regular wallet-relying party.</br></br> 2)  The requirement for this attribute has been introduced in Annex I of CIR [(EU) 2026/1730](https://eur-lex.europa.eu/eli/reg_impl/2026/1730/oj).  |
+| 16. | Served Wallet-Relying Party Service  | Where applicable, an association to the wallet-relying party service that is relying upon the intermediary to whom the wallet-relying party access certificate has been issued and that is acting on behalf of the relying party service who intends to rely upon the wallet. | `WalletRelyingPartyService.servedWRPS` | 1) Note, that this attribute may only be present in case of an intermediary, not in case of a regular wallet-relying party.</br></br> 2)  The requirement for this attribute has been introduced in Annex I of CIR [(EU) 2026/1730](https://eur-lex.europa.eu/eli/reg_impl/2026/1730/oj).  |
 | *See Note*   | Supervisory Authority   | The competent data protection supervisory authority supervising the wallet-relying party and its intended uses. <br/>The national registry SHALL register the competent data protection supervisory authority, which is in charge of supervising the wallet-relying party, with their contact information in the mechanism offered for registering wallet-relying parties.  | `supervisoryAuthority` | 1) The legal basis for registering this information is implied by Article 5a (5) (a) (x) of [(EU) No. 910/2014](http://data.europa.eu/eli/reg/2014/910/oj) and Article 7 of [(EU) 2024/2982](http://data.europa.eu/eli/reg_impl/2024/2982/oj). </br> 2) See [TS 8](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts8-common-interface-for-reporting-of-wrp-to-dpa.md) for more information. |
+| *See Note*   | Provides Attestations   | A list of attestation types the Wallet-Relying Party Service intends to issue for Wallet Units.  | `WalletRelyingPartyService.providesAttestations` | 1) The legal basis for this attribute is [(EU) 2025/848](http://data.europa.eu/eli/reg_impl/2025/848/oj) (ANNEX I Nr. 9)), which states that "for each intended use, a list of the data, **including attestations and attributes**" shall be registered. </br></br> 2) This attribute SHALL be registered if and only if the entitlements of the Wallet-Relying Party Service are of type 'QEAA_Provider', 'Non_Q_EAA_Provider', 'PUB_EAA_Provider' or 'PID_Provider'.|
 
 ## 4. References
 
