@@ -1,33 +1,33 @@
-@startuml
-
-package "http://data.europa.eu/eudi/wrp/" {
+classDiagram
   class WalletRelyingParty {
     + tradeName: string [0..1]
     + isPSB: boolean
     + supervisoryAuthority: SupervisoryAuthority
     + registryURI: string
-    + walletRelyingPartyService: WalletRelyingPartyService [1..*]
+    + services: WalletRelyingPartyService [1..*]
   }
-  WalletRelyingParty --|> Provider
 
-class WalletRelyingPartyService {
-    + serviceTradeName: string [1..1]
-    + serviceIdentifier: string [1..1]
-    + supportURI: string [1..*]
-    + srvDescription: MultiLangString [1..*]
-    + intendedUse: IntendedUse [0..*]
-    + entitlements: string [0..*]
-    + providesAttestations: ProvidedAttestation [0..*]
-    + usesIntermediary: WalletRelyingPartyService [0..*]
-    + isIntermediary: boolean
+  class WalletRelyingPartyService {
+    + serviceTradeName string [1..1]
+    + serviceIdentifier string [0..1]
+    + supportURI string
+    + email string
+    + phone string
+    + srvDescription MultiLangString [1..*]
+    + intendedUses IntendedUse[0..*]
+    + entitlements string [0..*]
+    + subEntitlements string [0..*]
+    + providesAttestations ProvidedAttestation [0..*]
+    + usesIntermediaries WalletRelyingPartyService [0..*]
+    + isIntermediary boolean
+    + servedWRPServices string [0..*]
   }
+  
   class Provider {
-    + policy: Policy [1..*]
-    + providerType: string
-    + x5c: string [0..*]
+    +Policy policy [1..*]
+    +string providerType
+    +string x5c [0..*]
   }
-  Provider --|> LegalEntity
-
   class Policy {
     + policyURI: string
     + type: string
@@ -44,12 +44,12 @@ class WalletRelyingPartyService {
 
   class ProvidedAttestation {
     + format: string
-    + meta: string
+    + type: string
   }
 
   class Credential {
     + format: string
-    + meta: string
+    + meta: MetaType
     + claims: Claim [1..*]
   }
 
@@ -82,10 +82,22 @@ class WalletRelyingPartyService {
     + legislativeIdentifier: string
     + legalBasis: string [0..*]
   }
-  
+
   class MultiLangString {
     + lang: string
     + content: string
+  }
+
+  class MetaType {
+     <<abstract>>
+  }
+
+  class DcSdJwtMeta {
+    + List~String~ vct_values
+  }
+
+  class MsoMdocMeta {
+    + String doctype_value
   }
 
   class SupervisoryAuthority {
@@ -102,9 +114,11 @@ class WalletRelyingPartyService {
     + dateOfBirth: string [0..1]
     + placeOfBirth: string [0..1]
   }
-
+  end
+  WalletRelyingParty --|> Provider : inherits
+  Provider --|> LegalEntity : inherits
   WalletRelyingParty -- SupervisoryAuthority : supervised by
-  WalletRelyingParty -- walletRelyingPartyService : has at least one
+  WalletRelyingParty -- WalletRelyingPartyService : has at least one
   WalletRelyingPartyService -- ProvidedAttestation : may provide
   WalletRelyingPartyService -- WalletRelyingPartyService : may use intermediary
   WalletRelyingPartyService -- IntendedUse : contains
@@ -113,10 +127,11 @@ class WalletRelyingPartyService {
   IntendedUse -- Policy : has
   IntendedUse -- Credential : contains
   Credential -- Claim : contains
+  Credential -- MetaType : contains
   LegalEntity -- Identifier : identified by
   LegalEntity -- LegalPerson : may be
   LegalEntity -- NaturalPerson : may be
   LegalPerson -- Law : may be authentic source established by
   Provider -- Policy : has
-}
-@enduml
+  MetaType <|-- DcSdJwtMeta : inheritance
+  MetaType <|-- MsoMdocMeta : inheritance

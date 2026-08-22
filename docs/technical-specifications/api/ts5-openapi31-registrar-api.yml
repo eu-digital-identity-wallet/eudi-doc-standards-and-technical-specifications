@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: EUDI Wallet Relying Party Registrar API
-  version: v1.4
+  version: v1.5
 servers:
   - url: 'https://example.com/registrar'
 components:
@@ -13,8 +13,8 @@ components:
       properties:
         format:
           type: string
-        meta:
-          $ref: '#/components/schemas/MetaType'
+        type:
+          type: string
     Claim:
       type: object
       properties:
@@ -214,10 +214,11 @@ components:
         serviceIdentifier:
           type: string
         supportURI:
-          type: array
-          items:
-            type: string
-          minItems: 1
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
         srvDescription:
           type: array
           items:
@@ -225,7 +226,7 @@ components:
             minItems: 1
             items:
               $ref: '#/components/schemas/MultiLangString'
-        intendedUse:
+        intendedUses:
           type: array
           items:
             $ref: '#/components/schemas/IntendedUse'
@@ -235,18 +236,28 @@ components:
           items:
             type: string
           minItems: 0
+        subEntitlements:
+          type: array
+          items:
+            type: string
+          minItems: 0  
         providesAttestations:
           type: array
           items:
             $ref: '#/components/schemas/ProvidedAttestation'
           minItems: 0
-        usesIntermediary:
+        usesIntermediaries:
           type: array
           items:
             $ref: '#/components/schemas/WalletRelyingPartyService'
           minItems: 0
         isIntermediary:
           type: boolean
+        servedWRPServices:
+          type: array
+          items:
+            type: string
+          minItems: 0 
     WalletRelyingPartySchema:
       allOf:
         - $ref: '#/components/schemas/Provider'
@@ -260,7 +271,7 @@ components:
               type: string
             registryURI:
               type: string
-            walletRelyingPartyService:
+            services:
               type: array
               minItems: 1
               items:
@@ -374,7 +385,7 @@ paths:
           name: serviceidentifier
           schema:
             type: string
-          description: Filter by precise Service Identifier inside the WRP services array
+          description: Filter by precise Service Identifier inside the WRPServices array
         - in: query
           name: isolateService
           schema:
@@ -403,7 +414,7 @@ paths:
             type: string
           description: Filter by entitlement value
         - in: query
-          name: providesattestation
+          name: providedattestation
           schema:
             type: string
           description: Filter by provided attestation type
@@ -411,12 +422,12 @@ paths:
           name: credentialmeta
           schema:
             type: string
-          description: Filter by credentialmeta information
+          description: Filter by credential -> meta information
         - in: query
           name: credentialformat
           schema:
             type: string
-          description: Filter by WRPs that have registered given credentialformat within their intended use
+          description: Filter by WRPs that have registered given credential format within their intended use
         - in: query
           name: usesintermediary
           schema:
@@ -573,7 +584,7 @@ paths:
           name: credentialmeta
           schema:
             type: string
-          description: Filter by matching credentialMeta information
+          description: Filter by matching credential -> meta information
         - in: query
           name: policyurl
           schema:
@@ -596,4 +607,4 @@ paths:
         '400':
           description: Invalid request parameters
         '404':
-          description: Wallet Relying Party not found
+          description: Wallet Relying Party for intended use configuration not found
