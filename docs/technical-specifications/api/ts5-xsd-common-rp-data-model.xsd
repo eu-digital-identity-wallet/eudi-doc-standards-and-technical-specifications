@@ -6,7 +6,8 @@
 
     <xsd:complexType name="ProvidedAttestation">
         <xsd:sequence>
-            <xsd:element name="meta" type="tns:MetaType" minOccurs="1"/>
+            <xsd:element name="format" type="xsd:string"/>
+            <xsd:element name="type" type="xsd:string"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -37,7 +38,7 @@
             <xsd:element name="intendedUseIdentifier" type="xsd:string"/>
             <xsd:element name="createdAt" type="xsd:string"/>
             <xsd:element name="revokedAt" type="xsd:string" minOccurs="0"/>
-            <xsd:element name="credential" type="tns:ArrayOfCredential" minOccurs="1"/>
+            <xsd:element name="credentials" type="tns:ArrayOfCredential" minOccurs="1"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -132,7 +133,8 @@
     <xsd:complexType name="WalletRelyingPartyService">
         <xsd:sequence>
             <xsd:element name="entitlements" type="tns:ArrayOfString" minOccurs="0"/>
-            <xsd:element name="intendedUse" type="tns:ArrayOfIntendedUse" minOccurs="0"/>
+            <xsd:element name="subEntitlements" type="tns:ArrayOfString" minOccurs="0"/>
+            <xsd:element name="intendedUses" type="tns:ArrayOfIntendedUse" minOccurs="0"/>
             <xsd:element name="providesAttestations" type="tns:ArrayOfProvidedAttestation" minOccurs="0"/>
             <xsd:element name="srvDescription" minOccurs="1">
                 <xsd:complexType>
@@ -147,11 +149,14 @@
                     </xsd:sequence>
                 </xsd:complexType>
             </xsd:element>
-            <xsd:element name="supportURI" type="tns:ArrayOfString" minOccurs="1"/>
-            <xsd:element name="serviceIdentifier" type="xsd:string" minOccurs="1"/>
+            <xsd:element name="supportURI" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="email" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="phone" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="serviceIdentifier" type="xsd:string" minOccurs="0"/>
             <xsd:element name="serviceTradeName" type="xsd:string" minOccurs="1"/>
-            <xsd:element name="usesIntermediary" type="tns:ArrayOfWalletRelyingPartyService" minOccurs="0"/>
+            <xsd:element name="usesIntermediaries" type="tns:ArrayOfWalletRelyingPartyService" minOccurs="0"/>
             <xsd:element name="isIntermediary" type="xsd:boolean" minOccurs="1"/>
+            <xsd:element name="servedWRPServices" type="tns:ArrayOfString" minOccurs="0"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -160,10 +165,10 @@
             <xsd:extension base="tns:Provider">
                 <xsd:sequence>
                     <xsd:element name="isPSB" type="xsd:boolean" minOccurs="1"/>
-                    <xsd:element name="supervisoryAuthority" type="tns:SupervisoryAuthority" minOccurs="0"/>
+                    <xsd:element name="supervisoryAuthority" type="tns:SupervisoryAuthority" minOccurs="1"/>
                     <xsd:element name="tradeName" type="xsd:string" minOccurs="0"/>
                     <xsd:element name="registryURI" type="xsd:string"/>
-                    <xsd:element name="walletRelyingPartyService" type="tns:ArrayOfWalletRelyingPartyService" minOccurs="1"/>
+                    <xsd:element name="services" type="tns:ArrayOfWalletRelyingPartyService" minOccurs="1"/>
                 </xsd:sequence>
             </xsd:extension>
         </xsd:complexContent>
