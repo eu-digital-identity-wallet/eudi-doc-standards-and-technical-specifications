@@ -2,9 +2,32 @@ openapi: 3.1.0
 info:
   title: EUDI Wallet Relying Party Registrar API
   version: v1.5
+  description: |
+    Every operation that answers with a Wallet Relying Party or a check result can answer in two
+    forms. The caller chooses with the `Accept` request header:
+
+    - `Accept: application/json` - the payload as plain, unsigned JSON. This is the default: it
+      is also returned for `*/*`, for a missing `Accept`, and when both forms are acceptable with
+      the same quality. Might not be supported; a Registrar that does not support it answers
+      these default cases with `application/jwt`.
+    - `Accept: application/jwt` - the same payload as a JWS-signed answer (compact
+      serialisation). The `x-jku-url` response header points at the JWK Set that verifies the
+      signature.
+
+    Non-supported `Accept` header is answered with `406 Not Acceptable`.
+
 servers:
   - url: 'https://example.com/registrar'
 components:
+  headers:
+    JkuUrl:
+      description: URL of the JWK Set that verifies the signature. Sent with `application/jwt` answers only.
+      schema:
+        type: string
+        format: uri
+  responses:
+    NotAcceptable:
+      description: None of the media types in the `Accept` header can be served. Register always accepts `application/jwt` and additionally may accept `application/json`.
   schemas:
     WalletRelyingParty:
       $ref: '#/components/schemas/WalletRelyingPartySchema'
@@ -278,7 +301,7 @@ components:
                 $ref: '#/components/schemas/WalletRelyingPartyService'
     SignedWRP:
       type: object
-      description: The schema for the payload contained within the signed JWT response for WRP single queries/updates.
+      description: 'The schema for the payload contained within the signed JWT response for WRP single queries/updates, and of the body of the same response as plain JSON (`Accept: application/json`).'
       required:
         - iss
         - iat
@@ -295,7 +318,7 @@ components:
           $ref: '#/components/schemas/WalletRelyingParty'
     SignedWRPArray:
       type: object
-      description: The schema for the payload within the JWT response for /wrp 'get' method.
+      description: 'The schema for the payload within the JWT response for /wrp ''get'' method, and of the body of the same response as plain JSON (`Accept: application/json`).'
       required:
         - iss
         - iat
@@ -323,7 +346,7 @@ components:
               description: Whether there is a next page of results.
     SignedIntendedUseCheckResult:
       type: object
-      description: The schema for the payload within the JWT response for /wrp/check-intended-use 'get' method
+      description: 'The schema for the payload within the JWT response for /wrp/check-intended-use ''get'' method, and of the body of the same response as plain JSON (`Accept: application/json`).'
       required:
         - iss
         - iat
@@ -357,21 +380,25 @@ paths:
               $ref: '#/components/schemas/WalletRelyingParty'
       responses:
         '200':
-          description: Successfully updated Wallet Relying Party as a JWS-signed object
+          description: Successfully updated Wallet Relying Party, JWS-signed or as plain JSON depending on `Accept`
           headers:
             x-jku-url:
-              schema:
-                type: string
-                format: uri
+              $ref: '#/components/headers/JkuUrl'
           content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignedWRP'
             application/jwt:
               schema:
                 type: string
                 format: JWS
+                description: Payload conforms to 'SignedWRP'
         '400':
           description: Invalid request payload
         '404':
           description: Wallet Relying Party not found
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
     get:
       summary: 'Get a list of Wallet Relying Parties (with optional filtering, isolation, and pagination)'
       description: Returns a list of matching Wallet Relying Parties. If `serviceIdentifier` is provided  along side `isolateService=true`, the returned parent records will have their  `walletRelyingPartyService` arrays filtered down to contain only the matching service instance.
@@ -456,13 +483,14 @@ paths:
           description: use cursor-based pagination
       responses:
         '200':
-          description: JWS-signed list of matching Wallet Relying Party objects (potentially service-isolated)
+          description: List of matching Wallet Relying Party objects (potentially service-isolated), JWS-signed or as plain JSON depending on `Accept`
           headers:
             x-jku-url:
-              schema:
-                type: string
-                format: uri
+              $ref: '#/components/headers/JkuUrl'
           content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignedWRPArray'
             application/jwt:
               schema:
                 type: string
@@ -472,10 +500,12 @@ paths:
           description: Invalid request payload
         '404':
           description: Wallet Relying Party not found
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
   /wrp/{identifier}:
     get:
       summary: Get Wallet Relying Party by identifier
-      description: Method to retrieve a WRP object as a signed JWS.
+      description: Method to retrieve a WRP object, as a signed JWS or as plain JSON depending on `Accept`.
       parameters:
         - in: path
           name: identifier
@@ -485,19 +515,23 @@ paths:
           description: The identifier of the Wallet Relying Party to retrieve
       responses:
         '200':
-          description: Found Wallet Relying Party as a JWS-signed object
+          description: Found Wallet Relying Party, JWS-signed or as plain JSON depending on `Accept`
           headers:
             x-jku-url:
-              schema:
-                type: string
-                format: uri
+              $ref: '#/components/headers/JkuUrl'
           content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignedWRP'
             application/jwt:
               schema:
                 type: string
                 format: JWS
+                description: Payload conforms to 'SignedWRP'
         '404':
           description: Wallet Relying Party not found
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
     delete:
       summary: Delete a Wallet Relying Party by identifier
       description: Atomic WRP delete method. The whole WRP object will be deleted.
@@ -533,14 +567,14 @@ paths:
           description: The specific service identifier lookup key
       responses:
         '200':
-          description: Found isolated parent record containing only the filtered service object instance
+          description: Found isolated parent record containing only the filtered service object instance, JWS-signed or as plain JSON depending on `Accept`
           headers:
             x-jku-url:
-              description: JWKS verification endpoint
-              schema:
-                type: string
-                format: uri
+              $ref: '#/components/headers/JkuUrl'
           content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignedWRP'
             application/jwt:
               schema:
                 type: string
@@ -548,12 +582,14 @@ paths:
                 description: Payload unpacks to a SignedWRP containing the parent structural keys but a singular service item.
         '404':
           description: Either the target Wallet Relying Party or the specific Service Identifier was not located.
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
       x-stoplight:
         id: ydthi4t2vlans
   /wrp/check-intended-use:
     get:
       summary: Check if a specific intended use configuration is active
-      description: Provides a JWS-signed boolean `TRUE` or `FALSE` response if the queried parameter set can be found in the Registrar's `Intended use` information
+      description: Provides a boolean `TRUE` or `FALSE` response, JWS-signed or as plain JSON depending on `Accept`, if the queried parameter set can be found in the Registrar's `Intended use` information
       parameters:
         - in: query
           name: identifier
@@ -593,18 +629,22 @@ paths:
           description: Filter by registered privacy policy URI
       responses:
         '200':
-          description: Intended use check result as a JWS-signed object
+          description: Intended use check result, JWS-signed or as plain JSON depending on `Accept`
           headers:
             x-jku-url:
-              schema:
-                type: string
-                format: uri
+              $ref: '#/components/headers/JkuUrl'
           content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignedIntendedUseCheckResult'
             application/jwt:
               schema:
                 type: string
                 format: JWS
+                description: Payload conforms to 'SignedIntendedUseCheckResult'
         '400':
           description: Invalid request parameters
         '404':
           description: Wallet Relying Party for intended use configuration not found
+        '406':
+          $ref: '#/components/responses/NotAcceptable'
