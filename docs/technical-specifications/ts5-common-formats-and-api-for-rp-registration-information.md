@@ -34,6 +34,7 @@ The full licence text is available at:
 | `1.3`   | 13.02.2026  | Substantial updates to data class structures (new SupervisoryAuthority and ProvidedAttestation classes) and existing attribute naming and cardinality changes.     |
 | `1.4`   | 15.07.2026  | Introducing new WalletRelyingPartyService data class and Relying Party Service Identifier, moving of some existing attributes to this class. API query response and methods changes adjusted to new WRP Service concept.  |
 | `1.5`   | 20.08.2026  | Alignment with changes introduced in EU 2026/1730, cardinality and UML fixes to issues introduced in version 1.4.  |
+| `1.6`   | 30.09.2026  | Interoperability-improving fixes based on feedback from EE implementation team, new ServiceReference class, mechanism to register a policy as an attestation provider  |
 
 ## 1. Introduction and Overview
 
@@ -85,13 +86,15 @@ The top-level class of the data model is **WalletRelyingParty**, which
   - **SupervisoryAuthority**
   - **ProvidedAttestation**
   - **MetaType**
+  - **ServiceReference**
   
-- depends on following auxiliary classes of the [Provider information specification]:
+- depends on following auxiliary classes of the [Provider information specification] and [Specification of interfaces and formats for the catalogue of attributes and the catalogue of attestations]:
   - **Identifier**
   - **Policy**
   - **LegalPerson**
   - **NaturalPerson**
   - **Law**
+  - **TrustAuthority**
 
 The information present in the issued Wallet-Relying Party Registration Certificates (issuance of RPRC is done separately for each Intended use of a Wallet-Relying Party Service), specified in \[ETSI 119 475\], is gathered from these classes.
 
@@ -106,6 +109,8 @@ superclass specified in the [Provider information specification]. In addition to
 | `isPSB` | [1..1] | *boolean* | indicates whether the Wallet-Relying Party **is a public sector body** or not. The attribute SHALL be provided and be set to `FALSE` if registered entity is not a public sector body.  |
 | `supervisoryAuthority` | [1..1] | [*SupervisoryAuthority*](#247-supervisoryauthority) | specifies the competent **data protection supervisory authority** according to Article 51 of [(EU) 2016/679](http://data.europa.eu/eli/reg/2016/679/oj) in charge of supervising the Wallet-Relying Party. It provides the necessary contact information towards the Data Protection Authority through its `email`, `phone` and/or `formURI` attributes, of which at least one SHALL be provided for an DPA registered into a Member State Registry. |
 | `registryURI` | [1..1] | *string* | URI for the national registry API of the registered Wallet-Relying Party. The national Registrar SHALL provide this information upon registration. For other Registrar-provided data, see also `intendedUseIdentifier` in the [`IntendedUse`](#244-intendeduse) class. |
+| `createdAt` | [1..1] | *string* | Validity start date for the registration data of the Wallet-Relying Party in [ISO8601‑1] YYYY-MM-DD format. |
+| `revokedAt` | [0..1] | *string* | Revocation date of Wallet-Relying Party registration information in[ISO8601‑1] YYYY-MM-DD format. Registration MAY be revoked by the Wallet-Relying Party or by the Registrar for reasons defined in [Regulation] and [CIR for Relying Party Registration]. *Note that the [CIR for Relying Party Registration] requires a 10-year retention period for Wallet-Relying Party data by the applicable Registrar.* |
 | `services` | [1..*] | Array of [*WalletRelyingPartyService*](#241-walletrelyingpartyservice) objects | contains list of all individually registered services (**Wallet-Relying Party Services**) of the Wallet-Relying Party in a Member State Registry. The registered services can be queried via the Registry API behind the`registryURI`, see to the [API query methods](#322-method-description) and `serviceIdentifier` attribute in the [*WalletRelyingPartyService*](#241-walletrelyingpartyservice) class. |
 
 > Note: [Specification of Common Interface for Data Deletion Requests] adds the contact information of intended-use responsible DPA to the set of data to be registered by the Wallet-Relying Party. This information is available as OneOf[supervisoryAuthority.email, supervisoryAuthority.phone, supervisoryAuthority.formURI] if the same DPA is valid for all intended uses of the Wallet-Relying Party.
@@ -133,14 +138,21 @@ The `WalletRelyingPartyService` class is used within the [`WalletRelyingParty`](
 | `supportURI` | [0..1] | *string* | specifies the **support URI** for the Wallet-Relying Party Service. Note that Annex I (7) of [CIR for Relying Party Registration] stipulates that the Wallet-Relying Party SHALL provide detailed contact information in form of (a) a website for helpdesk and support, (b) a phone number or (c) an e-mail address pertaining to its registration and intended use of the Wallet Units (**at least one of the the listed options**). Therefore, at least one of `supportURI`, `email`, or `phone` attributes SHALL be present. |
 | `email` | [0..1] | *string* | may be present in order to specify **email address** of the Wallet-Relying Party Service according to [RFC5322](https://www.rfc-editor.org/rfc/rfc5322.html). |
 | `phone` | [0..1] | *string* | may be present in order to specify **phone number** of the Wallet-Relying Party Service starting with the ‘+’ symbol as the international code prefix and the country code, followed by numbers only as specified in [RFC2806](https://www.rfc-editor.org/rfc/rfc2806.html). |
-| `srvDescription` | [1..*] | Array of *[MultiLangString](#246-multilangstring) objects* | contains an array of arrays with **localised descriptions of the Wallet-Relying Party Service**. |
+| `srvDescription` | [1..*] | Array of *[MultiLangString](#246-multilangstring) objects* | contains an array of **localised descriptions of the Wallet-Relying Party Service**. |
 | `intendedUses` | [0..*] | Array of [*IntendedUse*](#244-intendeduse) objects | array of `IntendedUse` objects specifying the intended use cases in which the Wallet-Relying Party Service intends to rely on attestations of attributes of a Wallet User presented by a Wallet Unit. `IntendedUse` is **not required** for Wallet-Relying Party Services that are registered only to act as intermediaries. Note that attestation providers requesting attestations of attributes against their attestation provisioning service will need to register their intended use(s), as normal service providers do. |
 | `entitlements` | [0..*] | Array of *strings* | specifies the **set of entitlements** of the Wallet-Relying Party Service in form of a URI according to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986.html). Note that a Wallet-Relying Party may register a service for multiple entitlements. An attestation provider that requires presentation of another attestation during issuance of their own attestation SHALL register both as a Service_Provider and with their attestation provider entitlement in a single service registration. A pure intermediary service SHALL NOT be registered an entitlement. The following URIs are specified for the roles present in the [CIR for Relying Party Registration]: <ul><li> https://uri.etsi.org/19475/Entitlement/Service_Provider</li> <li> https://uri.etsi.org/19475/Entitlement/QEAA_Provider</li><li> https://uri.etsi.org/19475/Entitlement/Non_Q_EAA_Provider</li><li> https://uri.etsi.org/19475/Entitlement/PUB_EAA_Provider</li><li> https://uri.etsi.org/19475/Entitlement/PID_Provider</li><li> https://uri.etsi.org/19475/Entitlement/QCert_for_ESeal_Provider</li><li> https://uri.etsi.org/19475/Entitlement/QCert_for_ESig_Provider</li><li> https://uri.etsi.org/19475/Entitlement/rQSealCDs_Provider</li><li> https://uri.etsi.org/19475/Entitlement/rQSigCDs_Provider</li><li> https://uri.etsi.org/19475/Entitlement/ESig_ESeal_Creation_Provider</li></ul> |
 | `subEntitlements` | [0..*] | Array of *strings* | specifies the **sub-entitlements** of the Wallet-Relying Party Service in form of a URI according to [RFC3986](https://www.rfc-editor.org/rfc/rfc3986.html). Member States may provide additional sub-entitlements to state which attestations a specific non-qualified issuer of electronic attestation of attributes shall issue. |
-| `providesAttestations` | [0..*] | Array of [*ProvidedAttestation*](#248-providedattestation) objects | A list of referenced or self-declared attestation types the Wallet-Relying Party Service intends to issue for Wallet Units. Shall be non-empty only if any member of the `entitlements` array of the Wallet-Relying Party Service is of type QEAA_Provider, Non_Q_EAA_Provider, PUB_EAA_Provider or PID_Provider, listing the attestation type(s) (`ProvidedAttestation`) the Wallet-Relying Party Service intends to issue to Wallet Units. Referenceable attestation types are listed in a publicly available attestation catalogue, such as the one defined in [Specification of interfaces and formats for the catalogue of attributes and the catalogue of attestations]. The attribute to be referenced for a catalogued attestation type is its catalogue-assigned attestation schema URI (`SchemaMeta.Schema.uri`) |
-| `usesIntermediaries` | [0..*] | Array of [*WalletRelyingPartyservice*](#241-walletrelyingpartyservice) objects | if present, indicates **whether the Wallet-Relying Party Service depends on use of at least one intermediary** and lists the needed information (`WalletRelyingParty.WalletRelyingPartyService.serviceIdentifier`, `WalletRelyingParty.WalletRelyingPartyService.serviceTradeName` and `WalletRelyingParty.registryURI`) of the intermediaries the registered Wallet-Relying Party Service depends on. The URL to the Registrar of the intermediary is necessary as it may have different Registrar than the Wallet Relying Party Service depending on it. See [ARF Topic 52](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/annexes/annex-2/annex-2.02-high-level-requirements-by-topic.md#a2330-topic-52-relying-party-intermediaries), high-level requirements RPI_01 and RPI_07. |
+| `providesAttestations` | [0..*] | Array of [*ProvidedAttestation*](#248-providedattestation) objects | a list of referenced or self-declared attestation types the Wallet-Relying Party Service intends to issue for Wallet Units. Shall be non-empty only if any member of the `entitlements` array of the Wallet-Relying Party Service is of type QEAA_Provider, Non_Q_EAA_Provider, PUB_EAA_Provider or PID_Provider, listing the attestation type(s) (`ProvidedAttestation`) the Wallet-Relying Party Service intends to issue to Wallet Units. Referenceable attestation types are listed in a publicly available attestation catalogue, such as the one defined in [Specification of interfaces and formats for the catalogue of attributes and the catalogue of attestations](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts11-interfaces-and-formats-for-catalogue-of-attributes-and-catalogue-of-schemes.md). The attribute to be referenced for a catalogued attestation type is its catalogue-assigned attestation schema URI (`SchemaMeta.Schema.uri`). |
+| `issuerPolicies` | [0..*] | Array of [*Policy*](#249-policy-external) objects | optional object that allows for registering the privacy (or other) policies applicable when an attestation provider registers a WalletRelyingPartyService without an Intended use (has no duty to register one, if it does not request a presentation of an attestation in exchange/as a prerequisite of issuance). The registered policies SHALL be possible to be displayed localised to the User's language (locale), and localisations SHALL be provided for all official languages of Member States where the attestation is provided. The localisation, if provided through listing individual URIs for each policy language version and if intended for rendering on the EUDI Wallet Instance, SHOULD be provided in accordance with Annex E of [ETSI TS119612 V2.3.1](https://www.etsi.org/deliver/etsi_ts/119600_119699/119612/02.03.01_60/ts_119612v020301p.pdf).   *NOTES: - A registered [*Policy*] under the issuerPolicies object, when present, should be treated similar to the `IntendedUse.privacyPolicy` at issuance of the related WRP registration certificate following the [ETSI TS 119 475]. - In case of accidental duplicate registration of a privacy policy, the one within the [*IntendedUse*](#244-intendeduse) object takes always precedence.* |
+| `usesIntermediaries` | [0..*] | Array of [*ServiceReference*](#241-servicereference) objects | if present, indicates **whether the Wallet-Relying Party Service depends on use of at least one intermediary** and lists these intermediaries via the `ServiceReference` objects present in the array. See [ARF Topic 52](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/annexes/annex-2/annex-2.02-high-level-requirements-by-topic.md#a2330-topic-52-relying-party-intermediaries), high-level requirements RPI_01 and RPI_07. |
 | `isIntermediary` | [1..1] | *boolean* | indicates whether the Wallet-Relying Party Service is registered to act on-behalf of other Relying Parties (is an intermediary or not). Attribute SHALL be set to FALSE if `usesIntermediaries` attribute is present. |
-| `servedWRPServices` | [0..*] | Array of [*WalletRelyingPartyService.serviceIdentifier*] strings | Array of associated Wallet-Relying Party Services that rely upon the intermediary service that is registered to act on behalf of the Wallet-Relying Parties, each relying Wallet-Relying Party Service identified by its registered `serviceIdentifier`. | 1) Note, that this attribute may only be present and managed in case of an intermediary service, not in case of a regular Wallet-Relying Party Service.</br></br> 2)  The requirement for this attribute has been introduced in Annex I of CIR [(EU) 2026/1730](https://eur-lex.europa.eu/eli/reg_impl/2026/1730/oj). |
+| `servedWRPServices` | [0..*] | Array of [*ServiceReference*](#24-servicereference) objects | Array of associated other Wallet-Relying Party Services that rely upon the intermediary service that is registered to act on behalf of the Wallet-Relying Parties. Each relying Wallet-Relying Party Service is identified by a listed `ServiceReference` object. | 1) Note, that this attribute may only be present and managed in case of an intermediary service, not in case of a regular Wallet-Relying Party Service.</br></br> 2)  The requirement for this attribute has been introduced in Annex I of CIR [(EU) 2026/1730](https://eur-lex.europa.eu/eli/reg_impl/2026/1730/oj). |
+
+#### 2.4.1.1 Scope and Resolution of Service Identifiers
+
+The value assigned to a `serviceIdentifier` MUST be unique within the scope of its owning Wallet-Relying Party (WRP). The registry does not enforce global registry-wide uniqueness for these identifiers. Furthermore, an intermediary service may reference a service registered in a registry different of its own.  
+
+Consequently, to reference or cross-link a service belonging to any WRP (such as within the `servedWRPServices` or `usesIntermediaries` attributes), implementations MUST qualify the reference by bundling the target WRP's unique identifier (`identifier`) alongside specific target `serviceIdentifier` and target registry's URI `registryURI`. This is done by utilising the [*ServiceReference*](#24-servicereference) class.
 
 > Note: The `isIntermediary` attribute is not included into the access or registration certificate attributes mapped in [ETSI TS 119 475](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/287), thus making this attribute available for verification only via the Registrar's API. It should be included onto suitable certificate (access certificate) to help with verification of the parties involved in intermediated transactions.
 
@@ -150,7 +162,7 @@ The `Claim` class is used within the definition of the [`Credential`](#245-crede
 
 | Attribute | Multiplicity | Type | Description |
 |-----------|--------------|------|-------------|
-| `path` | [1..1] | *non-empty array of strings, nulls and non-negative integers* | a path pointer that specifies the path to a claim within the `Credential`. See [OpenID4VP] Sections 6.3. and 7. Section 7.1 specifies use of path for Credentials in sd-jwt-vc format, and Section 7.2 for Credentials in mso_mdoc format. |
+| `path` | [1..*] | *Any* (String \| Integer \| Null) | path pointer that specifies the path to a claim within the `Credential` - a non-empty array constructing the OpenID4VP claims path pointer. See [OpenID4VP] Sections 6.3. and 7. Section 7.1 specifies use of path for Credentials in sd-jwt-vc format, and Section 7.2 for Credentials in mso_mdoc format. |
 
 > Note: If the Wallet-Relying Party defines a set of expected claim/attribute values (see [OpenID4VP Section 6.3](https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#name-claims-query)) for a requested `Credential`, such are not informed as part of the Intended use registration to the Registrar.
 
@@ -160,7 +172,7 @@ The `Identifier` class is used within the definition of the `LegalEntity` superc
 
 ##### 2.4.3.1 Unique Identifier for identification of Wallet-Relying Parties
 
-The ARF Annex 2 high-level requirements on Relying Party registration and authentication - see [Topic 44](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/annexes/annex-2/annex-2-high-level-requirements.md#a2344-topic-44---relying-party-registration-certificates), [Topic 52](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/annexes/annex-2/annex-2-high-level-requirements.md#a2352-topic-52-relying-party-intermediaries), [Topic 6](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/annexes/annex-2/annex-2-high-level-requirements.md#a236-topic-6---relying-party-authentication-and-user-approval) - require a Wallet Unit to be able to both identify the Wallet-Relying Party with an unique identifier and a trade name or service name of the said Relying Party, and in the optional case that Registrar issues Registration Certificates, allow association between the Access Certificate and the Registration Certificate of a Relying Party (or between an intermediary and its End-Relying Party) based on this unique identifier.
+The ARF Annex 2 high-level requirements on Relying Party registration and authentication - see [Topic 44](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/annexes/annex-2/annex-2-high-level-requirements.md#a2344-topic-44---relying-party-registration-certificates), [Topic 52](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/annexes/annex-2/annex-2-high-level-requirements.md#a2352-topic-52-relying-party-intermediaries), [Topic 6](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/annexes/annex-2/annex-2-high-level-requirements.md#a236-topic-6---relying-party-authentication-and-user-approval) - require a Wallet Unit to be able to both identify the Wallet-Relying Party with an unique identifier and a trade name or service name of the said Relying Party, and to allow association between the Access Certificate and the Registration Certificate of a Relying Party (or between an intermediary and its End-Relying Party) based on this unique identifier.
 
 The [CIR for Relying Party Registration] Annex I (2) lists seven alternative identifiers and a wild card option (3)(h) to be registrable for a Wallet-Relying Party, of which **at least one** should be provided when registering a Wallet-Relying Party to a Registrar.
 
@@ -226,12 +238,14 @@ The `SupervisoryAuthority` class is used within the definition of the [`WalletRe
 
 #### 2.4.8 ProvidedAttestation
 
-The `ProvidedAttestation` class is used within the definition of the [`WalletRelyingPartyService`](#241-walletrelyingpartyservice) class to specify each attestation type to be provided when registered Wallet-Relying Party Service is an attestation provider. The class allows two complementary mechanisms to specify the attestation information: 1) linking to a URI that points to the attestation schema in a machine-readable catalogue (e.g., hosted in the European Commission hosted Catalogue of Attestations, see [Specification of interfaces and formats for the catalogue of attributes and the catalogue of attestations](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts11-interfaces-and-formats-for-catalogue-of-attributes-and-catalogue-of-schemes.md), or similar hosted by a member state or by private actor), or 2) in lack of a publicly accessible attestation schema and Attestation Rulebook, a self-declaration of the attestation schema via defining the attestation type through using an attestation format specific type metadata.
+The `ProvidedAttestation` class is used within the definition of the [`WalletRelyingPartyService`](#241-walletrelyingpartyservice) class to specify each attestation type to be provided when registered Wallet-Relying Party Service is an attestation provider. The class allows two complementary mechanisms to specify the attestation information: 1) linking to a URI that points to the attestation schema in a machine-readable catalogue (e.g., hosted in the European Commission hosted Catalogue of Attestations, see [Specification of interfaces and formats for the catalogue of attributes and the catalogue of attestations](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts11-interfaces-and-formats-for-catalogue-of-attributes-and-catalogue-of-schemes.md), or similar hosted by a member state or by private actor), or 2) in lack of a publicly accessible attestation schema and Attestation Rulebook, a self-declaration of the attestation schema via defining the attestation type and its trust anchors/authorities through using an attestation format specific type metadata.
 
 | Attribute | Multiplicity | Type | Description |
 |-----------|--------------|------|-------------|
 | `format`  | [1..1] | *string* | Specifies the format of the attestation. For valid values, see enumerations listed in [Specification of interfaces and formats for the catalogue of attributes and the catalogue of attestations] and [OpenID4VP] Appendix B.  |
 | `type`    | [1..1] | *string* | A string value for defining the unique attestation type. If the attestation type and full issuer metadata is available in an attestation catalogue or via the issuer service, the string value used SHALL be an URI pointing to the machine-readable attestation schema or issuer metadata. The properties of type attribute are defined per Credential Format, see [OID4VCI] Appendix [A.3.2](https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0.html#appendix-A.3.2) for SD-JWT VC format "vct" attribute, and appendix [A2.2](https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0.html#appendix-A.3.2) for ISO mdoc format "doctype" element.      |
+| `trustedAuthorities` | [0..*]   | Array of [*TrustAuthority*](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts11-interfaces-and-formats-for-catalogue-of-attributes-and-catalogue-of-schemes.md#433-trustauthority-sub-class) objects | optional array of objects that resolve to the applicable trust management scheme(s) (trust model) or trust anchor(s) of the attestation type. It SHALL be used according to the options available in [OpenID4VP Section 6.1.1](https://openid.net/specs/openid-4-verifiable-presentations-1_0-27.html#section-6.1.1). See [The European Commission Specification for interfaces and formats for the Catalogue of Attributes and the Catalogue of Attestations](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/blob/main/docs/technical-specifications/ts11-interfaces-and-formats-for-catalogue-of-attributes-and-catalogue-of-schemes.md#433-trustauthority-sub-class) for complete object description. The `trustedAuthorities` SHOULD be used with any non-catalogued attestation type with a trust model/anchor, and MAY also be used with a catalogued attestation type in case the hosting attestation catalogue has no support for machine-readable trust anchors. In case `trustedAuthorities` is found present for an attestation type both on the catalogue and the registry, the version found in the catalogue SHALL always take precedence. |
+
 
 > Note: `ProvidedAttestation` is a deduced version of the `Credential` class without the 'claims' attribute array. This allows clear separation between attestation type registrations required from registering attestation providers (just the particular attestation type they issue) and service providers (which may, e.g., list allowed "vct_values" values for the requested SD-JWT VC attestation type, including possible inherited types, and a list of claims (attributes) requested for the Intended use). Full set of claims of an provided attestation type are declared behind the attestation schema URI, referenced via the `ProvidedAttestation.type` attribute.
 
@@ -253,40 +267,28 @@ The `Law` class is used within the definition of the `LegalPerson` class and con
 
 #### 2.4.13 MetaType
 
-The `MetaType` class is used in `Credential` class. It contains either an array of strings constructing the `vct_values` array(SD-JWT VC format) or a `doctype_value` string (mdoc format).  
+The `MetaType` class is used in `Credential` class. It contains either an array of strings constructing the `vct_values` array(SD-JWT VC format) or a `doctype_value` string (mdoc format). 
+
+| Attribute | Multiplicity | Type | Description |
+|-----------|--------------|------|-------------|
+| `vct_values` | [0..*] | Array of strings | Array of "vct" values constructing the requested type path for SD-JWT VC format. Exactly one of vct_values or doctype_value SHALL be present. |
+| `doctype_value` | [0..1] | string | The doctype value string for ISO mdoc format. Exactly one of vct_values or doctype_value SHALL be present. |
+
+#### 2.4.14 ServiceReference
+
+The `ServiceReference` class is used in `WalletRelyingPartyService` class, in the context of either `usesIntermediaries` or `servedWRPServices` attribute. The object contains `WalletRelyingParty.identifier`, `WalletRelyingPartyService.serviceIdentifier` and `WalletRelyingParty.registryURI` triple to allow unique identification of a referenced Wallet-Relying party Service across the registrars. See also section [2.4.1.1](#2411-scope-and-resolution-of-service-identifiers).
+
+| Attribute | Multiplicity | Type | Description |
+|-----------|--------------|------|-------------|
+| `identifier`| [1..1] | *Identifier* | the identifier of the Wallet-Relying Party. |
+| `serviceIdentifier` | [1..1] | *string* | the identifier of the Wallet-Relying Party Service. |
+| `registryURI` | [1..1] | *string* | URI for the national registry API of the Wallet-Relying Party. |
 
 ## 3 Common Application Programming Interface
 
-### 3.1 API methods on registration and updating of Wallet-Relying Party data
+### 3.1 API methods for registrar queries (open API)
 
 #### 3.1.1 Requirements
-
-The common Registry API write methods are defined for purposes of managing the register information of Member State Registrars, and SHALL be accessible by authorised users only.
-
-#### 3.1.2 Method description
-
-path:
-`/wrp` (POST, PUT and DELETE):
-
-**POST** is for creating a new WalletRelyingParty. Method expects a request body with the WalletRelyingParty schema, and returns a `201` on success.
-
-**PUT** is for updating an existing WalletRelyingParty. Method expects a request body with the WalletRelyingParty schema, and can return `200` on success or `404` if not found.
-
-**DELETE** is for deleting of an existing WalletRelyingParty. Method expects WalletRelyingParty identifier as a parameter, and returns a `204` on success.
-
-> Note: **The harmonisation of the POST methods (means to accomplish registration of a new Wallet-Relying Party or once registered, management of its underlying Wallet-Relying Party Services) have been left for further study.** A basic method for creating a WalletRelyingParty instance at the Registrar is provided in the API specification in a commented-out section. The Registrar implementor should carefully consider the design options with write methods - some approach that works for large organisations with multiple actively managed (updated) services may be not suitable for Wallet-Relying Parties with just a single, stable service.
-
-#### 3.1.3 Authentication and authorisation
-
-The write methods SHALL be only accessible for authenticated and authorised API clients, and methods shall apply only under the authorised scope of the API client. **The national mechanisms to implement authentication and authorisation are left for the discretion of the Member States.**
-
-The applicable mechanism SHALL be documented by adding a `securitySchemes` section in `components` and a `security` section at the root level or at the path/operation level in the individual instance of the [Annex A.2](#a2-openapi-specification-normative) specification.
-
-> Note: Requirement to provide secure-by-design and high-availability API is especially valid for the methods listed here.
-
-### 3.2 API methods for registrar queries (open API)
-
-#### 3.2.1 Requirements
 
 The Registry API's read methods SHALL be open for public access.
 
@@ -305,14 +307,14 @@ Where query results match at least one wallet-relying party, the JWS-signed meth
 
 - set of information registered to matching Wallet-Relying Party (the full contents of `WalletRelyingParty` class for given instance without the `WalletRelyingParty.physicalAddress` attribute).
 
-#### 3.2.2 Method description
+#### 3.1.2 Method descriptions
 
 paths:
 `/wrp` (GET):
 
 There is a single **GET** /wrp endpoint for making parametrised queries. For this purpose, the API specification has the `parameters` section, where:
 
-- Each filterable field (`identifier`, `legalname`, `tradename`, `serviceidentifier`, `policy`, `entitlement`, `providedattestation`, `usesintermediary`, `isintermediary`, `intendeduseidentifier`, `claimpath`, `credentialmeta`, `credentialformat`) is defined as a query parameter.
+- Each filterable field (`identifier`, `legalName`, `tradeName`, `serviceIdentifier`, `policy`, `entitlement`, `providedAttestation`, `usesIntermediary`, `isIntermediary`, `intendedUseIdentifier`, `claimPath`, `credentialMeta`, `credentialFormat`) is defined as a query parameter.
 - `in: query`: Specifies that the parameter is a query parameter.
 - `name`: The name of the query parameter.
 - `schema`: Defines the data type of the query parameter (mostly `string`, with `boolean` for `isintermediary`).
@@ -320,45 +322,53 @@ There is a single **GET** /wrp endpoint for making parametrised queries. For thi
 
 If no query parameters are included, the method returns the full list of registered Wallet-Relying Parties in the Registry.
 
-In addition to the basic parameter set the endpoint includes also parameters for handling cursor-based pagination, and methods to query the Registry based on Intended use components - the seven `intendedUse` filters.
+In addition to the basic parameter set the endpoint includes also parameters for handling cursor-based pagination, and methods to query the Registry based on Intended use components - the seven `intendedUse` filters. Note that query strings with `+` character may be decoded erroneously (e.g. with `/wrp?credentialFormat=dc+sd-jwt` the format value would be decoded as `dc sd-jwt` in HTML form encoding) so implementers must use percent-encoding of the value.
 
 The API clients can make requests such as:
 
 `/wrp?identifier=someOrganisationIdentifier`
 
-`/wrp?serviceidentifier=exampleServiceIdentifier`
+`/wrp?serviceIdentifier=exampleServiceIdentifier`
 
-`/wrp?legalname=Example%20Corp`
+`/wrp?legalName=Example%20Corp`
 
 `/wrp?policy=https://example.com/policy`
 
 `/wrp?entitlement=http://data.europa.eu/eudi/entitlement/PUB_EAA_Provider`
 
-`/wrp?isintermediary=true`
+`/wrp?isIntermediary=true`
 
-`/wrp?identifier=someIdentifier&claimpath=IBAN&credentialformat=dc+sd-jwt`
+`/wrp?identifier=someIdentifier&claimPath=IBAN&credentialFormat=dc%2Bsd-jwt`
 
-And even combine multiple filters: `/wrp?legalname=Another%20Org&isintermediary=false`
+And even combine multiple filters: `/wrp?legalName=Another%20Org&isIntermediary=false`
 
-The JWS-signed response body for a successful GET `(200)` will be an array of matching `WalletRelyingParty` objects, each matching object including the `WalletRelyingPartyService` objects of this Wallet-Relying Party, if the used query parameter/parameters were related to service layer attributes. 
+The JWS-signed response body for a successful GET `(200)` will be an array of matching `WalletRelyingParty` objects, each matching object including the `WalletRelyingPartyService` objects of this Wallet-Relying Party, if the used query parameter/parameters were related to service layer attributes.
 
-In case a query is done using the `serviceidentifier` filter, the response body for a successful GET `(200)` will be `WalletRelyingParty` object including only the matching, isolated `WalletRelyingPartyService` object.
+In case a query is done using the `serviceIdentifier` filter, the response body for a successful GET `(200)` will be `WalletRelyingParty` object including only the matching, isolated `WalletRelyingPartyService` object.
+
+The JWS-signed response body for a successful GET `(200)` with no query matches will be an empty array.
 
 `/wrp/{identifier}` (GET):
 
 A parallel endpoint for the DELETE endpoint, a GET endpoint for requesting a singular `WalletRelyingParty` object for a registered Wallet-Relying Party that matches the `identifier` given in the API request. Response is a signed JWT.
 
+The JWS-signed response body for a successful GET `(200)` with no query matches will be an empty array.
+
 `/wrp/check-intended-use` (GET):
 
-A dedicated check endpoint for allowing a highly specialised endpoint for making narrowed-down `Intended use` related queries from the Registry with seven optional parameters (see the [API specification](api/ts5-openapi31-registrar-api.yml) for details). The query parameters of the basic `/wrp` endpoint can be used to have same outcome, but this endpoint provides a JWS-signed boolean `TRUE` or `FALSE` response, based on if the queried parameter set can be found in `Intended use` information among the registered `WalletRelyingPartyService` in the Registry.
+A dedicated check endpoint for allowing a highly specialised endpoint for making narrowed-down `Intended use` related queries from the Registry with seven optional parameters (see the [API specification](api/ts5-openapi31-registrar-api.yml) for details). The query parameters of the basic `/wrp` endpoint can be used to have same outcome, but this endpoint provides a JWS-signed boolean `TRUE` or `FALSE` response, based on if the queried parameter set can be found in `Intended use` information among the registered `WalletRelyingPartyService` in the Registry. The response SHALL take also into account the validity status of the intended use - in case a matching intended use is registered, but its `revokedAt` value reveals state of revocation at time of query the response SHALL be `FALSE`.
 
-`/wrp/{identifier}/services/{serviceidentifier}` (GET):
+Endpoint provides an `(404)` in case it was provided parameters that point to a non-registered intended use.
 
-An endpoint for requesting a Wallet Relying Party payload isolated to a specific serviceIdentifier of a registered `WalletRelyingPartyService`.  Retrieves the parent Wallet Relying Party record matching the '{identifier}', but slices the `walletRelyingPartyService` array down so it returns ONLY the  single service instance matching the provided `{serviceidentifier}` value.
+`/wrp/{identifier}/services/{serviceIdentifier}` (GET):
+
+An endpoint for requesting a Wallet Relying Party payload isolated to a specific serviceIdentifier of a registered `WalletRelyingPartyService`.  Retrieves the parent Wallet Relying Party record matching the '{identifier}', but slices the `walletRelyingPartyService` array down so it returns ONLY the  single service instance matching the provided `{serviceIdentifier}` value.
+
+The JWS-signed response body for a successful GET `(200)` with no query matches will be an empty array.
 
 The OpenAPI 3.1 compatible REST API methods for the above are provided in Annex A.2
 
-#### 3.2.3 Protection against DDOS attacks and accidental overuse of the GET methods
+#### 3.1.3 Protection against DDOS attacks and accidental overuse of the GET methods
 
 The API implementation SHALL take into consideration the vulnerabilities that an open, comprehensive query interface enables for both malicious or non-malicious users of the interface. First well-known vulnerability is sensitivity for Distributed Denial-of-Service (DDoS) attacks, the other valid one especially for the GET/wrp endpoint is the server load that very complex query parameter combinations from badly planned or non-intended/accidental misuse of the query mechanism can cause at the Registrar's server-side solution.
 
@@ -383,7 +393,7 @@ The implementers SHOULD consider how to limit the load of the API from perfectly
 
 The Registrar SHALL publish in their respective API documentation what limits it has configured regarding rate limits for legal use, or use of the query parameters. E.g., it could be that the API allows only 3 calls per minute from each IP address, and/or queries with total of 4 parameters (both values are examples - actual limits must be tested during the API implementation and test phases).
 
-### 4 References
+## 4 References
 
 | Reference                              | Description                                  |
 |----------------------------------------|----------------------------------------------|
@@ -406,10 +416,14 @@ The Registrar SHALL publish in their respective API documentation what limits it
 
 The file [`ts5-json-common-rp-data-model.json`](api/ts5-json-common-rp-data-model.json) contains the JSON schema definitions corresponding to the Data Model specified in [Section 2](#2-data-model) above. It is a Wallet-Relying Party Registration -specific subset of the full data model defined in [Provider information specification].
 
-### A.2 OpenAPI Specification (normative)
+### A.2 OpenAPI Specification - read-only methods (normative)
 
-The YAML file [`ts5-openapi31-registrar-api.yml`](api/ts5-openapi31-registrar-api.yml) contains the [OpenAPI](https://spec.openapis.org/oas/latest.html) specification of the JSON and REST based application programming interfaces described in [Section 3](#3-common-application-programming-interface). The API version numbering follows the TS5 version number on which it is based.
+The YAML file [`ts5-openapi31-registrar-api.yml`](api/ts5-openapi31-registrar-api.yml) contains the [OpenAPI](https://spec.openapis.org/oas/latest.html) specification of the JSON and REST based application programming interfaces described in [Section 3](#3-common-application-programming-interface). Since version 1.6 the API contains only open access (GET) methods. The API version numbering follows the TS5 version number on which it is based.
 
-### A.3 XML Schema (informative)
+### A.3 OpenAPI Specification - write methods (informative)
+
+The YAML file [`ts5-openapi31-write-api.yml`](api/ts5-openapi31-write-api.yml) contains the non-normative write-method (POST, PUT, DELETE) specific [OpenAPI](https://spec.openapis.org/oas/latest.html) specification of the JSON and REST based application programming interfaces described in specification [ts5-api-write-methods](./ts5-write-api-for-rp-registration-information.md). The write API version numbering follows the version number of [ts5-api-write-methods](./ts5-write-api-for-rp-registration-information.md).
+
+### A.4 XML Schema (informative)
 
 The file [`ts5-xsd-common-rp-data-model.xsd`](api/ts5-xsd-common-rp-data-model.xsd) contains the XML schema definitions corresponding to the Data Model specified in [Section 2](#2-data-model).

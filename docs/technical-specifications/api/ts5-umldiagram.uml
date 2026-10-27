@@ -4,6 +4,8 @@ classDiagram
     + isPSB: boolean
     + supervisoryAuthority: SupervisoryAuthority
     + registryURI: string
+    + createdAt: string
+    + revokedAt: string
     + services: WalletRelyingPartyService [1..*]
   }
 
@@ -18,15 +20,16 @@ classDiagram
     + entitlements string [0..*]
     + subEntitlements string [0..*]
     + providesAttestations ProvidedAttestation [0..*]
-    + usesIntermediaries WalletRelyingPartyService [0..*]
+    + issuerPolicies Policy [0..*]
+    + usesIntermediaries ServiceReference [0..*]
     + isIntermediary boolean
-    + servedWRPServices string [0..*]
+    + servedWRPServices ServiceReference [0..*]
   }
   
   class Provider {
     +Policy policy [1..*]
-    +string providerType
-    +string x5c [0..*]
+    +providerType: string
+    +x5c: string [0..*]
   }
   class Policy {
     + policyURI: string
@@ -36,7 +39,7 @@ classDiagram
   class IntendedUse {
     + purpose: MultiLangString [1..*]
     + privacyPolicy: Policy [1..*]
-    + intendedUseIdentifier : string
+    + intendedUseIdentifier: string
     + createdAt: string
     + revokedAt: string
     + credentials: Credential [1..*]
@@ -45,6 +48,7 @@ classDiagram
   class ProvidedAttestation {
     + format: string
     + type: string
+    + trustAuthorities: trustAuthority [0..*]
   }
 
   class Credential {
@@ -89,15 +93,14 @@ classDiagram
   }
 
   class MetaType {
-     <<abstract>>
+    + vct_values: string [0..*]
+    + doctype_value: string [0..1]
   }
 
-  class DcSdJwtMeta {
-    + List~String~ vct_values
-  }
-
-  class MsoMdocMeta {
-    + String doctype_value
+  class ServiceReference {
+    + identifier: Identifier
+    + serviceIdentifier: string
+    + registryURI: string
   }
 
   class SupervisoryAuthority {
@@ -106,6 +109,12 @@ classDiagram
     + email: string [0..*]
     + phone: string [0..*]
     + formURI: string [0..*]
+  }
+
+  class TrustAuthority {
+    + frameworkType: string
+    + value: string
+    +isLOTE: boolean
   }
 
   class NaturalPerson {
@@ -123,6 +132,9 @@ classDiagram
   WalletRelyingPartyService -- WalletRelyingPartyService : may use intermediary
   WalletRelyingPartyService -- IntendedUse : contains
   WalletRelyingPartyService -- MultiLangString : srvDescription
+  WalletRelyingPartyService -- ServiceReference : used in context of intermediaries
+  WalletRelyingPartyService -- Policy : issuerPolicies may be used by attestation provider with no intended use
+  ProvidedAttestation -- TrustAuthority : may have
   IntendedUse -- MultiLangString : purpose
   IntendedUse -- Policy : has
   IntendedUse -- Credential : contains
@@ -133,5 +145,4 @@ classDiagram
   LegalEntity -- NaturalPerson : may be
   LegalPerson -- Law : may be authentic source established by
   Provider -- Policy : has
-  MetaType <|-- DcSdJwtMeta : inheritance
-  MetaType <|-- MsoMdocMeta : inheritance
+  

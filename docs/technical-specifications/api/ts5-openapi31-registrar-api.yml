@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: EUDI Wallet Relying Party Registrar API
-  version: v1.5
+  version: v1.6
 servers:
   - url: 'https://example.com/registrar'
 components:
@@ -15,11 +15,24 @@ components:
           type: string
         type:
           type: string
+        trustAuthorities:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrustAuthority'
+          minItems: 0
     Claim:
       type: object
       properties:
         path:
-          type: string
+          type: array
+          minItems: 1
+          description: A non-empty array of strings, nulls, and non-negative integers representing the OpenID4VP claims path pointer.
+      items:
+        oneOf:
+          - type: string
+          - type: integer
+            minimum: 0
+          - type: "null"
     Credential:
       type: object
       properties:
@@ -37,8 +50,20 @@ components:
       properties:
         identifier:
           type: string
+          description: The actual identifier value
+          example: "FIFPRO.1234567-8"
         type:
           type: string
+          format: uri
+          description: The type of identifier aligned with the admissible identifier type URIs defined in TS2
+          enum:
+            - "http://data.europa.eu/eudi/id/EORI-No"
+            - "http://data.europa.eu/eudi/id/LEI"
+            - "http://data.europa.eu/eudi/id/EUID"
+            - "http://data.europa.eu/eudi/id/VATIN"
+            - "http://data.europa.eu/eudi/id/TIN"
+            - "http://data.europa.eu/eudi/id/Excise"
+          example: "http://data.europa.eu/eudi/id/EUID"
     IntendedUse:
       type: object
       properties:
@@ -66,19 +91,26 @@ components:
     Law:
       type: object
       properties:
-        lang:
+        legislativeIdentifier:
           type: string
         legalBasis:
-          type: string
+          type: array
+          items:
+            type: string
+          minItems: 0
     LegalEntity:
       type: object
       properties:
         country:
           type: string
+          pattern: '^[A-Z]{2}$' # For ISO 3166-1 alpha-2
+          example: "FI"
         email:
           type: array
           items:
             type: string
+            format: email
+            example: "support@example.com"
           minItems: 0
         identifier:
           type: array
@@ -89,6 +121,7 @@ components:
           type: array
           items:
             type: string
+            format: uri
           minItems: 0
         legalPerson:
           $ref: '#/components/schemas/LegalEntity'
@@ -102,6 +135,9 @@ components:
           type: array
           items:
             type: string
+            format: tel
+            pattern: '^\+?[1-9]\d{1,14}$' # Standard RFC 3966 / E.164 phone format enforcement
+            example: "+358401234567"
           minItems: 0
         postalAddress:
           type: array
@@ -123,30 +159,16 @@ components:
           minItems: 1
     MetaType:
       type: object
-      oneOf:
-        - $ref: '#/components/schemas/DcSdJwtMeta'
-        - $ref: '#/components/schemas/MsoMdocMeta'
-    DcSdJwtMeta:
-      title: dc_sd_jwt
-      type: object
-      required:
-        - vct_values
+      description: An object defining additional properties requested by the Verifier. Exactly one of 'vct_values' or 'doctype_value' SHALL be present.
       properties:
         vct_values:
           type: array
           items:
             type: string
-          minItems: 1
-      additionalProperties: false
-    MsoMdocMeta:
-      title: mso_mdoc
-      type: object
-      required:
-        - doctype_value
-      properties:
+          description: Array of 'vct' values used for Credentials in SD-JWT VC format.
         doctype_value:
           type: string
-      additionalProperties: false
+          description: The 'doctype' string used for Credentials in ISO mdoc format.
     MultiLangString:
       type: object
       properties:
@@ -170,6 +192,7 @@ components:
       properties:
         policyURI:
           type: string
+          format: uri
         type:
           type: string
     Provider:
@@ -179,25 +202,51 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Policy'
-          minItems: 0
+          minItems: 1
         providerType:
-          type: integer
-        x5c:
           type: string
+        x5c:
+          type: array
+          items:
+            type: string
+          minItems: 0
+    ServiceReference:
+      type: object
+      required:
+        - identifier
+        - serviceIdentifier
+        - registryURI
+      properties:
+        identifier:
+          type: array
+          items:
+            $ref: '#/components/schemas/Identifier'
+          minItems: 1
+        serviceIdentifier:
+          type: string
+          description: The locally unique service identifier assigned by the WRP.
+        registryURI:
+          type: string
+          format: uri
     SupervisoryAuthority:
       type: object
       properties:
         country:
           type: string
+          pattern: '^[A-Z]{2}$' # For ISO 3166-1 alpha-2, or use '^[A-Z]{2,3}$' if alpha-3 is permitted
+          example: "FI" 
         email:
           type: array
           items:
             type: string
+            format: email
+            example: "support@example.com"
           minItems: 0
         formURI:
           type: array
           items:
             type: string
+            format: uri
           minItems: 0
         name:
           type: string
@@ -205,7 +254,31 @@ components:
           type: array
           items:
             type: string
+            format: tel
+            pattern: '^\+?[1-9]\d{1,14}$' # Standard RFC 3966 / E.164 phone format enforcement
+            example: "+358401234567"
           minItems: 0
+      anyOf:
+        - required: [email]
+        - required: [phone]
+        - required: [formURI]
+    TrustAuthority:
+      title: TrustAuthority
+      description: Applicable trust model/framework type and identifier for attestation type.
+      type: object
+      properties:
+        frameworkType:
+          description: Trust framework type from OID4VP Section 6.1.1.
+          type: string
+          enum: [aki, etsi_tl, openid_federation]
+        value:
+          description: base64url or uri-formatted identifier according to the type.
+          type: string
+        isLOTE:
+          description: optional boolean value that is set TRUE when the applicable trust framework type is an ETSI Trusted List (etsi_tl) but the trusted list behind the value URI is a list of trusted entities (LoTE).
+          type: boolean
+      required: [frameworkType, value]
+      additionalProperties: false
     WalletRelyingPartyService:
       type: object
       properties:
@@ -215,17 +288,21 @@ components:
           type: string
         supportURI:
           type: string
+          format: uri
         email:
           type: string
+          format: email
+          example: "support@example.com"
         phone:
           type: string
+          format: tel
+          pattern: '^\+?[1-9]\d{1,14}$' # Standard RFC 3966 / E.164 phone format enforcement
+          example: "+358401234567"
         srvDescription:
           type: array
           items:
-            type: array
+            $ref: '#/components/schemas/MultiLangString'
             minItems: 1
-            items:
-              $ref: '#/components/schemas/MultiLangString'
         intendedUses:
           type: array
           items:
@@ -246,18 +323,57 @@ components:
           items:
             $ref: '#/components/schemas/ProvidedAttestation'
           minItems: 0
+        issuerPolicies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Policy'
+          minItems: 0  
         usesIntermediaries:
           type: array
           items:
-            $ref: '#/components/schemas/WalletRelyingPartyService'
+            $ref: '#/components/schemas/ServiceReference'
           minItems: 0
         isIntermediary:
           type: boolean
         servedWRPServices:
           type: array
           items:
-            type: string
-          minItems: 0 
+            $ref: '#/components/schemas/ServiceReference'
+          minItems: 0
+      anyOf:
+        - required: [supportURI]
+        - required: [email]
+        - required: [phone]
+      allOf:
+        - if:
+            properties:
+              isIntermediary:
+                const: false
+          then:
+            properties:
+              servedWRPServices:
+                maxItems: 0
+        - if:
+            properties:
+              usesIntermediaries:
+                minItems: 1
+          then:
+            properties:
+              isIntermediary:
+                const: false
+        - if:
+            properties:
+              providesAttestations:
+                minItems: 1
+          then:
+            properties:
+              entitlements:
+                contains:
+                  enum:
+                    - "QEAA_Provider"
+                    - "Non_Q_EAA_Provider"
+                    - "PUB_EAA_Provider"
+                    - "PID_Provider"
     WalletRelyingPartySchema:
       allOf:
         - $ref: '#/components/schemas/Provider'
@@ -270,6 +386,11 @@ components:
             tradeName:
               type: string
             registryURI:
+              type: string
+              format: uri
+            createdAt:
+              type: string
+            revokedAt:
               type: string
             services:
               type: array
@@ -341,37 +462,11 @@ components:
           properties:
             isRegistered:
               type: boolean
-              description: True if specified attributes match registration data.
+              description: True if specified attributes match registration data and 'revokedAt' value of the IntendedUse doesn't indicate revocation at time of query.
             details:
               type: string
 paths:
   /wrp:
-    put:
-      summary: Update an existing Wallet Relying Party
-      description: Atomic update method for managing wrp objects
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/WalletRelyingParty'
-      responses:
-        '200':
-          description: Successfully updated Wallet Relying Party as a JWS-signed object
-          headers:
-            x-jku-url:
-              schema:
-                type: string
-                format: uri
-          content:
-            application/jwt:
-              schema:
-                type: string
-                format: JWS
-        '400':
-          description: Invalid request payload
-        '404':
-          description: Wallet Relying Party not found
     get:
       summary: 'Get a list of Wallet Relying Parties (with optional filtering, isolation, and pagination)'
       description: Returns a list of matching Wallet Relying Parties. If `serviceIdentifier` is provided  along side `isolateService=true`, the returned parent records will have their  `walletRelyingPartyService` arrays filtered down to contain only the matching service instance.
@@ -380,12 +475,12 @@ paths:
           name: identifier
           schema:
             type: string
-          description: Filter by Wallet-Relying Party identifier
+          description: Filter by Wallet-Relying Party identifier (exact WalletRelyingParty.Identifier.identifier match only)
         - in: query
-          name: serviceidentifier
+          name: serviceIdentifier
           schema:
             type: string
-          description: Filter by precise Service Identifier inside the WRPServices array
+          description: Filter by precise Service Identifier inside the WRPServices array (exact WalletRelyingPartyService.serviceIdentifier match only)
         - in: query
           name: isolateService
           schema:
@@ -394,55 +489,57 @@ paths:
           description: |
             If true, and a `serviceIdentifier` match is found, the backend will strip out all  other non-matching service instances from the returned WRP objects in the `data` array.
         - in: query
-          name: legalname
+          name: legalName
           schema:
             type: string
-          description: Filter by registered legal name
+          description: Filter by registered legal name (case-insensitive substring match)
         - in: query
-          name: tradename
+          name: tradeName
           schema:
             type: string
-          description: Filter by WRP 'tradeName' or WalletRelyingPartyService 'serviceTradeName'
+          description: Filter by WRP 'tradeName' or WalletRelyingPartyService 'serviceTradeName' (case-insensitive substring match of either)
         - in: query
           name: policy
           schema:
             type: string
-          description: Filter by policy URI
+            format: uri
+          description: Filter by policy URI (matching exact Provider.policy, WalletRelyingParty.issuerPolicy and IntendedUse.privacyPolicy policyURIs)
         - in: query
           name: entitlement
           schema:
             type: string
-          description: Filter by entitlement value
+            format: uri
+          description: Filter by entitlement value (matching exact entitlement and/or subEntitlement URIs)
         - in: query
-          name: providedattestation
+          name: providedAttestation
           schema:
             type: string
-          description: Filter by provided attestation type
+          description: Filter by provided attestation type (exact match only)
         - in: query
-          name: credentialmeta
+          name: credentialMeta
           schema:
             type: string
-          description: Filter by credential -> meta information
+          description: Filter by credential -> meta object information (exact match of "vct" or "docType" value present in meta object)
         - in: query
-          name: credentialformat
+          name: credentialFormat
           schema:
             type: string
-          description: Filter by WRPs that have registered given credential format within their intended use
+          description: Filter by WRPs that have registered given credential format within their intended use (exact enumeration string match only)
         - in: query
-          name: usesintermediary
+          name: usesIntermediary
           schema:
             type: string
-          description: Filter by intermediary service matching with given 'WalletRelyingPartyService.serviceIdentifier' string
+          description: Filter by intermediary service matching with given 'WalletRelyingPartyService.serviceIdentifier' string (exact match)
         - in: query
-          name: isintermediary
+          name: isIntermediary
           schema:
             type: boolean
-          description: Filter by WRPs that have registered as an intermediary
+          description: Filter by WRPs that have registered as an intermediary (match with WalletRelyingPartyService.isIntermediary=true)
         - in: query
-          name: intendeduseidentifier
+          name: intendedUseIdentifier
           schema:
             type: string
-          description: Filter by registrar-assigned identifier of an intended use
+          description: Filter by registrar-assigned identifier of an intended use (exact IntendedUse.intendedUseIdentifier match only)
         - in: query
           name: limit
           schema:
@@ -456,7 +553,7 @@ paths:
           description: use cursor-based pagination
       responses:
         '200':
-          description: JWS-signed list of matching Wallet Relying Party objects (potentially service-isolated)
+          description: JWS-signed list of matching Wallet Relying Party objects (potentially service-isolated). A query with no match returns an empty list.
           headers:
             x-jku-url:
               schema:
@@ -471,7 +568,7 @@ paths:
         '400':
           description: Invalid request payload
         '404':
-          description: Wallet Relying Party not found
+          description: The resource does not exist
   /wrp/{identifier}:
     get:
       summary: Get Wallet Relying Party by identifier
@@ -482,10 +579,10 @@ paths:
           required: true
           schema:
             type: string
-          description: The identifier of the Wallet Relying Party to retrieve
+          description: The identifier of the Wallet Relying Party to retrieve (exact WalletRelyingParty.Identifier.identifier match)
       responses:
         '200':
-          description: Found Wallet Relying Party as a JWS-signed object
+          description: Found Wallet Relying Party as a JWS-signed object. Empty array if no matches were found.
           headers:
             x-jku-url:
               schema:
@@ -497,22 +594,7 @@ paths:
                 type: string
                 format: JWS
         '404':
-          description: Wallet Relying Party not found
-    delete:
-      summary: Delete a Wallet Relying Party by identifier
-      description: Atomic WRP delete method. The whole WRP object will be deleted.
-      parameters:
-        - in: path
-          name: identifier
-          required: true
-          schema:
-            type: string
-          description: Wallet Relying Party identifier
-      responses:
-        '204':
-          description: Wallet Relying Party successfully deleted
-        '404':
-          description: Wallet Relying Party not found
+          description: The resource does not exist
   /wrp/{identifier}/services/{serviceidentifier}:
     get:
       summary: Get Wallet Relying Party payload isolated to a specific registered Service Identifier
@@ -524,16 +606,16 @@ paths:
           required: true
           schema:
             type: string
-          description: The parent unique identifier of the Wallet Relying Party
+          description: The parent unique identifier of the Wallet Relying Party (exact match of WalletRelyingParty.Identifier.identifier)
         - in: path
-          name: serviceidentifier
+          name: serviceIdentifier
           required: true
           schema:
             type: string
-          description: The specific service identifier lookup key
+          description: The specific service identifier lookup key (exact WalletRelyingPartyService.serviceIdentifier)
       responses:
         '200':
-          description: Found isolated parent record containing only the filtered service object instance
+          description: Found isolated parent record containing only the filtered service object instance. Returns empty array if either the target Wallet Relying Party or the specific Service Identifier was not found.
           headers:
             x-jku-url:
               description: JWKS verification endpoint
@@ -547,53 +629,51 @@ paths:
                 format: JWS
                 description: Payload unpacks to a SignedWRP containing the parent structural keys but a singular service item.
         '404':
-          description: Either the target Wallet Relying Party or the specific Service Identifier was not located.
-      x-stoplight:
-        id: ydthi4t2vlans
+          description: The resource does not exist
   /wrp/check-intended-use:
     get:
-      summary: Check if a specific intended use configuration is active
-      description: Provides a JWS-signed boolean `TRUE` or `FALSE` response if the queried parameter set can be found in the Registrar's `Intended use` information
+      summary: Check if a specific intended use configuration is active 
+      description: Provides a JWS-signed boolean `TRUE` or `FALSE` response if the queried parameter set can be found in the Registrar's `Intended use` information which has not been revoked at time of the query.
       parameters:
         - in: query
           name: identifier
           schema:
             type: string
-          description: Filter by WRP identifier
+          description: Filter by WRP identifier (exact match of WalletRelyingParty.Identifier.identifier)
         - in: query
-          name: serviceidentifier
+          name: serviceIdentifier
           schema:
             type: string
-          description: Service identification filter context
+          description: Service identification filter context (exact WalletRelyingPartyService.serviceIdentifier)
         - in: query
-          name: intendeduseidentifier
+          name: intendedUseIdentifier
           schema:
             type: string
-          description: Filter by intendedUseIdentifier
+          description: Filter by intendedUseIdentifier (exact IntendedUse.intendedUseIdentifier match only)
         - in: query
-          name: credentialformat
+          name: credentialFormat
           schema:
             type: string
-          description: Filter intended uses by registered credential format
+          description: Filter intended uses by registered credential format (exact enumeration string match only)
         - in: query
-          name: claimpath
+          name: claimPath
           schema:
             type: string
-          description: Filter by registered claim paths
+          description: Filter by registered claim paths (exact Claim.path matches only)
         - in: query
-          name: credentialmeta
+          name: credentialMeta
           schema:
             type: string
-          description: Filter by matching credential -> meta information
+          description: Filter by matching credential -> meta information (exact match of "vct" or "docType" string value present in Credential.meta object)
         - in: query
-          name: policyurl
+          name: policy
           schema:
             type: string
             format: uri
-          description: Filter by registered privacy policy URI
+          description: Filter by registered privacy policy URI (exact IntendedUse.privacyPolicy policyURI match)
       responses:
         '200':
-          description: Intended use check result as a JWS-signed object
+          description: Intended use check result as a JWS-signed object. Query response rules with positive matches (200 TRUE) are provided in parameter descriptions. If no match could be found from the registry, response is 200 FALSE.
           headers:
             x-jku-url:
               schema:
@@ -606,5 +686,3 @@ paths:
                 format: JWS
         '400':
           description: Invalid request parameters
-        '404':
-          description: Wallet Relying Party for intended use configuration not found

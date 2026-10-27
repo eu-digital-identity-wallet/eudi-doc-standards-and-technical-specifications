@@ -8,12 +8,37 @@
         <xsd:sequence>
             <xsd:element name="format" type="xsd:string"/>
             <xsd:element name="type" type="xsd:string"/>
+            <xsd:element name="trustedAuthorities" type="tns:ArrayOfTrustAuthority" minOccurs="0" maxOccurs="unbounded">
+                <xsd:annotation>
+                    <xsd:documentation>Optional object(s) that resolve to the applicable trust management scheme (trust model) or trust anchor to be used</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
         </xsd:sequence>
     </xsd:complexType>
 
     <xsd:complexType name="Claim">
         <xsd:sequence>
             <xsd:element name="path" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="Claim">
+        <xsd:sequence>
+            <xsd:element name="path" minOccurs="1" maxOccurs="1">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <!-- path_item represents individual elements in the JSON array -->
+                        <xsd:element name="path_item" minOccurs="1" maxOccurs="unbounded" nillable="true">
+                            <xsd:complexType>
+                                <xsd:choice>
+                                    <xsd:element name="string_value" type="string"/>
+                                    <xsd:element name="integer_value" type="nonNegativeInteger"/>
+                                </xsd:choice>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -44,8 +69,8 @@
 
     <xsd:complexType name="Law">
         <xsd:sequence>
-            <xsd:element name="lang" type="xsd:string"/>
-            <xsd:element name="legalBasis" type="xsd:string"/>
+            <xsd:element name="legislativeIdentifier" type="xsd:string"/>
+            <xsd:element name="legalBasis" type="tns:ArrayOfString" minOccurs="0"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -55,9 +80,8 @@
             <xsd:element name="email" type="tns:ArrayOfString" minOccurs="0"/>
             <xsd:element name="identifier" type="tns:ArrayOfIdentifier" minOccurs="1"/>
             <xsd:element name="infoURI" type="tns:ArrayOfString" minOccurs="0"/>
-            <xsd:element name="legalPerson" type="tns:LegalEntity" minOccurs="0"/>
-            <xsd:element name="may_be" type="tns:ArrayOfLegalPerson" minOccurs="0"/>
-            <xsd:element name="naturalPerson" type="tns:NaturalPerson" minOccurs="0"/>
+            <xsd:element name="legalPerson" type="tns:LegalPerson" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="naturalPerson" type="tns:NaturalPerson" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="phone" type="tns:ArrayOfString" minOccurs="0"/>
             <xsd:element name="postalAddress" type="tns:ArrayOfString" minOccurs="0"/>
         </xsd:sequence>
@@ -98,10 +122,10 @@
 
     <xsd:complexType name="NaturalPerson">
         <xsd:sequence>
-            <xsd:element name="dateOfBirth" type="xsd:string"/>
+            <xsd:element name="dateOfBirth" type="xsd:string" minOccurs="0" maxOccurs="1"/>
             <xsd:element name="familyName" type="xsd:string"/>
             <xsd:element name="givenName" type="xsd:string"/>
-            <xsd:element name="placeOfBirth" type="xsd:string"/>
+            <xsd:element name="placeOfBirth" type="xsd:string" minOccurs="0" maxOccurs="1"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -114,9 +138,22 @@
 
     <xsd:complexType name="Provider">
         <xsd:sequence>
-            <xsd:element name="policy" type="tns:ArrayOfPolicy" minOccurs="0"/>
-            <xsd:element name="providerType" type="xsd:integer"/>
-            <xsd:element name="x5c" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="policy" type="tns:ArrayOfPolicy" minOccurs="1"/>
+            <xsd:element name="providerType" type="xsd:string"/>
+            <xsd:element name="x5c" type="tns:ArrayOfString" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="ServiceReference">
+        <xsd:sequence>
+            <!-- identifier is an array (minOccurs="1", maxOccurs="unbounded") of Identifier elements -->
+            <xsd:element name="identifier" type="tns:Identifier" minOccurs="1" maxOccurs="unbounded"/>
+        
+            <!-- serviceIdentifier is a required string -->
+            <xsd:element name="serviceIdentifier" type="string" minOccurs="1" maxOccurs="1"/>
+        
+            <!-- registryURI is a required URI string -->
+            <xsd:element name="registryURI" type="anyURI" minOccurs="1" maxOccurs="1"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -136,27 +173,16 @@
             <xsd:element name="subEntitlements" type="tns:ArrayOfString" minOccurs="0"/>
             <xsd:element name="intendedUses" type="tns:ArrayOfIntendedUse" minOccurs="0"/>
             <xsd:element name="providesAttestations" type="tns:ArrayOfProvidedAttestation" minOccurs="0"/>
-            <xsd:element name="srvDescription" minOccurs="1">
-                <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:element name="descriptionSet" minOccurs="0" maxOccurs="unbounded">
-                            <xsd:complexType>
-                                <xsd:sequence>
-                                    <xsd:element name="localizedString" type="tns:MultiLangString" minOccurs="1" maxOccurs="unbounded"/>
-                                </xsd:sequence>
-                            </xsd:complexType>
-                        </xsd:element>
-                    </xsd:sequence>
-                </xsd:complexType>
-            </xsd:element>
+            <xsd:element name="issuerPolicies" type="tns:ArrayOfPolicy" minOccurs="0"/>
+            <xsd:element name="srvDescription" type="tns:ArrayOfMultiLangString" minOccurs="1"/>
             <xsd:element name="supportURI" type="xsd:string" minOccurs="0"/>
             <xsd:element name="email" type="xsd:string" minOccurs="0"/>
             <xsd:element name="phone" type="xsd:string" minOccurs="0"/>
             <xsd:element name="serviceIdentifier" type="xsd:string" minOccurs="0"/>
             <xsd:element name="serviceTradeName" type="xsd:string" minOccurs="1"/>
-            <xsd:element name="usesIntermediaries" type="tns:ArrayOfWalletRelyingPartyService" minOccurs="0"/>
+            <xsd:element name="usesIntermediaries" type="tns:ArrayOfServiceReference" minOccurs="0"/>
             <xsd:element name="isIntermediary" type="xsd:boolean" minOccurs="1"/>
-            <xsd:element name="servedWRPServices" type="tns:ArrayOfString" minOccurs="0"/>
+            <xsd:element name="servedWRPServices" type="tns:ArrayOfServiceReference" minOccurs="0"/>
         </xsd:sequence>
     </xsd:complexType>
 
@@ -168,6 +194,8 @@
                     <xsd:element name="supervisoryAuthority" type="tns:SupervisoryAuthority" minOccurs="1"/>
                     <xsd:element name="tradeName" type="xsd:string" minOccurs="0"/>
                     <xsd:element name="registryURI" type="xsd:string"/>
+                    <xsd:element name="createdAt" type="xsd:string"/>
+                    <xsd:element name="revokedAt" type="xsd:string" minOccurs="0"/>
                     <xsd:element name="services" type="tns:ArrayOfWalletRelyingPartyService" minOccurs="1"/>
                 </xsd:sequence>
             </xsd:extension>
@@ -231,6 +259,35 @@
     <xsd:complexType name="ArrayOfPolicy">
         <xsd:sequence>
             <xsd:element name="item" type="tns:Policy" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="ArrayOfServiceReference">
+        <xsd:sequence>
+            <xsd:element name="item" type="tns:ServiceReference" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="ArrayOfTrustAuthority">
+        <xsd:annotation>
+            <xsd:documentation>Applicable trust model/framework type and identifier for attestation type</xsd:documentation>
+        </xsd:annotation>
+        <xsd:sequence>
+            <xsd:element name="frameworkType" type="tns:FrameworkType">
+                <xsd:annotation>
+                    <xsd:documentation>Trust framework type from OID4VP Section 6.1.1.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="value" type="xs:string">
+                <xsd:annotation>
+                    <xsd:documentation>base64url or uri-formatted identifier according to the type</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="isLOTE" type="xs:boolean" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>SHALL be set TRUE when framework type is an ETSI Trusted List (etsi_tl) but the trusted list behind the value URI is a list of trusted entities (LoTE)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
         </xsd:sequence>
     </xsd:complexType>
 
