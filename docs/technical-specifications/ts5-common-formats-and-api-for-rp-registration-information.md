@@ -35,6 +35,7 @@ The full licence text is available at:
 | `1.4`   | 15.07.2026  | Introducing new WalletRelyingPartyService data class and Relying Party Service Identifier, moving of some existing attributes to this class. API query response and methods changes adjusted to new WRP Service concept.  |
 | `1.5`   | 20.08.2026  | Alignment with changes introduced in EU 2026/1730, cardinality and UML fixes to issues introduced in version 1.4.  |
 | `1.6`   | 30.09.2026  | Interoperability-improving fixes based on feedback from EE implementation team, new ServiceReference class, mechanism to register a policy as an attestation provider  |
+| `1.6.1` | 10.11.2026  | Fixing OpenAPI errata found in version 1.6, addition of new attributes to track WRP Service lifecycle  |
 
 ## 1. Introduction and Overview
 
@@ -111,7 +112,7 @@ superclass specified in the [Provider information specification]. In addition to
 | `registryURI` | [1..1] | *string* | URI for the national registry API of the registered Wallet-Relying Party. The national Registrar SHALL provide this information upon registration. For other Registrar-provided data, see also `intendedUseIdentifier` in the [`IntendedUse`](#244-intendeduse) class. |
 | `createdAt` | [1..1] | *string* | Validity start date for the registration data of the Wallet-Relying Party in [ISO8601‑1] YYYY-MM-DD format. |
 | `revokedAt` | [0..1] | *string* | Revocation date of Wallet-Relying Party registration information in[ISO8601‑1] YYYY-MM-DD format. Registration MAY be revoked by the Wallet-Relying Party or by the Registrar for reasons defined in [Regulation] and [CIR for Relying Party Registration]. *Note that the [CIR for Relying Party Registration] requires a 10-year retention period for Wallet-Relying Party data by the applicable Registrar.* |
-| `services` | [1..*] | Array of [*WalletRelyingPartyService*](#241-walletrelyingpartyservice) objects | contains list of all individually registered services (**Wallet-Relying Party Services**) of the Wallet-Relying Party in a Member State Registry. The registered services can be queried via the Registry API behind the`registryURI`, see to the [API query methods](#322-method-description) and `serviceIdentifier` attribute in the [*WalletRelyingPartyService*](#241-walletrelyingpartyservice) class. |
+| `services` | [1..*] | Array of [*WalletRelyingPartyService*](#2414-servicereference) objects | contains list of all individually registered services (**Wallet-Relying Party Services**) of the Wallet-Relying Party in a Member State Registry. The registered services can be queried via the Registry API behind the`registryURI`, see to the [API query methods](#312-method-descriptions) and `serviceIdentifier` attribute in the [*WalletRelyingPartyService*](#2414-servicereference) class. |
 
 > Note: [Specification of Common Interface for Data Deletion Requests] adds the contact information of intended-use responsible DPA to the set of data to be registered by the Wallet-Relying Party. This information is available as OneOf[supervisoryAuthority.email, supervisoryAuthority.phone, supervisoryAuthority.formURI] if the same DPA is valid for all intended uses of the Wallet-Relying Party.
 
@@ -134,7 +135,7 @@ The `WalletRelyingPartyService` class is used within the [`WalletRelyingParty`](
 | Attribute | Multiplicity | Type | Description     |
 |-----------|--------------|------|-----------------|
 | `serviceTradeName` | [1..1] | *string* | shall be present in order to specify the **trade name** (common name, service name) of the Wallet-Relying Party Service. This attribute will be presented to the Wallet User in the Wallet Unit UI upon a presentation request or attestation offer and used for value matching in access and registration certificate verification process. |
-| `serviceIdentifier` | [0..1] | *string* | may be present in order to specify the identifier of the Wallet-Relying Party Service. The Wallet Relying Party may register any meaningful identifier that helps it to identify the particular service from other services registered by the Wallet-Relying Party. **If the Wallet-Relying Party relies on an intermediary, it SHALL register a serviceIdentifier**. If the Wallet-Relying Party has only one service and/or has no requirement for service-bound issuance of access certificates, and is not relying on an intermediary, registering this attribute can be omitted. |
+| `serviceIdentifier` | [1..1] | *string* | shall be present in order to specify the identifier of the Wallet-Relying Party Service. The Wallet Relying Party may register any meaningful identifier that helps it to identify the particular service from other services registered by the Wallet-Relying Party. A `serviceIdentifier` is used as a key on multiple API methods, and is required in order to update or delete a Wallet-Relying Party Service through the registry API.  |
 | `supportURI` | [0..1] | *string* | specifies the **support URI** for the Wallet-Relying Party Service. Note that Annex I (7) of [CIR for Relying Party Registration] stipulates that the Wallet-Relying Party SHALL provide detailed contact information in form of (a) a website for helpdesk and support, (b) a phone number or (c) an e-mail address pertaining to its registration and intended use of the Wallet Units (**at least one of the the listed options**). Therefore, at least one of `supportURI`, `email`, or `phone` attributes SHALL be present. |
 | `email` | [0..1] | *string* | may be present in order to specify **email address** of the Wallet-Relying Party Service according to [RFC5322](https://www.rfc-editor.org/rfc/rfc5322.html). |
 | `phone` | [0..1] | *string* | may be present in order to specify **phone number** of the Wallet-Relying Party Service starting with the ‘+’ symbol as the international code prefix and the country code, followed by numbers only as specified in [RFC2806](https://www.rfc-editor.org/rfc/rfc2806.html). |
@@ -146,7 +147,11 @@ The `WalletRelyingPartyService` class is used within the [`WalletRelyingParty`](
 | `issuerPolicies` | [0..*] | Array of [*Policy*](#249-policy-external) objects | optional object that allows for registering the privacy (or other) policies applicable when an attestation provider registers a WalletRelyingPartyService without an Intended use (has no duty to register one, if it does not request a presentation of an attestation in exchange/as a prerequisite of issuance). The registered policies SHALL be possible to be displayed localised to the User's language (locale), and localisations SHALL be provided for all official languages of Member States where the attestation is provided. The localisation, if provided through listing individual URIs for each policy language version and if intended for rendering on the EUDI Wallet Instance, SHOULD be provided in accordance with Annex E of [ETSI TS119612 V2.3.1](https://www.etsi.org/deliver/etsi_ts/119600_119699/119612/02.03.01_60/ts_119612v020301p.pdf).   *NOTES: - A registered [*Policy*] under the issuerPolicies object, when present, should be treated similar to the `IntendedUse.privacyPolicy` at issuance of the related WRP registration certificate following the [ETSI TS 119 475]. - In case of accidental duplicate registration of a privacy policy, the one within the [*IntendedUse*](#244-intendeduse) object takes always precedence.* |
 | `usesIntermediaries` | [0..*] | Array of [*ServiceReference*](#241-servicereference) objects | if present, indicates **whether the Wallet-Relying Party Service depends on use of at least one intermediary** and lists these intermediaries via the `ServiceReference` objects present in the array. See [ARF Topic 52](https://github.com/eu-digital-identity-wallet/eudi-doc-architecture-and-reference-framework/blob/main/docs/annexes/annex-2/annex-2.02-high-level-requirements-by-topic.md#a2330-topic-52-relying-party-intermediaries), high-level requirements RPI_01 and RPI_07. |
 | `isIntermediary` | [1..1] | *boolean* | indicates whether the Wallet-Relying Party Service is registered to act on-behalf of other Relying Parties (is an intermediary or not). Attribute SHALL be set to FALSE if `usesIntermediaries` attribute is present. |
-| `servedWRPServices` | [0..*] | Array of [*ServiceReference*](#24-servicereference) objects | Array of associated other Wallet-Relying Party Services that rely upon the intermediary service that is registered to act on behalf of the Wallet-Relying Parties. Each relying Wallet-Relying Party Service is identified by a listed `ServiceReference` object. | 1) Note, that this attribute may only be present and managed in case of an intermediary service, not in case of a regular Wallet-Relying Party Service.</br></br> 2)  The requirement for this attribute has been introduced in Annex I of CIR [(EU) 2026/1730](https://eur-lex.europa.eu/eli/reg_impl/2026/1730/oj). |
+| `servedWRPServices` | [0..*] | Array of [*ServiceReference*](#2414-servicereference) objects | array of associated other Wallet-Relying Party Services that rely upon the intermediary service that is registered to act on behalf of the Wallet-Relying Parties. Each relying Wallet-Relying Party Service is identified by a listed `ServiceReference` object. | 1) Note, that this attribute may only be present and managed in case of an intermediary service, not in case of a regular Wallet-Relying Party Service.</br></br> 2)  The requirement for this attribute has been introduced in Annex I of CIR [(EU) 2026/1730](https://eur-lex.europa.eu/eli/reg_impl/2026/1730/oj). |
+| `status` | [1..1] | *string* | status of the registration,  A string from the set of: `active`, `suspended` or `revoked`. |
+| `createdAt` | [1..1] | *string* | validity start date for the registration data of the Wallet-Relying Party Service in [ISO8601‑1] YYYY-MM-DD format. |
+| `suspendedAt` | [0..1] | *string* | suspension start date for the registration data of the Wallet-Relying Party Service in [ISO8601‑1] YYYY-MM-DD format. |
+| `revokedAt` | [0..1] | *string* | revocation date of Wallet-Relying Party Service registration information in[ISO8601‑1] YYYY-MM-DD format.    |
 
 #### 2.4.1.1 Scope and Resolution of Service Identifiers
 
@@ -276,11 +281,11 @@ The `MetaType` class is used in `Credential` class. It contains either an array 
 
 #### 2.4.14 ServiceReference
 
-The `ServiceReference` class is used in `WalletRelyingPartyService` class, in the context of either `usesIntermediaries` or `servedWRPServices` attribute. The object contains `WalletRelyingParty.identifier`, `WalletRelyingPartyService.serviceIdentifier` and `WalletRelyingParty.registryURI` triple to allow unique identification of a referenced Wallet-Relying party Service across the registrars. See also section [2.4.1.1](#2411-scope-and-resolution-of-service-identifiers).
+The `ServiceReference` class is used in `WalletRelyingPartyService` class, in the context of either `usesIntermediaries` or `servedWRPServices` attribute. The object contains the WRP identifier chosen to identify the Wallet-Relying Party in its access and registration certificates (according to [ETSI TS 119 475](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/287), organization idenfifier is used for a legal person, and serial number for a natural person Wallet-Relying Party) value from `WalletRelyingParty.identifier`, `WalletRelyingPartyService.serviceIdentifier` and `WalletRelyingParty.registryURI`. This triple allows unique identification of a referenced Wallet-Relying Party Service across the registrars. See also section [2.4.1.1](#2411-scope-and-resolution-of-service-identifiers).
 
 | Attribute | Multiplicity | Type | Description |
 |-----------|--------------|------|-------------|
-| `identifier`| [1..1] | *Identifier* | the identifier of the Wallet-Relying Party. |
+| `identifier`| [1..1] | *string* | the identifier of the Wallet-Relying Party used to identify the Wallet-Relying Party in its registration and access certificates, which shall follow the semantics defined in [ETSI TS 119 475](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues/287). The value SHALL be `subject organizationIdenfifier` for a legal person, or `serialNumber` for a natural person registered as a Wallet-Relying Party. |
 | `serviceIdentifier` | [1..1] | *string* | the identifier of the Wallet-Relying Party Service. |
 | `registryURI` | [1..1] | *string* | URI for the national registry API of the Wallet-Relying Party. |
 
@@ -294,7 +299,7 @@ The Registry API's read methods SHALL be open for public access.
 
 The public API SHALL provide methods for searching and querying complete data sets of registered Wallet-Relying Parties matching with provided query parameters, that can be any of:
 
-- **official or business registration number** (see `WalletRelyingParty.Identifier`) - will return data of list of matching Wallet-Relying Parties
+- **official or business registration number** (see `WalletRelyingParty.Identifier`) - will return data of list of matching Wallet-Relying Parties.
 - **official company name or trade name** (see `WalletRelyingParty.legalName` and `WalletRelyingParty.tradeName`) - will return data of list of matching Wallet-Relying Parties.
 - **URL of the Wallet-Relying Party's privacy policy** (see `WalletRelyingParty.policy` and `IntendedUse.privacyPolicy`) - will return data of list of matching Wallet-Relying Parties.
 - **type of entitlement** (see `WalletRelyingPartyService.entitlements` and `WalletRelyingPartyService.subEntitlements`) - will return data of list of Wallet-Relying Party Services matching with queried entitlement type.
@@ -317,7 +322,7 @@ There is a single **GET** /wrp endpoint for making parametrised queries. For thi
 - Each filterable field (`identifier`, `legalName`, `tradeName`, `serviceIdentifier`, `policy`, `entitlement`, `providedAttestation`, `usesIntermediary`, `isIntermediary`, `intendedUseIdentifier`, `claimPath`, `credentialMeta`, `credentialFormat`) is defined as a query parameter.
 - `in: query`: Specifies that the parameter is a query parameter.
 - `name`: The name of the query parameter.
-- `schema`: Defines the data type of the query parameter (mostly `string`, with `boolean` for `isintermediary`).
+- `schema`: Defines the data type of the query parameter (mostly `string`, with `boolean` for `isIntermediary`).
 - `description`: Provides a brief explanation of what the query parameter filters by.
 
 If no query parameters are included, the method returns the full list of registered Wallet-Relying Parties in the Registry.
@@ -350,21 +355,21 @@ The JWS-signed response body for a successful GET `(200)` with no query matches 
 
 `/wrp/{identifier}` (GET):
 
-A parallel endpoint for the DELETE endpoint, a GET endpoint for requesting a singular `WalletRelyingParty` object for a registered Wallet-Relying Party that matches the `identifier` given in the API request. Response is a signed JWT.
+A GET endpoint for requesting a singular `WalletRelyingParty` object for a registered Wallet-Relying Party that matches the `identifier` given in the API request. Response is a signed JWT.
 
-The JWS-signed response body for a successful GET `(200)` with no query matches will be an empty array.
+The response body in case of no matching WRP will be a `(404)`.
 
 `/wrp/check-intended-use` (GET):
 
-A dedicated check endpoint for allowing a highly specialised endpoint for making narrowed-down `Intended use` related queries from the Registry with seven optional parameters (see the [API specification](api/ts5-openapi31-registrar-api.yml) for details). The query parameters of the basic `/wrp` endpoint can be used to have same outcome, but this endpoint provides a JWS-signed boolean `TRUE` or `FALSE` response, based on if the queried parameter set can be found in `Intended use` information among the registered `WalletRelyingPartyService` in the Registry. The response SHALL take also into account the validity status of the intended use - in case a matching intended use is registered, but its `revokedAt` value reveals state of revocation at time of query the response SHALL be `FALSE`.
+A dedicated check endpoint for allowing a highly specialised endpoint for making narrowed-down `Intended use` related queries from the Registry with seven optional parameters (see the [API specification](api/ts5-openapi31-registrar-api.yml) for details). The query parameters of the basic `/wrp` endpoint can be used to have the same outcome, but this endpoint provides a JWS-signed boolean `200 TRUE` or `200 FALSE` response, based on if the queried parameter set can be found in `Intended use` information among the registered `WalletRelyingPartyService` in the Registry. The response SHALL take also into account the validity status of the intended use - in case a matching intended use is registered, but its `revokedAt` value reveals state of revocation at time of query the response SHALL be `200 FALSE`.
 
-Endpoint provides an `(404)` in case it was provided parameters that point to a non-registered intended use.
+Endpoint provides an `(404)` in case the queried identifier is not registered in the registry.
 
 `/wrp/{identifier}/services/{serviceIdentifier}` (GET):
 
 An endpoint for requesting a Wallet Relying Party payload isolated to a specific serviceIdentifier of a registered `WalletRelyingPartyService`.  Retrieves the parent Wallet Relying Party record matching the '{identifier}', but slices the `walletRelyingPartyService` array down so it returns ONLY the  single service instance matching the provided `{serviceIdentifier}` value.
 
-The JWS-signed response body for a successful GET `(200)` with no query matches will be an empty array.
+The response body in case of no matching WRP or Wallet-Relying Party Service will be a `(404)`.
 
 The OpenAPI 3.1 compatible REST API methods for the above are provided in Annex A.2
 
