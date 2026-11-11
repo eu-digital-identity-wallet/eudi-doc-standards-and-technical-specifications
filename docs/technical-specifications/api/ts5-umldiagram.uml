@@ -11,7 +11,7 @@ classDiagram
 
   class WalletRelyingPartyService {
     + serviceTradeName string [1..1]
-    + serviceIdentifier string [0..1]
+    + serviceIdentifier string [1..1]
     + supportURI string
     + email string
     + phone string
@@ -24,6 +24,10 @@ classDiagram
     + usesIntermediaries ServiceReference [0..*]
     + isIntermediary boolean
     + servedWRPServices ServiceReference [0..*]
+    + status: string
+    + createdAt: string
+    + suspendedAt: string
+    + revokedAt: string
   }
   
   class Provider {
@@ -48,7 +52,7 @@ classDiagram
   class ProvidedAttestation {
     + format: string
     + type: string
-    + trustAuthorities: trustAuthority [0..*]
+    + trustedAuthorities: trustAuthority [0..*]
   }
 
   class Credential {
@@ -98,7 +102,7 @@ classDiagram
   }
 
   class ServiceReference {
-    + identifier: Identifier
+    + identifier: string
     + serviceIdentifier: string
     + registryURI: string
   }

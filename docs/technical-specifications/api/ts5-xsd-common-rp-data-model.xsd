@@ -146,8 +146,8 @@
 
     <xsd:complexType name="ServiceReference">
         <xsd:sequence>
-            <!-- identifier is an array (minOccurs="1", maxOccurs="unbounded") of Identifier elements -->
-            <xsd:element name="identifier" type="tns:Identifier" minOccurs="1" maxOccurs="unbounded"/>
+            <!-- identifier is a required string for the semantic identifier of WRP -->
+            <xsd:element name="identifier" type="string" minOccurs="1" maxOccurs="1"/>
         
             <!-- serviceIdentifier is a required string -->
             <xsd:element name="serviceIdentifier" type="string" minOccurs="1" maxOccurs="1"/>
@@ -178,11 +178,15 @@
             <xsd:element name="supportURI" type="xsd:string" minOccurs="0"/>
             <xsd:element name="email" type="xsd:string" minOccurs="0"/>
             <xsd:element name="phone" type="xsd:string" minOccurs="0"/>
-            <xsd:element name="serviceIdentifier" type="xsd:string" minOccurs="0"/>
+            <xsd:element name="serviceIdentifier" type="xsd:string" minOccurs="1"/>
             <xsd:element name="serviceTradeName" type="xsd:string" minOccurs="1"/>
             <xsd:element name="usesIntermediaries" type="tns:ArrayOfServiceReference" minOccurs="0"/>
             <xsd:element name="isIntermediary" type="xsd:boolean" minOccurs="1"/>
             <xsd:element name="servedWRPServices" type="tns:ArrayOfServiceReference" minOccurs="0"/>
+            <xsd:element name="status" type="xsd:string"/>
+            <xsd:element name="createdAt" type="xsd:string"/>
+            <xsd:element name="suspendedAt" type="xsd:string" minOccurs="0"/>        
+            <xsd:element name="revokedAt" type="xsd:string" minOccurs="0"/>
         </xsd:sequence>
     </xsd:complexType>
 

@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: EUDI Wallet Relying Party Registrar API (Cleartext/JSON)
-  version: v1.6
+  version: v1.6.1
 servers:
   - url: 'https://example.com/registrar'
 components:
@@ -15,7 +15,7 @@ components:
           type: string
         type:
           type: string
-        trustAuthorities:
+        trustedAuthorities:
           type: array
           items:
             $ref: '#/components/schemas/TrustAuthority'
@@ -54,16 +54,15 @@ components:
           example: "FIFPRO.1234567-8"
         type:
           type: string
-          format: uri
-          description: The type of identifier aligned with the admissible identifier type URIs defined in TS2
-          enum:
-            - "http://data.europa.eu/eudi/id/EORI-No"
-            - "http://data.europa.eu/eudi/id/LEI"
-            - "http://data.europa.eu/eudi/id/EUID"
-            - "http://data.europa.eu/eudi/id/VATIN"
-            - "http://data.europa.eu/eudi/id/TIN"
-            - "http://data.europa.eu/eudi/id/Excise"
-          example: "http://data.europa.eu/eudi/id/EUID"
+          description: The type of identifier aligned with the admissible identifier type URIs defined in TS2. Note that there may be national scheme URIs outside TS2, and serialNumber in case of natural person as registered WRP cannot be presented via an URI.
+          examples: 
+          - "http://data.europa.eu/eudi/id/EUID" 
+          - "http://data.europa.eu/eudi/id/EORI-No" 
+          - "http://data.europa.eu/eudi/id/LEI" 
+          - "http://data.europa.eu/eudi/id/EUID" 
+          - "http://data.europa.eu/eudi/id/VATIN" 
+          - "http://data.europa.eu/eudi/id/TIN"
+          - "http://data.europa.eu/eudi/id/Excise"
     IntendedUse:
       type: object
       properties:
@@ -214,10 +213,8 @@ components:
         - registryURI
       properties:
         identifier:
-          type: array
-          items:
-            $ref: '#/components/schemas/Identifier'
-          minItems: 1
+          type: string
+          description: The organizationIdentifier or serialNumber of the WRP following semantics from ETSI TS 119 475.
         serviceIdentifier:
           type: string
           description: The locally unique service identifier assigned by the WRP.
@@ -336,6 +333,19 @@ components:
           items:
             $ref: '#/components/schemas/ServiceReference'
           minItems: 0
+        status: 
+          type: string
+          enum: [active, suspended, revoked]
+          readonly: true
+        createdAt:
+          type: string
+          readonly: true
+        suspendedAt:
+          type: string
+          readonly: true
+        revokedAt:
+          type: string
+          readonly: true
       anyOf:
         - required: [supportURI]
         - required: [email]
@@ -464,8 +474,8 @@ components:
 paths:
   /wrp:
     get:
-      summary: 'Get a list of Wallet Relying Parties (with optional filtering, isolation, and pagination)'
-      description: Returns a list of matching Wallet Relying Parties in cleartext JSON.
+      summary: 'Get a list of Wallet Relying Parties (with optional filtering and pagination)'
+      description: Returns a list of matching Wallet Relying Parties in cleartext JSON. If `serviceIdentifier` is provided and match is found, the returned parent records will have their `walletRelyingPartyService` arrays filtered down to contain only the matching service instance.
       parameters:
         - in: query
           name: identifier
@@ -477,13 +487,6 @@ paths:
           schema:
             type: string
           description: Filter by precise Service Identifier inside the WRPServices array (exact WalletRelyingPartyService.serviceIdentifier match only)
-        - in: query
-          name: isolateService
-          schema:
-            type: boolean
-            default: false
-          description: |
-            If true, and a `serviceIdentifier` match is found, the backend will strip out all other non-matching service instances from the returned WRP objects in the `data` array.
         - in: query
           name: legalName
           schema:
@@ -499,7 +502,7 @@ paths:
           schema:
             type: string
             format: uri
-          description: Filter by policy URI (matching exact Provider.policy, WalletRelyingParty.issuerPolicy and IntendedUse.privacyPolicy policyURIs)
+          description: Filter by policy URI (matching exact Provider.policy, WalletRelyingPartyService.issuerPolicies and IntendedUse.privacyPolicy policyURIs)
         - in: query
           name: entitlement
           schema:
@@ -521,6 +524,11 @@ paths:
           schema:
             type: string
           description: Filter by WRPs that have registered given credential format within their intended use (exact enumeration string match only)
+        - in: query
+          name: claimPath
+          schema:
+            type: string
+          description: Filter by registered claim paths (exact Claim.path matches only)
         - in: query
           name: usesIntermediary
           schema:
@@ -549,15 +557,13 @@ paths:
           description: use cursor-based pagination
       responses:
         '200':
-          description: Cleartext list of matching Wallet Relying Party objects.
+          description: Cleartext list of matching Wallet Relying Party objects.  A query with no match returns an empty list.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SignedWRPArray'
         '400':
           description: Invalid request payload
-        '404':
-          description: The resource does not exist
   /wrp/{identifier}:
     get:
       summary: Get Wallet Relying Party by identifier
@@ -578,7 +584,7 @@ paths:
                 $ref: '#/components/schemas/SignedWRP'
         '404':
           description: The resource does not exist
-  /wrp/{identifier}/services/{serviceidentifier}:
+  /wrp/{identifier}/services/{serviceIdentifier}:
     get:
       summary: Get Wallet Relying Party payload isolated to a specific registered Service Identifier
       description: |
@@ -655,3 +661,5 @@ paths:
                 $ref: '#/components/schemas/SignedIntendedUseCheckResult'
         '400':
           description: Invalid request parameters
+        '404':
+          description: The identifier does not exist

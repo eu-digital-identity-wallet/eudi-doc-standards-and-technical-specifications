@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: EUDI Wallet Relying Party Registrar API
-  version: v1.6
+  version: v1.6.1
 servers:
   - url: 'https://example.com/registrar'
 components:
@@ -15,7 +15,7 @@ components:
           type: string
         type:
           type: string
-        trustAuthorities:
+        trustedAuthorities:
           type: array
           items:
             $ref: '#/components/schemas/TrustAuthority'
@@ -27,12 +27,12 @@ components:
           type: array
           minItems: 1
           description: A non-empty array of strings, nulls, and non-negative integers representing the OpenID4VP claims path pointer.
-      items:
-        oneOf:
-          - type: string
-          - type: integer
-            minimum: 0
-          - type: "null"
+          items:
+            oneOf:
+              - type: string
+              - type: integer
+                minimum: 0
+              - type: "null"
     Credential:
       type: object
       properties:
@@ -54,16 +54,15 @@ components:
           example: "FIFPRO.1234567-8"
         type:
           type: string
-          format: uri
-          description: The type of identifier aligned with the admissible identifier type URIs defined in TS2
-          enum:
-            - "http://data.europa.eu/eudi/id/EORI-No"
-            - "http://data.europa.eu/eudi/id/LEI"
-            - "http://data.europa.eu/eudi/id/EUID"
-            - "http://data.europa.eu/eudi/id/VATIN"
-            - "http://data.europa.eu/eudi/id/TIN"
-            - "http://data.europa.eu/eudi/id/Excise"
-          example: "http://data.europa.eu/eudi/id/EUID"
+          description: The type of identifier aligned with the admissible identifier type URIs defined in TS2. Note that there may be national scheme URIs outside TS2, and serialNumber in case of natural person as registered WRP cannot be presented via an URI.
+          examples: 
+          - "http://data.europa.eu/eudi/id/EUID" 
+          - "http://data.europa.eu/eudi/id/EORI-No" 
+          - "http://data.europa.eu/eudi/id/LEI" 
+          - "http://data.europa.eu/eudi/id/EUID" 
+          - "http://data.europa.eu/eudi/id/VATIN" 
+          - "http://data.europa.eu/eudi/id/TIN"
+          - "http://data.europa.eu/eudi/id/Excise"
     IntendedUse:
       type: object
       properties:
@@ -79,10 +78,13 @@ components:
           minItems: 1
         intendedUseIdentifier:
           type: string
+          readonly: true
         createdAt:
           type: string
+          readonly: true
         revokedAt:
           type: string
+          readonly: true
         credentials:
           type: array
           items:
@@ -124,11 +126,7 @@ components:
             format: uri
           minItems: 0
         legalPerson:
-          $ref: '#/components/schemas/LegalEntity'
-        may be:
-          type: array
-          items:
-            $ref: '#/components/schemas/LegalPerson'
+          $ref: '#/components/schemas/LegalPerson'
         naturalPerson:
           $ref: '#/components/schemas/NaturalPerson'
         phone:
@@ -218,10 +216,8 @@ components:
         - registryURI
       properties:
         identifier:
-          type: array
-          items:
-            $ref: '#/components/schemas/Identifier'
-          minItems: 1
+          type: string
+          description: The organizationIdentifier or serialNumber of the WRP following semantics from ETSI TS 119 475.
         serviceIdentifier:
           type: string
           description: The locally unique service identifier assigned by the WRP.
@@ -340,6 +336,19 @@ components:
           items:
             $ref: '#/components/schemas/ServiceReference'
           minItems: 0
+        status: 
+          type: string
+          enum: [active, suspended, revoked]
+          readonly: true
+        createdAt:
+          type: string
+          readonly: true
+        suspendedAt:
+          type: string
+          readonly: true
+        revokedAt:
+          type: string
+          readonly: true
       anyOf:
         - required: [supportURI]
         - required: [email]
@@ -388,10 +397,13 @@ components:
             registryURI:
               type: string
               format: uri
+              readonly: true
             createdAt:
               type: string
+              readonly: true
             revokedAt:
               type: string
+              readonly: true
             services:
               type: array
               minItems: 1
@@ -468,8 +480,8 @@ components:
 paths:
   /wrp:
     get:
-      summary: 'Get a list of Wallet Relying Parties (with optional filtering, isolation, and pagination)'
-      description: Returns a list of matching Wallet Relying Parties. If `serviceIdentifier` is provided  along side `isolateService=true`, the returned parent records will have their  `walletRelyingPartyService` arrays filtered down to contain only the matching service instance.
+      summary: 'Get a list of Wallet Relying Parties (with optional filtering and pagination)'
+      description: Returns a list of matching Wallet Relying Parties. If `serviceIdentifier` is provided and match is found, the returned parent records will have their `walletRelyingPartyService` arrays filtered down to contain only the matching service instance.
       parameters:
         - in: query
           name: identifier
@@ -481,13 +493,6 @@ paths:
           schema:
             type: string
           description: Filter by precise Service Identifier inside the WRPServices array (exact WalletRelyingPartyService.serviceIdentifier match only)
-        - in: query
-          name: isolateService
-          schema:
-            type: boolean
-            default: false
-          description: |
-            If true, and a `serviceIdentifier` match is found, the backend will strip out all  other non-matching service instances from the returned WRP objects in the `data` array.
         - in: query
           name: legalName
           schema:
@@ -503,7 +508,7 @@ paths:
           schema:
             type: string
             format: uri
-          description: Filter by policy URI (matching exact Provider.policy, WalletRelyingParty.issuerPolicy and IntendedUse.privacyPolicy policyURIs)
+          description: Filter by policy URI (matching exact Provider.policy, WalletRelyingPartyService.issuerPolicies and IntendedUse.privacyPolicy policyURIs)
         - in: query
           name: entitlement
           schema:
@@ -525,6 +530,11 @@ paths:
           schema:
             type: string
           description: Filter by WRPs that have registered given credential format within their intended use (exact enumeration string match only)
+        - in: query
+          name: claimPath
+          schema:
+            type: string
+          description: Filter by registered claim paths (exact Claim.path matches only)
         - in: query
           name: usesIntermediary
           schema:
@@ -567,8 +577,6 @@ paths:
                 description: Payload conforms to 'SignedWRPArray'
         '400':
           description: Invalid request payload
-        '404':
-          description: The resource does not exist
   /wrp/{identifier}:
     get:
       summary: Get Wallet Relying Party by identifier
@@ -582,7 +590,7 @@ paths:
           description: The identifier of the Wallet Relying Party to retrieve (exact WalletRelyingParty.Identifier.identifier match)
       responses:
         '200':
-          description: Found Wallet Relying Party as a JWS-signed object. Empty array if no matches were found.
+          description: Found Wallet Relying Party as a JWS-signed object.
           headers:
             x-jku-url:
               schema:
@@ -595,7 +603,7 @@ paths:
                 format: JWS
         '404':
           description: The resource does not exist
-  /wrp/{identifier}/services/{serviceidentifier}:
+  /wrp/{identifier}/services/{serviceIdentifier}:
     get:
       summary: Get Wallet Relying Party payload isolated to a specific registered Service Identifier
       description: |
@@ -615,7 +623,7 @@ paths:
           description: The specific service identifier lookup key (exact WalletRelyingPartyService.serviceIdentifier)
       responses:
         '200':
-          description: Found isolated parent record containing only the filtered service object instance. Returns empty array if either the target Wallet Relying Party or the specific Service Identifier was not found.
+          description: Found isolated parent record containing only the filtered service object instance.
           headers:
             x-jku-url:
               description: JWKS verification endpoint
@@ -686,3 +694,5 @@ paths:
                 format: JWS
         '400':
           description: Invalid request parameters
+        '404':
+          description: The identifier does not exist
