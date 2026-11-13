@@ -448,7 +448,7 @@ Example of a `key_attestation` object:
 
 ```
 {
-  "typ": "keyattestation+jwt",
+  "typ": "key-attestation+jwt",
   "alg": "ES256",
   "x5c": ["MIIDQjCCA..."]
 }
