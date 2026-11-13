@@ -468,6 +468,7 @@ The following is a non-normative example of the KB-JWT object:
     "jti": "deeec2b0-3bea-4477-bd5d-e3462a709481",
     "nonce": "bUtJdjJESWdmTWNjb011YQ",
     "sd_hash": "Re-CtLZfjGLErKy3eSriZ4bBx3AtUH5Q5wsWiiWKIwY",
+    "response_mode": "direct_post",
     "amr": [
         {"knowledge": "passphrase_less_than_8_chars"},
         {"inherence": "fingerprint_device"}
