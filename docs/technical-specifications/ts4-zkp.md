@@ -295,17 +295,18 @@ and stored securely within the associated WSCD.
 | --- | --- |
 | [Ame2017] | Scott Ames, Carmit Hazay, Yuval Ishai,  Muthuramakrishnan Venkitasubramaniam, "Ligero: Lightweight Sublinear Arguments Without a Trusted Setup", in ACM CCS 2017
 | [Api2025] | Rutchathon Chairattana-Apirom, Franklin Harding, Anna Lysyanskaya, and Stefano Tessaro, "Server-Aided Anonymous Credentials," available at <https://eprint.iacr.org/2025/513>, 2025
-| [Bar2016] | Amira Barki, Solenn Brunet, Nicolas Desmoulins, and Jacques Traor´e, "Improved algebraic MACs and practical keyed-verification anonymous credentials," In Roberto Avanzi and Howard M. Heys, editors, SAC 2016, volume 10532 of LNCS, pages 360–380. Springer, Cham, August 2016
+| [Bar2016] | Amira Barki, Solenn Brunet, Nicolas Desmoulins, and Jacques Traor´e, "Improved algebraic MACs and practical keyed-verification anonymous credentials," In Roberto Avanzi and Howard M. Heys, editors, SAC 2016, volume 10532 of LNCS, pages 360–380. Springer, Cham, August 2016 |
 | [BBT2025] | Trust Model : Securing digital identity with advanced cryptographic algorithms, available at https://github.com/Orange-OpenSource/BBS-SHARP-doc-eudi-wallet ,  2025
 | [Des2025] | Nicolas Desmoulins, Antoine Dumanois, Seyni Kane, and Jacques Traoré, “Making BBS Anonymous Credentials eIDAS 2.0 Compliant”, Cryptology ePrint Archive, Paper 2025/619, 2025, available at <https://eprint.iacr.org/2025/619> |
 | [Topic_G] | Discussion Paper for the European Digital Identity Cooperation Group regarding Topic G: Zero Knowledge Proof, version 1.4 |
 | [BBS2004] | Boneh, Dan, Xavier Boyen, and Hovav Shacham. "Short group signatures." In Annual international cryptology conference, pp. 41-55. Berlin, Heidelberg: Springer Berlin Heidelberg, 2004. |
-| [Cel2024] | Sofia Celi, Shai Levin, and Joe Rowell, "CDLS: proving knowledge of committed discrete logarithms with soundness," Progress in Cryptology – AFRICACRYPT 2024 |
+| [Cam2016] | Jan Camenisch, Manu Drijvers, and Anja Lehmann, "Anonymous Attestation Using the Strong Diffie–Hellman Assumption Revisited." In ACM CCS 2016 |
+| [Cel2024] | Sofia Celi, Shai Levin, and Joe Rowell, "CDLS: proving knowledge of committed discrete logarithms with soundness." Progress in Cryptology – AFRICACRYPT 2024 |
 | [Cha2020] | M Chase, T Perrin, G Zaverucha "The Signal Private Group System and Anonymous Credentials Supporting Efficient Verifiable Encryption." In ACM CCS 2020 |
 | [Cha2022] | M Chase, M. Orrù, T Perrin, G Zaverucha "Proofs of discrete logarithm equality across groups." Cryptology ePrint Archive, Paper 2022/1593, 2022, available at <https://eprint.iacr.org/2022/1593>  |
 | [ETSI\_119476] | ETSI TR 119 476 V1.2.1, Electronic Signatures and Trust  Infrastructures (ESI); Analysis of selective disclosure and zero-knowledge proofs applied to Electronic Attestation of Attributes |
 | [Fri2024] | Matteo Frigo and abhi shelat, Anonymous credentials from ECDSA, Cryptology ePrint Archive, Paper 2024/2010, 2024, available at <https://eprint.iacr.org/2024/2010> |
-| [Gro2016] | Jens Groth, “On the Size of Pairing-Based Non-Interactive Arguments”, in EUROCRYPT 2016 |
+| [Gro2016] | Jens Groth, "On the Size of Pairing-Based Non-Interactive Arguments", in EUROCRYPT 2016 |
 | [Kal2022]| V Kalos, GC Polyzos, "Requirements and Secure Serialization for Selective Disclosure Verifiable Credentials", in IFIP SEC 2022
 | [Loo2025] | Tobias Looker, Vasilis Kalos, Andrew Whitehead and  Mike Lodder, "The BBS Signature Scheme," available at <https://datatracker.ietf.org/doc/draft-irtf-cfrg-bbs-signatures/>, 2025
 | [Orr2024] | Michele Orrù, Stefano Tessaro, Greg Zaverucha, Chenzhi Zhu, "Oblivious issuance of proofs", In Annual International Cryptology Conference, 2024 |
