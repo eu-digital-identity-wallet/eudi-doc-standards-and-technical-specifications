@@ -1,0 +1,101 @@
+name: Report a discrepancy
+description: Report an inconsistency, gap, ambiguity or dependency in the standards, technical specifications or Implementing Regulations of the EUDI Wallet
+title: "[Discrepancy] <Specification> - <Short description of the issue>"
+labels: ["discrepancy"]
+body:
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Report a discrepancy in the EUDI Wallet standards or Implementing Regulations
+
+        Use this form when you find a problem in a **standard or technical specification** (for example an ETSI or ISO specification referenced for the EUDI Wallet) or in a **Commission Implementing Regulation (CIR)**, or when the two do not match. You may have found it anywhere: while reading the ARF, implementing a wallet or a relying party, testing, or reviewing a draft.
+
+        We are looking for four kinds of problems:
+        - **Inconsistency**: two texts say different things, for example a standard and a CIR, or two clauses of the same standard.
+        - **Gap**: something needed to implement or test is not specified.
+        - **Ambiguity**: the text can reasonably be read in more than one way.
+        - **Dependency**: a requirement relies on another specification that is missing, outdated or not yet published.
+
+        **What happens next.** The European Commission assesses every submission and replies in this issue. If the problem is confirmed, it is tracked in the [EUDI Wallet Errata Registry](https://github.com/orgs/eu-digital-identity-wallet/projects/67/views/1), where an erratum or interim solution is published until the responsible body fixes the text.
+
+        **This form is not for** general questions, bugs in wallet apps or in the Reference Implementation, or security vulnerabilities.
+
+        Before you submit:
+        - Report one issue per ticket.
+        - Check the [Errata Registry](https://github.com/orgs/eu-digital-identity-wallet/projects/67/views/1) and the [existing issues](https://github.com/eu-digital-identity-wallet/eudi-doc-standards-and-technical-specifications/issues) to avoid duplicates.
+        - Keep the submission concise and focused on the issue.
+        - Replace the title placeholder with the standard or CIR and a short, searchable description, for example `[Discrepancy] ETSI TS 119 472-2 - Unclear encoding of the cnf claim`.
+
+  - type: dropdown
+    id: source
+    attributes:
+      label: Source
+      description: Where did you identify the issue? If you choose Other, name it in the problem statement.
+      options:
+        - Architecture and Reference Framework (ARF)
+        - Reference Implementation (RI)
+        - Functional Conformance Testing Architecture (FCAF)
+        - Standards and Technical Specifications (STS)
+        - Implementing Acts
+        - Other EUDI Wallet documentation or workstream
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected
+    attributes:
+      label: Affected standard or CIR
+      description: Name the standard or CIR, its version and the section or requirement, and any other document involved. Start each line with `- ` (dash + space).
+      placeholder: |
+        - ETSI TS 119 472-2 V1.2.1, clause 4.3.2
+        - CIR (EU) 2024/2979, Annex I, point 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: |
+        Describe the inconsistency, gap, ambiguity or dependency. Please explain:
+        - What is the issue?
+        - Why does it need to be addressed?
+        - What is its impact, if known?
+
+        Quote the relevant text where it helps.
+      placeholder: |
+        Clause 4.3.2 requires ..., while CIR (EU) 2024/2979, Annex I, point 3 requires ...
+        As a result, a wallet that follows the standard cannot ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: references
+    attributes:
+      label: Supporting references
+      description: Optional. Links, references, screenshots or examples that illustrate the issue, such as an ARF discussion, a test result or an implementation. Start each URL with `- ` (dash + space).
+      placeholder: |
+        - https://github.com/eu-digital-identity-wallet/...
+    validations:
+      required: false
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed clarification or solution
+      description: Optional. If you have a suggestion for how the issue could be addressed, include it, for example a corrected text or the interpretation you applied. Submissions without a proposal are also welcome.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Before submitting
+      options:
+        - label: I checked the Errata Registry and existing issues for duplicates.
+          required: true
+        - label: I understand this issue is public and it contains no confidential or personal data.
+          required: true
+        - label: This is not a security vulnerability. (Report vulnerabilities privately, not in a public issue.)
+          required: true
